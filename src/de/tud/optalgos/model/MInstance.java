@@ -4,7 +4,7 @@ import java.util.Set;
 
 public class MInstance {
 	
-	private Set<Rectangle> rechtangles;
+	private Set<MRectangle> rechtangles;
 	private int boxLength;
 
 }
