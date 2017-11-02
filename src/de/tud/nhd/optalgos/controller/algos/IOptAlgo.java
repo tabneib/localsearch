@@ -1,8 +1,8 @@
-package de.tud.nhd.optalgos.controller;
+package de.tud.nhd.optalgos.controller.algos;
 
 import de.tud.nhd.optalgos.model.Solution;
 
-public interface OptAlgo {
+public interface IOptAlgo {
 	
 	
 	/**
