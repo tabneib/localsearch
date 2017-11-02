@@ -1,10 +1,10 @@
-package de.tud.nhd.optalgos.model;
+package de.tud.optalgos.model;
 
 import java.util.Set;
 
 public class MInstance {
 	
-	private Set<Rechtangle> rechtangles;
+	private Set<Rectangle> rechtangles;
 	private int boxLength;
 
 }

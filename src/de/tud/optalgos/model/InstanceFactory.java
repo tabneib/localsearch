@@ -1,4 +1,4 @@
-package de.tud.nhd.optalgos.model;
+package de.tud.optalgos.model;
 
 public class InstanceFactory {
 

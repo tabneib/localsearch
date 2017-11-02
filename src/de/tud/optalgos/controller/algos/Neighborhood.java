@@ -1,10 +1,10 @@
-package de.tud.nhd.optalgos.controller.algos;
+package de.tud.optalgos.controller.algos;
 
 
 import java.util.Iterator;
 
-import de.tud.nhd.optalgos.model.Instance;
-import de.tud.nhd.optalgos.model.Solution;
+import de.tud.optalgos.model.Instance;
+import de.tud.optalgos.model.Solution;
 
 public abstract class Neighborhood implements Iterator<Solution> {
 	

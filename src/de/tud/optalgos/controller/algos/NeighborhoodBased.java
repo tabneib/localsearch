@@ -1,7 +1,7 @@
-package de.tud.nhd.optalgos.controller.algos;
+package de.tud.optalgos.controller.algos;
 
-import de.tud.nhd.optalgos.model.OptProblem;
-import de.tud.nhd.optalgos.model.Solution;
+import de.tud.optalgos.model.OptProblem;
+import de.tud.optalgos.model.Solution;
 
 public abstract class NeighborhoodBased implements IOptAlgo{
 	
