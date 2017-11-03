@@ -113,9 +113,8 @@ public class InstanceFactory {
 		MRectangle r;
 		MRectangle[] rSplit;
 		while (!maxSize.isEmpty() && 
-				maxSize.peek() >= boxLength && maxSize.peek() >= 3) {
+				maxSize.peek() >= boxLength && maxSize.peek() >= minLength * 2) {
 
-			System.out.println("maxSize               ===> " + maxSize);
 			r = getRandomRect(rectangles);
 			rectangles.remove(r);
 			maxSize.remove(r.getMaxSize());
@@ -126,7 +125,7 @@ public class InstanceFactory {
 				rSplit = randomlySplit(r, minLength);
 
 				for (int i = 0; i < 2; i++) {
-					if (rSplit[i].getMinSize() == minLength) 
+					if (rSplit[i].getMinSize() < minLength * 2) 
 						results.add(rSplit[i]);
 					else {
 						maxSize.add(rSplit[i].getMaxSize());
@@ -134,9 +133,9 @@ public class InstanceFactory {
 					}
 				}
 			}
-			System.out.println("-----------------------------------------------------");
 		}
-		return rectangles;
+		results.addAll(rectangles);
+		return results;
 	}
 	
 	
@@ -151,7 +150,6 @@ public class InstanceFactory {
 		int sum = 0;
 		for (MRectangle r : rectangles) 
 			sum = sum + r.getMaxSize();
-		//System.out.println("getRandomRect : sum ===> " + sum);
 		
 		double randomNum = Math.random() * sum;
 		
@@ -167,35 +165,39 @@ public class InstanceFactory {
 	
 	/**
 	 * 
-	 * @param rectangle
+	 * @param rect
 	 * @return
 	 */
-	private static MRectangle[] randomlySplit(MRectangle rectangle, int minLength) {
+	private static MRectangle[] randomlySplit(MRectangle rect, int minLength) {
 		MRectangle[] result = new MRectangle[2];
 		
-		double randomNum = Math.random() * (rectangle.getHeight() + rectangle.getWidth());
+		double randomNum = Math.random() * (rect.getHeight() + rect.getWidth());
 
-		if (randomNum - rectangle.getHeight() <= 0) {
+		if (randomNum - rect.getHeight() <= 0) {
 			// split horizontally
 			// minLength + 1 <= splitY <= (height - 1) 
-			int splitY = (int) (Math.random() * 
-					(rectangle.getHeight() - 1 - minLength)) + minLength;
-			result[0] = new MRectangle((int) rectangle.getX(), (int) rectangle.getY(), 
-					(int) rectangle.getWidth(), splitY, rectangle.getBoxLength());
-			result[1] = new MRectangle((int) rectangle.getX(), (int) splitY, 
-					(int) rectangle.getWidth(), (int) rectangle.getHeight() - splitY, 
-					rectangle.getBoxLength());
+			int splitY = (int) 
+					(Math.random() * (rect.getHeight() - 1 - minLength)) + minLength;
+			
+			result[0] = new MRectangle((int) rect.getX(), (int) rect.getY(), 
+					(int) rect.getWidth(), splitY, rect.getBoxLength());
+			
+			result[1] = new MRectangle((int) rect.getX(), (int) rect.getY() +  splitY, 
+					(int) rect.getWidth(), (int) rect.getHeight() - splitY, 
+					rect.getBoxLength());
 		}
 		else {
 			// split vertically
 			// minLength +1 <= splitX <= (width - 1) 
-			int splitX = (int) (Math.random() * 
-					(rectangle.getWidth() - 1 - minLength)) + minLength;
-			result[0] = new MRectangle((int) rectangle.getX(), (int) rectangle.getY(), 
-					splitX, (int) rectangle.getHeight(), rectangle.getBoxLength());
-			result[1] = new MRectangle(splitX,  (int) rectangle.getY(), 
-					(int) rectangle.getWidth() - splitX, (int) rectangle.getHeight(), 
-					rectangle.getBoxLength());
+			int splitX = (int) 
+					(Math.random() * (rect.getWidth() - 1 - minLength)) + minLength;
+			
+			result[0] = new MRectangle((int) rect.getX(), (int) rect.getY(), 
+					splitX, (int) rect.getHeight(), rect.getBoxLength());
+			
+			result[1] = new MRectangle((int) rect.getX() + splitX,  (int) rect.getY(), 
+					(int) rect.getWidth() - splitX, (int) rect.getHeight(), 
+					rect.getBoxLength());
 		}
 		return result;
 	}

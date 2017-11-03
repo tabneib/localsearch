@@ -3,10 +3,12 @@ package de.tud.optalgos.view;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.swing.JFrame;
 
+import de.tud.optalgos.model.InstanceFactory;
 import de.tud.optalgos.model.MBox;
 import de.tud.optalgos.model.MRectangle;
 
@@ -16,12 +18,12 @@ public class Test extends JFrame {
 
 	private static final int BOX_LENGTH = 500;
 	private MBox mBox;
-	private HashSet<MRectangle> mRectangles;
+	//private ArrayList<MRectangle> mRectangles;
 	
-	public Test(MBox mBox, HashSet<MRectangle> mRectangles) {
+	public Test(MBox mBox) {
 		
 		this.mBox = mBox;
-		this.mRectangles = mRectangles;
+		//this.mRectangles = mRectangles;
 		
 		setTitle("Test GUI");
 		setSize(800, 600);
@@ -34,7 +36,7 @@ public class Test extends JFrame {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.draw(mBox);
 		
-		for (MRectangle r : mRectangles) {
+		for (MRectangle r : mBox.getMRectangles()) {
 			g2.setColor(Color.CYAN);
 			g2.fill(r);
 			g2.setColor(Color.BLACK);	
@@ -44,6 +46,7 @@ public class Test extends JFrame {
 	
 	public static void main(String[] args) {
 		
+		/*
 		MRectangle r1 = new MRectangle(0, 0, 250, 250, BOX_LENGTH);
 		MRectangle r2 = new MRectangle(250, 0, 50, 50, BOX_LENGTH);
 		MRectangle r3 = new MRectangle(0, 250, 100, 100, BOX_LENGTH);
@@ -54,8 +57,13 @@ public class Test extends JFrame {
 		rectangles.add(r1);
 		rectangles.add(r2);
 		rectangles.add(r3);
+		*/
 		
-		new Test(box, rectangles);
-		
+		ArrayList<MRectangle> rectList = 
+				InstanceFactory.splitter(BOX_LENGTH, BOX_LENGTH, BOX_LENGTH / 100);
+		HashSet<MRectangle> rectSet = new HashSet<>();
+		rectSet.addAll(rectList);
+
+		new Test(new MBox(BOX_LENGTH, rectSet));
 	}
 }
