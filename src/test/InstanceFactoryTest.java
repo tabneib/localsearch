@@ -13,31 +13,53 @@ import static org.junit.Assert.*;
 
 
 public class InstanceFactoryTest {
-	
-	ArrayList<int[]> getRandomInstance_ValidInput;
+
+	ArrayList<int[]> getInstanceRandom_ValidInput;
+	ArrayList<int[]> getInstanceSplit_ValidInput;
 	
 	@Before
 	public void prepareInputs(){
-		getRandomInstance_ValidInput = new ArrayList<>();
+		getInstanceRandom_ValidInput = new ArrayList<>();
 		// amount, minLength, maxLength, boxLength
-		getRandomInstance_ValidInput.add(new int[]{1, 1, 1, 10});
-		getRandomInstance_ValidInput.add(new int[]{2, 1, 2, 10});
-		getRandomInstance_ValidInput.add(new int[]{2, 1, 10, 10});
-		getRandomInstance_ValidInput.add(new int[]{2, 9, 10, 10});
-		getRandomInstance_ValidInput.add(new int[]{2, 10, 10, 10});
-		getRandomInstance_ValidInput.add(new int[]{50, 4, 7, 10});
-		getRandomInstance_ValidInput.add(new int[]{100, 1, 10, 20});
-		getRandomInstance_ValidInput.add(new int[]{1000, 1, 100, 1000});
-		getRandomInstance_ValidInput.add(new int[]{10000, 1, 200, 1000});
+		getInstanceRandom_ValidInput.add(new int[]{1, 1, 1, 10});
+		getInstanceRandom_ValidInput.add(new int[]{2, 1, 2, 10});
+		getInstanceRandom_ValidInput.add(new int[]{2, 1, 10, 10});
+		getInstanceRandom_ValidInput.add(new int[]{2, 9, 10, 10});
+		getInstanceRandom_ValidInput.add(new int[]{2, 10, 10, 10});
+		getInstanceRandom_ValidInput.add(new int[]{50, 4, 7, 10});
+		getInstanceRandom_ValidInput.add(new int[]{100, 1, 10, 20});
+		getInstanceRandom_ValidInput.add(new int[]{1000, 1, 100, 1000});
+		getInstanceRandom_ValidInput.add(new int[]{10000, 1, 200, 1000});
+		
+		getInstanceSplit_ValidInput = new ArrayList<>();
+		// initLength, boxLength, mnLength
+		getInstanceSplit_ValidInput.add(new int[]{1, 1, 1});
+		getInstanceSplit_ValidInput.add(new int[]{2, 2, 1});
+		getInstanceSplit_ValidInput.add(new int[]{20, 10, 1});
+		getInstanceSplit_ValidInput.add(new int[]{20, 20, 1});
+		getInstanceSplit_ValidInput.add(new int[]{100, 10, 5});
+		//getInstanceSplit_ValidInput.add(new int[]{1000, 10, 5}); // Too slow
+		getInstanceSplit_ValidInput.add(new int[]{1000, 1000, 1});
+		getInstanceSplit_ValidInput.add(new int[]{1000, 500, 50});
+		getInstanceSplit_ValidInput.add(new int[]{1000, 900, 1});
 	}
 
 	
 	@Test
-	public void getRandomInstance_validOutput() {
-		for (int[] input : getRandomInstance_ValidInput) 
+	public void getInstanceRandom_validOutput() {
+		for (int[] input : getInstanceRandom_ValidInput) 
 			assertValidMInstance(InstanceFactory.
-					getRandomInstance(input[0], input[1], input[2], input[3]), 
+					getInstanceRandom(input[0], input[1], input[2], input[3]), 
 					input[3], input[1], input[3]);
+	}
+	
+	
+	@Test
+	public void getInstanceSplit_validOutput() {
+		for (int[] input : getInstanceSplit_ValidInput) 
+			assertValidMInstance(InstanceFactory.
+					getInstanceSplit(input[0], input[1], input[2]), 
+					input[1], 1, input[1]);
 	}
 
 	
@@ -84,10 +106,10 @@ public class InstanceFactoryTest {
 
 		assertEquals(expectedBoxLength, mRectangle.getBoxLength());
 		
-		assertTrue(mRectangle.height >= minLength && 
-				mRectangle.width <= maxLength &&
-				mRectangle.height <= expectedBoxLength &&
-				mRectangle.width <= expectedBoxLength);
+		assertTrue(mRectangle.height >= minLength);
+		assertTrue(mRectangle.width <= maxLength);
+		assertTrue(mRectangle.height <= expectedBoxLength);
+		assertTrue(mRectangle.width <= expectedBoxLength);
 	}
 	
 	
@@ -99,6 +121,9 @@ public class InstanceFactoryTest {
 	private void assertValidMbox(MBox mBox, int expectedBoxLength) {
 		
 		assertEquals(expectedBoxLength, mBox.getBoxLength());
+		
+		// Must not be empty
+		assertFalse(mBox.getMRectangles().isEmpty());
 		
 		// All rectangles are inside the box
 		for (MRectangle r : mBox.getMRectangles()) 
