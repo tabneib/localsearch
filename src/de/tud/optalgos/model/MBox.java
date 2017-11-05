@@ -26,4 +26,9 @@ public class MBox extends Rectangle{
 	public HashSet<MRectangle> getMRectangles() {
 		return mRectangles;
 	}
+	
+	@Override
+	public String toString() {
+		return "((" + getLocation().getX() + ", " + getLocation().getY() + "), " + this.boxLength + ")";
+	}
 }

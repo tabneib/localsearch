@@ -1,7 +1,5 @@
 package test;
 
-import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,52 +12,155 @@ import static org.junit.Assert.*;
 
 public class InstanceFactoryTest {
 
-	ArrayList<int[]> getInstanceRandom_ValidInput;
-	ArrayList<int[]> getInstanceSplit_ValidInput;
+	int[] getInstanceRandom_ValidInput1;
+	int[] getInstanceRandom_ValidInput2;
+	int[] getInstanceRandom_ValidInput3;
+	int[] getInstanceRandom_ValidInput4;
+	int[] getInstanceRandom_ValidInput5;
+	int[] getInstanceRandom_ValidInput6;
+	int[] getInstanceRandom_ValidInput7;
+	int[] getInstanceRandom_ValidInput8;
+	int[] getInstanceRandom_ValidInput9;
+	
+	int[] getInstanceSplit_ValidInput1;
+	int[] getInstanceSplit_ValidInput2;
+	int[] getInstanceSplit_ValidInput3;
+	int[] getInstanceSplit_ValidInput4;
+	int[] getInstanceSplit_ValidInput5;
+	int[] getInstanceSplit_ValidInput6;
+	int[] getInstanceSplit_ValidInput7;
+	int[] getInstanceSplit_ValidInput8;
+	int[] getInstanceSplit_ValidInput9;
+	
 	
 	@Before
 	public void prepareInputs(){
-		getInstanceRandom_ValidInput = new ArrayList<>();
 		// amount, minLength, maxLength, boxLength
-		getInstanceRandom_ValidInput.add(new int[]{1, 1, 1, 10});
-		getInstanceRandom_ValidInput.add(new int[]{2, 1, 2, 10});
-		getInstanceRandom_ValidInput.add(new int[]{2, 1, 10, 10});
-		getInstanceRandom_ValidInput.add(new int[]{2, 9, 10, 10});
-		getInstanceRandom_ValidInput.add(new int[]{2, 10, 10, 10});
-		getInstanceRandom_ValidInput.add(new int[]{50, 4, 7, 10});
-		getInstanceRandom_ValidInput.add(new int[]{100, 1, 10, 20});
-		getInstanceRandom_ValidInput.add(new int[]{1000, 1, 100, 1000});
-		getInstanceRandom_ValidInput.add(new int[]{10000, 1, 200, 1000});
+		getInstanceRandom_ValidInput1 = new int[]{1, 1, 1, 10};
+		getInstanceRandom_ValidInput2 = new int[]{2, 1, 2, 10};
+		getInstanceRandom_ValidInput3 = new int[]{2, 1, 10, 10};
+		getInstanceRandom_ValidInput4 = new int[]{2, 9, 10, 10};
+		getInstanceRandom_ValidInput5 = new int[]{2, 10, 10, 10};
+		getInstanceRandom_ValidInput6 = new int[]{50, 4, 7, 10};
+		getInstanceRandom_ValidInput7 = new int[]{100, 1, 10, 20};
+		getInstanceRandom_ValidInput8 = new int[]{1000, 1, 100, 1000};
+		getInstanceRandom_ValidInput9 = new int[]{10000, 1, 200, 1000};
 		
-		getInstanceSplit_ValidInput = new ArrayList<>();
-		// initLength, boxLength, mnLength
-		getInstanceSplit_ValidInput.add(new int[]{1, 1, 1});
-		getInstanceSplit_ValidInput.add(new int[]{2, 2, 1});
-		getInstanceSplit_ValidInput.add(new int[]{20, 10, 1});
-		getInstanceSplit_ValidInput.add(new int[]{20, 20, 1});
-		getInstanceSplit_ValidInput.add(new int[]{100, 10, 5});
-		//getInstanceSplit_ValidInput.add(new int[]{1000, 10, 5}); // Too slow
-		getInstanceSplit_ValidInput.add(new int[]{1000, 1000, 1});
-		getInstanceSplit_ValidInput.add(new int[]{1000, 500, 50});
-		getInstanceSplit_ValidInput.add(new int[]{1000, 900, 1});
+		// initLength, boxLength, minLength
+		getInstanceSplit_ValidInput1 = new int[]{1, 1, 1};
+		getInstanceSplit_ValidInput2 = new int[]{2, 2, 1};
+		getInstanceSplit_ValidInput3 = new int[]{20, 10, 1};
+		getInstanceSplit_ValidInput4 = new int[]{20, 20, 1};
+		getInstanceSplit_ValidInput5 = new int[]{20, 10, 5};
+		getInstanceSplit_ValidInput6 = new int[]{1000, 10, 5}; 
+		getInstanceSplit_ValidInput7 = new int[]{1000, 1000, 1};
+		getInstanceSplit_ValidInput8 = new int[]{1000, 500, 50};
+		getInstanceSplit_ValidInput9 = new int[]{1000, 900, 1};
 	}
 
 	
 	@Test
 	public void getInstanceRandom_validOutput() {
-		for (int[] input : getInstanceRandom_ValidInput) 
-			assertValidMInstance(InstanceFactory.
-					getInstanceRandom(input[0], input[1], input[2], input[3]), 
-					input[3], input[1], input[3]);
+		
+		int[] input;
+		input = getInstanceRandom_ValidInput1;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
+
+		input = getInstanceRandom_ValidInput2;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
+		
+		input = getInstanceRandom_ValidInput3;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
+		
+		input = getInstanceRandom_ValidInput4;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
+		
+		input = getInstanceRandom_ValidInput5;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
+		
+		input = getInstanceRandom_ValidInput6;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
+		
+		input = getInstanceRandom_ValidInput7;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
+		
+		input = getInstanceRandom_ValidInput8;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
+		
+		input = getInstanceRandom_ValidInput9;
+		assertValidMInstance(InstanceFactory.
+				getInstanceRandom(input[0], input[1], input[2], input[3]), 
+				input[3], input[1], input[3]);
 	}
 	
 	
 	@Test
 	public void getInstanceSplit_validOutput() {
-		for (int[] input : getInstanceSplit_ValidInput) 
-			assertValidMInstance(InstanceFactory.
-					getInstanceSplit(input[0], input[1], input[2]), 
-					input[1], 1, input[1]);
+		
+		// initLength, boxLength, minLength
+		int[] input;
+
+		input = getInstanceSplit_ValidInput1;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+
+		input = getInstanceSplit_ValidInput2;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+
+		input = getInstanceSplit_ValidInput3;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+
+		input = getInstanceSplit_ValidInput4;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+
+		input = getInstanceSplit_ValidInput5;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+
+		input = getInstanceSplit_ValidInput6;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+
+		input = getInstanceSplit_ValidInput7;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+
+		input = getInstanceSplit_ValidInput8;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+
+		input = getInstanceSplit_ValidInput9;
+		assertValidMInstance(InstanceFactory.
+				getInstanceSplit(input[0], input[1], input[2]), 
+				input[1], input[2], input[1]);
+		
 	}
 
 	
@@ -127,7 +228,7 @@ public class InstanceFactoryTest {
 		
 		// All rectangles are inside the box
 		for (MRectangle r : mBox.getMRectangles()) 
-			assertTrue(mBox.contains(r));
+			assertTrue(mBox.contains(r) || mBox.equals(r));
 		
 		// Rectangles do not pairwise intersect
 		for (MRectangle r1 : mBox.getMRectangles()) {

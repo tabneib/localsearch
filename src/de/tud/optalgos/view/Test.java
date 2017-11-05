@@ -16,7 +16,7 @@ public class Test extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final int BOX_LENGTH = 500;
+	private static final int INIT_LENGTH = 600;
 	private MBox mBox;
 	//private ArrayList<MRectangle> mRectangles;
 	
@@ -58,12 +58,10 @@ public class Test extends JFrame {
 		rectangles.add(r2);
 		rectangles.add(r3);
 		*/
-		
-		ArrayList<MRectangle> rectList = 
-				InstanceFactory.splitter(BOX_LENGTH, BOX_LENGTH, BOX_LENGTH / 100);
 		HashSet<MRectangle> rectSet = new HashSet<>();
-		rectSet.addAll(rectList);
+		rectSet.addAll(
+				InstanceFactory.splitter(INIT_LENGTH, INIT_LENGTH, INIT_LENGTH / 100));
 
-		new Test(new MBox(BOX_LENGTH, rectSet));
+		new Test(new MBox(INIT_LENGTH, rectSet));
 	}
 }

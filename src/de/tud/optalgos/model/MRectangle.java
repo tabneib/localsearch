@@ -36,5 +36,12 @@ public class MRectangle extends Rectangle {
 	public int getMinSize() {
 		return minSize;
 	}
+	
+	@Override
+	public String toString(){
+		return "((" + getLocation().getX() + ", " + getLocation().getY() + "), " + 
+					"(" + getWidth() + ", " + getHeight() + "))";
+	};
 }
+
 
