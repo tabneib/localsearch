@@ -55,14 +55,16 @@ public class InstanceFactoryTest {
 		getInstanceSplit_ValidInput6 = new int[]{1000, 10, 5}; 
 		getInstanceSplit_ValidInput7 = new int[]{1000, 1000, 1};
 		getInstanceSplit_ValidInput8 = new int[]{1000, 500, 50};
-		getInstanceSplit_ValidInput9 = new int[]{1000, 900, 1};
+		getInstanceSplit_ValidInput9 = new int[]{10000, 5000, 1};
 	}
 
 	
 	@Test
 	public void getInstanceRandom_validOutput() {
-		
+
+		// amount, minLength, maxLength, boxLength
 		int[] input;
+		
 		input = getInstanceRandom_ValidInput1;
 		assertValidMInstance(InstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 

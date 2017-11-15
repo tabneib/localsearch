@@ -25,8 +25,8 @@ public class InstanceFactory {
 
 		ArrayList<MRectangle> rectangles = new ArrayList<>();
 		ArrayList<MBox> boxes = new ArrayList<>();
-		Random widthR = new Random(System.currentTimeMillis());
-		Random heightR = new Random(System.currentTimeMillis());
+		Random widthR = new Random();
+		Random heightR = new Random();
 
 		MRectangle rectangle;
 		MBox box;
@@ -47,8 +47,9 @@ public class InstanceFactory {
 
 	/**
 	 * 
-	 * @param amount
 	 * @param initLength
+	 * @param boxLength
+	 * @param minLength
 	 * @return
 	 */
 	public static MInstance getInstanceSplit(int initLength, int boxLength,
@@ -171,22 +172,24 @@ public class InstanceFactory {
 					rect.getWidth() + ", " + rect.getHeight() + ")");
 
 		boolean splitVertically;
-		if ((randomNum - rect.getHeight()) <= 0) {
-			// Height edge is chosen
+		if ((randomNum - rect.getHeight()) <= 0)
+			// Height edge is chosen..
 			if (rect.getHeight() >= 2 * minLength)
+				// ..and it can be split further
 				splitVertically = false;
 			else
+				// It cannot be split further => split the other edge instead
 				splitVertically = true;
-		} else {
-			// Width edge is chosen
+		else
+			// Width edge is chosen..
 			if (rect.getWidth() >= 2 * minLength)
+				// ..and it can be split further
 				splitVertically = true;
 			else
+				// It cannot be split further => split the other edge instead
 				splitVertically = false;
-		}
 
-		// If the "height" edge can still be split any is chosen by the random
-		// chooser
+		
 		if (!splitVertically) {
 			// split horizontally
 			// minLength <= splitY <= (height - minLength)
@@ -200,9 +203,6 @@ public class InstanceFactory {
 					(int) rect.getWidth(), (int) rect.getHeight() - splitY,
 					rect.getBoxLength());
 		} else {
-			// The "width" edge is chosen by the random chooser or the "height"
-			// edge
-			// cannot be split any further although it was chosen
 			// split vertically
 			// minLength <= splitX <= (width - minLength)
 			int splitX = ((int) (Math.random() * (rect.getWidth() + 1 - 2 * minLength)))
