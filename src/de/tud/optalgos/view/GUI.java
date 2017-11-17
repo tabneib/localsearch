@@ -71,7 +71,7 @@ public class GUI extends JFrame {
 	}
 
 	/**
-	 * 
+	 * create GUI window and call method to add stuff onto it
 	 */
 	public void initGUI() {
 		frame = new JFrame("OptAlgos GUI");
@@ -118,6 +118,7 @@ public class GUI extends JFrame {
 	 */
 	private Container makeBoxesContainer() {
 		
+		// Retrieve data
 		switch (this.generator) {
 			case RANDOM_GEN: 
 				mInstance = InstanceFactory.
@@ -176,6 +177,7 @@ public class GUI extends JFrame {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 3;
+		// Dummy label to keep the "width" beast at bay
 		JLabel dummy = new JLabel(" ");
 		dummy.setPreferredSize(new Dimension(MENU_CONTAINER_WIDTH, 1));
 		panel.add(dummy, c);
@@ -333,7 +335,7 @@ public class GUI extends JFrame {
 	}
 	
 	/**
-	 * 
+	 * Listener for selection of instance generator 
 	 *
 	 */
 	private class GenSelectListener implements ActionListener {
