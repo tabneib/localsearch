@@ -1,6 +1,8 @@
 package de.tud.optalgos.view;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -14,21 +16,52 @@ public class GUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
+	private final Font defaultFont = new JLabel().getFont();
+	
 	// Default parameters for instance generation
-	public static final int AMOUNT = 20;
-	public static final int MIN_LENGTH = 10;
-	public static final int MAX_LENGTH = 150;
-	public static final int BOX_LENGTH = 150;
-
+	public static final int DEFAULT_AMOUNT = 200;
+	public static final int DEFAULT_MIN_LENGTH = 10;
+	public static final int DEFAULT_MAX_LENGTH = 150;
+	public static final int DEFAULT_BOX_LENGTH = 150;
+	
 	// GUI Constants
 	public static final int WINDOW_HEIGHT = 650;
 	public static final int BOXES_CONTAINER_WIDTH = 900;
-	public static final int MENU_CONTAINER_WIDTH = 200;
+	public static final int MENU_CONTAINER_WIDTH = 380;
 	public static final int BOXES_PADDING = 10;
 	public static final int SCROLL_VIEW_PADDING = 20;
+	
+	// Other Constants
+	private static final String RANDOM_GEN = "Random-Instance-Generator";
+	private static final String SPLIT_GEN = "Split-Instance-Generator";
+	
+	// Data
+	private MInstance mInstance;
+	private ArrayList<MBox> boxes;
+	
+	// Options
+	private String generator = RANDOM_GEN;
+	private int amount = DEFAULT_AMOUNT;
+	private int minLength = DEFAULT_MIN_LENGTH;
+	private int maxLength = DEFAULT_MAX_LENGTH;
+	private int boxLength = DEFAULT_BOX_LENGTH;
+	private int initLength;
 
+	
+	// GUI Components
+	private JFrame frame;
+	private JLabel labelInsGen;
+	private JRadioButton radioRandGen;
+	private JRadioButton radioSplitGen;
+	private JTextField textFieldParams;
+	private JButton buttonInsGen;
+	private JLabel labelParams;
+	
 	public static void main(String[] args) {
-
+		new GUI();
+	}
+	
+	public GUI() {
 		// Job for the event-dispatching thread
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -40,11 +73,12 @@ public class GUI extends JFrame {
 	/**
 	 * 
 	 */
-	public static void initGUI() {
-		JFrame frame = new JFrame("OptAlgos GUI");
+	public void initGUI() {
+		frame = new JFrame("OptAlgos GUI");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//frame.setSize(BOXES_CONTAINER_WIDTH + MENU_CONTAINER_WIDTH, WINDOW_HEIGHT);
-
+		frame.setMinimumSize(new Dimension(
+				BOXES_CONTAINER_WIDTH + SCROLL_VIEW_PADDING + MENU_CONTAINER_WIDTH,
+				WINDOW_HEIGHT));
 		addComponentsToPane(frame.getContentPane());
 
 		frame.pack();
@@ -52,48 +86,60 @@ public class GUI extends JFrame {
 	}
 
 	/**
-	 * Add components to the main window
+	 * Add components to the GUI window
 	 * 
 	 * @param pane
 	 */
-	private static void addComponentsToPane(Container pane) {
+	private void addComponentsToPane(Container pane) {
 
 		pane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 		pane.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridy = 0;
+		c.anchor = GridBagConstraints.NORTHWEST;
 
 		// The container of all the boxes
 		c.weightx = 1.0;
 		c.gridx = 0;
-		pane.add(createBoxesContainer(), c);
+		pane.add(makeBoxesContainer(), c);
 
 		// The container of the menu
 		c.weightx = 0.5;
 		c.gridx = 1;
-		pane.add(createMenuContainer(InstanceFactory.
-				getInstanceRandom(AMOUNT, MIN_LENGTH, MAX_LENGTH, BOX_LENGTH)), c);
+		pane.add(makeMenuContainer(), c);
 
 	}
 
 	/**
-	 * Create a panel that display all the boxes
+	 * Create a panel that displays all the boxes
 	 * 
 	 * @return
 	 */
-	private static Container createMenuContainer(MInstance mInstance) {
+	private Container makeBoxesContainer() {
+		
+		switch (this.generator) {
+			case RANDOM_GEN: 
+				mInstance = InstanceFactory.
+					getInstanceRandom(amount, minLength, maxLength, boxLength);
+				break;
+			case SPLIT_GEN:
+				mInstance = InstanceFactory.
+					getInstanceSplit(initLength, boxLength, minLength);
+				break;
+		}
 
-		ArrayList<MBox> boxes = mInstance.getBoxes();
-
-		JPanel panel = new JPanel();
-		int gridX = BOXES_CONTAINER_WIDTH / (BOX_LENGTH + 2 * BOXES_PADDING);
+		ArrayList<MBoxPanel> boxPanels = new ArrayList<>();
+		boxes = mInstance.getBoxes();
+	
+		int gridX = BOXES_CONTAINER_WIDTH / (boxLength + 2 * BOXES_PADDING);
 		int gridY = boxes.size()/gridX + (boxes.size() % gridX == 0 ? 0 : 1);
 
-		panel.setPreferredSize(new Dimension(BOXES_CONTAINER_WIDTH, 
-					gridY * (BOX_LENGTH + 2 * BOXES_PADDING)));
+		JPanel boxesContainer = new JPanel();
+		boxesContainer.setPreferredSize(new Dimension(BOXES_CONTAINER_WIDTH, 
+					gridY * (boxLength + 2 * BOXES_PADDING)));
 		
-		panel.setLayout(new GridLayout(0, gridX, BOXES_PADDING, BOXES_PADDING));
+		boxesContainer.setLayout(new GridLayout(0, gridX, BOXES_PADDING, BOXES_PADDING));
 
 		// Fill the grids with boxes
 		MBoxPanel boxPanel;
@@ -101,11 +147,12 @@ public class GUI extends JFrame {
 			boxPanel= new MBoxPanel(boxes.get(i));
 			boxPanel.setPreferredSize(new 
 					Dimension(boxes.get(i).getBoxLength(), boxes.get(i).getBoxLength()));
-			panel.add(boxPanel);
+			boxesContainer.add(boxPanel);
+			boxPanels.add(boxPanel);
 		}
 
 		// The whole grid panel is contained inside a scroll pane
-		JScrollPane scrollPane = new JScrollPane(panel);
+		JScrollPane scrollPane = new JScrollPane(boxesContainer);
 		scrollPane.setPreferredSize(new Dimension(
 				BOXES_CONTAINER_WIDTH + SCROLL_VIEW_PADDING, WINDOW_HEIGHT));
 
@@ -113,24 +160,152 @@ public class GUI extends JFrame {
 	}
 
 	/**
-	 * 
+	 * Create a panel that displays the menu
 	 * @return
 	 */
-	private static Container createBoxesContainer() {
+	private Container makeMenuContainer() {
 		JPanel panel = new JPanel();
-		panel.setSize(MENU_CONTAINER_WIDTH, WINDOW_HEIGHT);
 
-		// TODO : generate the menu
+		panel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		panel.setLayout(new GridBagLayout());
 
+		GridBagConstraints c = new GridBagConstraints();
+		c.ipady = 10;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 3;
+		JLabel dummy = new JLabel(" ");
+		dummy.setPreferredSize(new Dimension(MENU_CONTAINER_WIDTH, 1));
+		panel.add(dummy, c);
+		
+		// Instance generation
+		
+		labelInsGen = new JLabel("Instance Generator");
+		labelInsGen.setFont(
+				new Font(defaultFont.getFontName(), Font.BOLD, defaultFont.getSize() + 2));
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 3;
+		panel.add(labelInsGen, c);
+
+		radioRandGen = new JRadioButton("Interval");
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		panel.add(radioRandGen, c);
+		
+		radioSplitGen = new JRadioButton("Split");
+		c.gridx = 1;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		panel.add(radioSplitGen, c);
+		
+		
+		ButtonGroup groupGen = new ButtonGroup();
+		groupGen.add(radioSplitGen);
+		groupGen.add(radioRandGen);
+		radioRandGen.setSelected(true);
+		
+		textFieldParams = new JTextField(
+				DEFAULT_AMOUNT + " " + DEFAULT_MIN_LENGTH + " " + DEFAULT_MAX_LENGTH + " " + DEFAULT_BOX_LENGTH);
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 2;
+		textFieldParams.setPreferredSize(new Dimension(260,30));
+		c.fill = GridBagConstraints.VERTICAL;
+		panel.add(textFieldParams, c);
+		c.fill = GridBagConstraints.NONE;
+		
+		buttonInsGen = new JButton("Generate");
+		c.gridx = 2;
+		c.gridy = 3;
+		c.gridwidth = 1;
+		buttonInsGen.setMaximumSize(new Dimension(100,30));
+		panel.add(buttonInsGen, c);
+		
+		labelParams = new JLabel("<amount> <minLen> <maxLen> <boxLen>");
+		labelParams.setFont(new Font("arial", Font.PLAIN, 11));
+		c.gridx = 0;
+		c.gridy = 4;
+		c.gridwidth = 2;
+		panel.add(labelParams, c);
+
+		setListeners();
 		return panel;
 	}
 
 	
 	/**
-	 * 
+	 * Setup listeners for the GUI components
+	 */
+	private void setListeners() {
+		
+		// Radio buttons
+		radioRandGen.addActionListener(new GenSelectListener());
+		radioSplitGen.addActionListener(new GenSelectListener());
+		buttonInsGen.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Parse parameter
+				String[] paramStrs = textFieldParams.getText().split(" ");
+				
+				try {
+					switch (paramStrs.length) {
+						case 4:
+							if (generator.equals(SPLIT_GEN))
+								throw new Exception();
+							amount = Integer.parseInt(paramStrs[0]);
+							minLength = Integer.parseInt(paramStrs[1]);
+							maxLength = Integer.parseInt(paramStrs[2]);
+							boxLength = Integer.parseInt(paramStrs[3]);
+							break;
+						case 3:
+							if (generator.equals(RANDOM_GEN))
+								throw new Exception();
+							initLength = Integer.parseInt(paramStrs[0]);
+							boxLength = Integer.parseInt(paramStrs[1]);
+							minLength = Integer.parseInt(paramStrs[2]);
+							break;
+						default:
+							throw new Exception();
+					}
+					
+					javax.swing.SwingUtilities.invokeLater(new Runnable() {
+						
+						@Override
+						public void run() {
+							Component bContainer = frame.getContentPane().getComponent(0);
+							GridBagLayout l = (GridBagLayout) 
+									frame.getContentPane().getLayout();
+							GridBagConstraints c = l.getConstraints(bContainer);
+							
+							frame.getContentPane().remove(bContainer);
+							frame.getContentPane().add(makeBoxesContainer(), c, 0);
+							frame.getContentPane().validate();
+						}
+					});
+					
+				}
+				catch (Exception exception) {
+					exception.printStackTrace();
+					JOptionPane.showMessageDialog(
+							null, "Invalid parameters!", "Error",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+				
+			}
+		});
+	}
+	
+	
+	/**
+	 * Class that represents a panel that displays a single box
 	 *
 	 */
-	private static class MBoxPanel extends JPanel {
+	private class MBoxPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -143,14 +318,37 @@ public class GUI extends JFrame {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D) g;
+			g2.setColor(new Color(227, 227, 227));
+			g2.fill(mBox);
+			g2.setColor(Color.BLACK);
 			g2.draw(mBox);	
 			
 			for (MRectangle r : mBox.getMRectangles()) {
-				g2.setColor(Color.CYAN);
+				g2.setColor(new Color(47, 255, 228));
 				g2.fill(r);
 				g2.setColor(Color.BLACK);	
 				g2.draw(r);
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 *
+	 */
+	private class GenSelectListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (radioRandGen.isSelected()) {
+				generator = RANDOM_GEN;
+				labelParams.setText("<amount> <minLen> <maxLen> <boxLen>");
+			}
+			else if (radioSplitGen.isSelected()) {
+				generator = SPLIT_GEN;
+				labelParams.setText("<initLen> <boxLen> <minLen>");
+			}
+		}
+	}
+	
 }
