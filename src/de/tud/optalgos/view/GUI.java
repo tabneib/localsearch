@@ -15,14 +15,14 @@ import de.tud.optalgos.model.MRectangle;
 public class GUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-
-	private final Font defaultFont = new JLabel().getFont();
 	
 	// Default parameters for instance generation
 	public static final int DEFAULT_AMOUNT = 200;
 	public static final int DEFAULT_MIN_LENGTH = 10;
 	public static final int DEFAULT_MAX_LENGTH = 150;
 	public static final int DEFAULT_BOX_LENGTH = 150;
+	public static final int DEFAULT_INIT_LENGTH = 500;
+	
 	
 	// GUI Constants
 	public static final int WINDOW_HEIGHT = 650;
@@ -45,10 +45,11 @@ public class GUI extends JFrame {
 	private int minLength = DEFAULT_MIN_LENGTH;
 	private int maxLength = DEFAULT_MAX_LENGTH;
 	private int boxLength = DEFAULT_BOX_LENGTH;
-	private int initLength;
+	private int initLength = DEFAULT_INIT_LENGTH;
 
 	
 	// GUI Components
+	private JLabel labelStatusBar;
 	private JFrame frame;
 	private JLabel labelInsGen;
 	private JRadioButton radioRandGen;
@@ -56,6 +57,8 @@ public class GUI extends JFrame {
 	private JTextField textFieldParams;
 	private JButton buttonInsGen;
 	private JLabel labelParams;
+
+	private final Font defaultFont = new JLabel().getFont();
 	
 	public static void main(String[] args) {
 		new GUI();
@@ -91,7 +94,11 @@ public class GUI extends JFrame {
 	 * @param pane
 	 */
 	private void addComponentsToPane(Container pane) {
-
+ 
+		// setup status bar
+		labelStatusBar = new JLabel("");
+		labelStatusBar.setFont(new Font("arial", Font.PLAIN, defaultFont.getSize()));
+		
 		pane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 		pane.setLayout(new GridBagLayout());
@@ -108,7 +115,14 @@ public class GUI extends JFrame {
 		c.weightx = 0.5;
 		c.gridx = 1;
 		pane.add(makeMenuContainer(), c);
-
+		
+		c.gridy = 1;
+		c.gridx = 0;
+		c.gridwidth = 2;
+		c.ipady = 10;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.WEST;
+		pane.add(labelStatusBar, c);
 	}
 
 	/**
@@ -157,6 +171,11 @@ public class GUI extends JFrame {
 		scrollPane.setPreferredSize(new Dimension(
 				BOXES_CONTAINER_WIDTH + SCROLL_VIEW_PADDING, WINDOW_HEIGHT));
 
+		// Update the status bar
+		labelStatusBar.setText("  #Box: " + boxes.size() + 
+				"   #Rect: " + mInstance.getRechtangles().size() +
+				"   boxLength: " + boxLength);
+		
 		return scrollPane;
 	}
 
@@ -211,7 +230,7 @@ public class GUI extends JFrame {
 		radioRandGen.setSelected(true);
 		
 		textFieldParams = new JTextField(
-				DEFAULT_AMOUNT + " " + DEFAULT_MIN_LENGTH + " " + DEFAULT_MAX_LENGTH + " " + DEFAULT_BOX_LENGTH);
+				amount + " " + minLength + " " + maxLength + " " + boxLength);
 		c.gridx = 0;
 		c.gridy = 3;
 		c.gridwidth = 2;
@@ -263,6 +282,10 @@ public class GUI extends JFrame {
 							minLength = Integer.parseInt(paramStrs[1]);
 							maxLength = Integer.parseInt(paramStrs[2]);
 							boxLength = Integer.parseInt(paramStrs[3]);
+							if (amount <= 1 || minLength < 1 ||
+									minLength > maxLength || maxLength > boxLength ||
+									boxLength >= BOXES_CONTAINER_WIDTH - 2*BOXES_PADDING)
+								throw new Exception();
 							break;
 						case 3:
 							if (generator.equals(RANDOM_GEN))
@@ -270,6 +293,10 @@ public class GUI extends JFrame {
 							initLength = Integer.parseInt(paramStrs[0]);
 							boxLength = Integer.parseInt(paramStrs[1]);
 							minLength = Integer.parseInt(paramStrs[2]);
+							if (minLength < 1 || minLength > boxLength ||
+									initLength < 2 * minLength ||
+									boxLength >= BOXES_CONTAINER_WIDTH - 2*BOXES_PADDING)
+								throw new Exception();
 							break;
 						default:
 							throw new Exception();
@@ -292,7 +319,6 @@ public class GUI extends JFrame {
 					
 				}
 				catch (Exception exception) {
-					exception.printStackTrace();
 					JOptionPane.showMessageDialog(
 							null, "Invalid parameters!", "Error",
 							JOptionPane.INFORMATION_MESSAGE);
@@ -344,10 +370,14 @@ public class GUI extends JFrame {
 		public void actionPerformed(ActionEvent arg0) {
 			if (radioRandGen.isSelected()) {
 				generator = RANDOM_GEN;
+				textFieldParams.setText(
+						amount + " " + minLength + " " + maxLength + " " + boxLength);
 				labelParams.setText("<amount> <minLen> <maxLen> <boxLen>");
 			}
 			else if (radioSplitGen.isSelected()) {
 				generator = SPLIT_GEN;
+				textFieldParams.setText(
+						initLength + " " + boxLength + " " + minLength);
 				labelParams.setText("<initLen> <boxLen> <minLen>");
 			}
 		}
