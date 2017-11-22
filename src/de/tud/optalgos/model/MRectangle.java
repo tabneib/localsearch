@@ -44,10 +44,11 @@ public class MRectangle extends Rectangle {
 		return minSize;
 	}
 	
-	public void rotate() {
+	public MRectangle rotate() {
 		int temp = this.width;
 		this.width = this.height;
 		this.height = temp;
+		return this;
 	}
 	
 	

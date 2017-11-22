@@ -47,7 +47,35 @@ public class MBox extends Rectangle{
 			m.rotate();
 		}
 		m.setLocation(x, y);
+		if(!this.contains(m)) {
+			return false;
+		}
+		for (MRectangle internM : this.mRectangles) {
+		    if(internM.intersects(m)) {
+		    	return false;
+		    }
+		}
 		mRectangles.add(m);
+		return true;
+	}
+	
+	/*
+	 * check if this box can insert a rectangle in definite location with or without rotation
+	 */
+	public boolean fit(MRectangle m, int x, int y, boolean rotated) {
+		if(rotated) {
+			m.rotate();
+		}
+		m.setLocation(x, y);
+		if(!this.contains(m)) {
+			return false;
+		}
+		for (MRectangle internM : this.mRectangles) {
+		    if(internM.intersects(m)) {
+		    	return false;
+		    }
+		}
+		
 		return true;
 	}
 	
