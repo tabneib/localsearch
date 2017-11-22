@@ -92,9 +92,9 @@ public class MBoxTest {
 		  rect_400_400 = new MRectangle(400, 400, BOX_LENGTH);
 		  rect_400_200 = new MRectangle(400, 200, BOX_LENGTH);
 		  rect_200_400 = rect_400_200.clone().rotate();
-		  rect_400_100 = new MRectangle(, BOX_LENGTH);
+		  rect_400_100 = new MRectangle(400, 100, BOX_LENGTH);
 		  rect_100_400 = rect_400_100.clone().rotate();
-		  rect_50_400 = new MRectangle(, BOX_LENGTH);
+		  rect_50_400 = new MRectangle(50, 400, BOX_LENGTH);
 		  rect_400_50 = rect_50_400.clone().rotate();
 
 		  rect_300_300 = new MRectangle(300, 300, BOX_LENGTH);
