@@ -44,12 +44,17 @@ public class MBox extends Rectangle{
 	 */
 	public boolean insert(MRectangle m, int x, int y, boolean rotated) {
 		if(rotated) {
-			m.tun();
+			m.rotate();
 		}
 		m.setLocation(x, y);
 		mRectangles.add(m);
 		return true;
 	}
+	
+	/*
+	 * insert in definite location with or without rotation
+	 */
+	
 
 	public HashSet<MRectangle> getMRectangles() {
 		return mRectangles;

@@ -10,6 +10,13 @@ public class MRectangle extends Rectangle {
 	private final int maxSize;
 	private final int minSize;
 	
+	public MRectangle(int x, int y,int width, int height, int boxLength) {
+		super.setRect(x, y, width, height);
+		this.boxLength = boxLength;
+		this.maxSize = Math.max(width, height);
+		this.minSize = Math.min(width, height);
+	}
+	
 	public MRectangle(int width, int height, int boxLength) {
 		super.setRect(-1, -1, width, height);
 		this.boxLength = boxLength;
@@ -37,7 +44,7 @@ public class MRectangle extends Rectangle {
 		return minSize;
 	}
 	
-	public void tun() {
+	public void rotate() {
 		int temp = this.width;
 		this.width = this.height;
 		this.height = temp;
@@ -49,6 +56,15 @@ public class MRectangle extends Rectangle {
 		return "((" + getLocation().getX() + ", " + getLocation().getY() + "), " + 
 					"(" + getWidth() + ", " + getHeight() + "))";
 	};
+	
+
+	@Override
+	public MRectangle clone(){
+		MRectangle cloneM = new MRectangle(this.width, this.height, boxLength);
+		return cloneM;
+	};
+	
+	
 }
 
 
