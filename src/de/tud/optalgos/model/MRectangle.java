@@ -10,8 +10,8 @@ public class MRectangle extends Rectangle {
 	private final int maxSize;
 	private final int minSize;
 	
-	public MRectangle(int x, int y, int width, int height, int boxLength) {
-		super.setRect(x, y, width, height);
+	public MRectangle(int width, int height, int boxLength) {
+		super.setRect(-1, -1, width, height);
 		this.boxLength = boxLength;
 		this.maxSize = Math.max(width, height);
 		this.minSize = Math.min(width, height);
@@ -36,6 +36,13 @@ public class MRectangle extends Rectangle {
 	public int getMinSize() {
 		return minSize;
 	}
+	
+	public void tun() {
+		int temp = this.width;
+		this.width = this.height;
+		this.height = temp;
+	}
+	
 	
 	@Override
 	public String toString(){
