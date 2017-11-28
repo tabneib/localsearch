@@ -270,18 +270,18 @@ public class GUI extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Parse parameter
-				String[] paramStrs = textFieldParams.getText().split(" ");
+				// Parse arguments
+				String[] argStrs = textFieldParams.getText().split(" ");
 				
 				try {
-					switch (paramStrs.length) {
+					switch (argStrs.length) {
 						case 4:
 							if (generator.equals(SPLIT_GEN))
 								throw new Exception();
-							amount = Integer.parseInt(paramStrs[0]);
-							minLength = Integer.parseInt(paramStrs[1]);
-							maxLength = Integer.parseInt(paramStrs[2]);
-							boxLength = Integer.parseInt(paramStrs[3]);
+							amount = Integer.parseInt(argStrs[0]);
+							minLength = Integer.parseInt(argStrs[1]);
+							maxLength = Integer.parseInt(argStrs[2]);
+							boxLength = Integer.parseInt(argStrs[3]);
 							if (amount <= 1 || minLength < 1 ||
 									minLength > maxLength || maxLength > boxLength ||
 									boxLength >= BOXES_CONTAINER_WIDTH - 2*BOXES_PADDING)
@@ -290,9 +290,9 @@ public class GUI extends JFrame {
 						case 3:
 							if (generator.equals(RANDOM_GEN))
 								throw new Exception();
-							initLength = Integer.parseInt(paramStrs[0]);
-							boxLength = Integer.parseInt(paramStrs[1]);
-							minLength = Integer.parseInt(paramStrs[2]);
+							initLength = Integer.parseInt(argStrs[0]);
+							boxLength = Integer.parseInt(argStrs[1]);
+							minLength = Integer.parseInt(argStrs[2]);
 							if (minLength < 1 || minLength > boxLength ||
 									initLength < 2 * minLength ||
 									boxLength >= BOXES_CONTAINER_WIDTH - 2*BOXES_PADDING)
@@ -320,7 +320,7 @@ public class GUI extends JFrame {
 				}
 				catch (Exception exception) {
 					JOptionPane.showMessageDialog(
-							null, "Invalid parameters!", "Error",
+							null, "Invalid arguments!", "Error",
 							JOptionPane.INFORMATION_MESSAGE);
 				}
 				
