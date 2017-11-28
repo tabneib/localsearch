@@ -8,6 +8,10 @@ public abstract class Solution implements Comparable<Solution>{
 		this.optProblem = optProblem;
 	}
 	
+	public OptProblem getOptProblem() {
+		return this.optProblem;
+	}
+	
 	public boolean isBetterThan(Solution other) {
 		if (compareTo(other) > 0 )
 			return true;

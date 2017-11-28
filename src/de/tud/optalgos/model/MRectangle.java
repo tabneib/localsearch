@@ -44,28 +44,27 @@ public class MRectangle extends Rectangle {
 		return minSize;
 	}
 	
-	public MRectangle rotate() {
-		int temp = this.width;
-		this.width = this.height;
-		this.height = temp;
-		return this;
+	public double getArea() {
+		return this.getWidth() * this.getHeight();
 	}
 	
+	public MRectangle rotate() {
+		MRectangle rotatedM = this.clone();
+		rotatedM.setSize(this.height, this.width);
+		return rotatedM;
+	}
 	
 	@Override
 	public String toString(){
 		return "((" + getLocation().getX() + ", " + getLocation().getY() + "), " + 
 					"(" + getWidth() + ", " + getHeight() + "))";
 	};
-	
 
 	@Override
 	public MRectangle clone(){
 		MRectangle cloneM = new MRectangle(this.width, this.height, boxLength);
 		return cloneM;
 	};
-	
-	
 }
 
 

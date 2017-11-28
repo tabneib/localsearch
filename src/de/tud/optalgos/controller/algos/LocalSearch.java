@@ -5,8 +5,9 @@ import de.tud.optalgos.model.Solution;
 
 public class LocalSearch extends NeighborhoodBased {
 
+	public static final int ATTEMPTS =1000;
 	private boolean terminated = false;
-
+	
 	
 	public LocalSearch (OptProblem optProblem, 
 			Neighborhood neighborhood, Solution startSolution) {
@@ -18,7 +19,9 @@ public class LocalSearch extends NeighborhoodBased {
 	 * Run the algorithm 
 	 */
 	public void run() {
+		System.out.println("start searching");
 		while (neighborhood.hasNext()) {
+			System.out.println("try");
 			Solution neighbor = neighborhood.next(); 
 			if (neighbor.isBetterThan(currentSolution)) {
 				currentSolution = neighbor;
