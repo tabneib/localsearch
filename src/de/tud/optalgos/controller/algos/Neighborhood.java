@@ -24,4 +24,14 @@ public abstract class Neighborhood implements Iterator<Solution> {
 		this.currentSolution = newSolution;
 	}
 
+	protected Instance getInstance() {
+		return instance;
+	}
+
+	
+	protected Solution getCurrentSolution() {
+		return currentSolution;
+	}
+
+	
 }

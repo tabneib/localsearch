@@ -7,10 +7,14 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
+import de.tud.optalgos.controller.algos.GeometryBasedNeighborhood;
+import de.tud.optalgos.controller.algos.LocalSearch;
 import de.tud.optalgos.model.InstanceFactory;
 import de.tud.optalgos.model.MBox;
 import de.tud.optalgos.model.MInstance;
 import de.tud.optalgos.model.MRectangle;
+import de.tud.optalgos.model.MSolution;
+import de.tud.optalgos.model.OptProblem;
 
 public class GUI extends JFrame {
 
@@ -145,8 +149,18 @@ public class GUI extends JFrame {
 		}
 
 		ArrayList<MBoxPanel> boxPanels = new ArrayList<>();
-		boxes = mInstance.getBoxes();
-	
+		//TODO
+		OptProblem optProblem = new OptProblem(this.mInstance, OptProblem.Direction.MAXIMALMIZING);
+		MSolution startSolution = new MSolution(optProblem);
+		GeometryBasedNeighborhood neighborhood = new GeometryBasedNeighborhood(this.mInstance, startSolution);
+		LocalSearch localSearch = new LocalSearch(optProblem, neighborhood, startSolution); 
+		System.out.println("tryout");
+		localSearch.run();
+		//boxes = mInstance.getBoxes();
+		MSolution finalSolution = ((MSolution) localSearch.getOptimum());
+		MInstance m =  (MInstance)finalSolution.getOptProblem().getInstance();
+		boxes = m.getBoxes();
+		
 		int gridX = BOXES_CONTAINER_WIDTH / (boxLength + 2 * BOXES_PADDING);
 		int gridY = boxes.size()/gridX + (boxes.size() % gridX == 0 ? 0 : 1);
 
