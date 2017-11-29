@@ -63,6 +63,7 @@ public class MRectangle extends Rectangle {
 	@Override
 	public MRectangle clone(){
 		MRectangle cloneM = new MRectangle(this.width, this.height, boxLength);
+		cloneM.setLocation(this.getLocation());
 		return cloneM;
 	};
 }

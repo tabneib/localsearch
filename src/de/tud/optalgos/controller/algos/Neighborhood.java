@@ -9,7 +9,7 @@ import de.tud.optalgos.model.Solution;
 public abstract class Neighborhood implements Iterator<Solution> {
 	
 	private Instance instance;
-	private Solution currentSolution;
+	protected Solution currentSolution;
 	
 	public Neighborhood (Instance instance, Solution currentSolution) {
 		this.instance = instance;
