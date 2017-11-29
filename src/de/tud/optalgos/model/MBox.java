@@ -4,11 +4,11 @@ import java.awt.Rectangle;
 import java.util.HashSet;
 import java.util.Random;
 
-public class MBox extends Rectangle{
+public class MBox extends Rectangle implements Cloneable{
 	
 	private static final long serialVersionUID = 1L;
 	public static final int SMOOTH_DEGREE = 10;
-	public static final int ATTEMPTS =10000;
+	public static final int ATTEMPTS =1000000;
 	private final int boxLength;
 	private int gridStep;
 	private HashSet<MRectangle> mRectangles;
@@ -42,14 +42,14 @@ public class MBox extends Rectangle{
 		System.out.println("insert");
 		Random r = new Random();
 		int maxRange = this.boxLength/this.gridStep;
-		
+		MRectangle cloneM = m.clone();
 		
 		if(this.getFreeArea() < m.getArea()) {
 			return false;
 		}
 		int attempt = 0;
 		while(attempt < ATTEMPTS) {
-			if(this.insert(m, r.nextInt(maxRange), r.nextInt(maxRange), r.nextBoolean())) {
+			if(this.insert(cloneM, r.nextInt(maxRange)*gridStep, r.nextInt(maxRange)*gridStep, r.nextBoolean())) {
 				return true;
 			}
 			attempt++;
@@ -135,4 +135,14 @@ public class MBox extends Rectangle{
 	public String toString() {
 		return "((" + getLocation().getX() + ", " + getLocation().getY() + "), " + this.boxLength + ")";
 	}
+	
+	@Override
+	public MBox clone(){
+		HashSet<MRectangle> clonedRectangles = new HashSet<MRectangle>();
+		for (MRectangle mRectangle : this.mRectangles) {
+			clonedRectangles.add(mRectangle.clone());
+		}
+		MBox newBox = new MBox(this.boxLength,clonedRectangles);
+		return newBox;
+	};
 }
