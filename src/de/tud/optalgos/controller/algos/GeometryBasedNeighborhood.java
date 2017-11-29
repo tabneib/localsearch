@@ -44,8 +44,8 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 	public boolean attempt() {
 		System.out.println("attempt to find next solution");
 		Random r = new Random();
-		MInstance instance = (MInstance) this.getInstance();
-		if(instance.getBoxes().size()<2) {
+	
+		if(newSolution.getBoxes().size()<2) {
 			return false;
 		}
 		
