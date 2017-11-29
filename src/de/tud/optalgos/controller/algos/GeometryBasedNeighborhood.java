@@ -8,7 +8,7 @@ import de.tud.optalgos.model.Solution;
 
 public class GeometryBasedNeighborhood extends Neighborhood{
 
-	public static final int ATTEMPTS =1000;
+	public static final int ATTEMPTS =10;
 	
 	private MSolution nextSolution;
 	private boolean findNext;
@@ -26,7 +26,7 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 		System.out.println("init hasNext");
 		this.findNext = true;
 		
-		this.nextSolution = this.getCurrentSolution().clone();
+		
 		//attempt to find next solution
 		int attempt = 0;
 		while(attempt < ATTEMPTS) {
@@ -43,6 +43,7 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 	
 	public boolean attempt() {
 		System.out.println("attempt to find next solution");
+		MSolution newSolution = ((MSolution)this.currentSolution).clone();
 		Random r = new Random();
 	
 		if(newSolution.getBoxes().size()<2) {
@@ -50,15 +51,15 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 		}
 		
 		//pick two random boxes
-		int sourceBoxIndex = r.nextInt(instance.getBoxes().size()-1);
+		int sourceBoxIndex = r.nextInt(newSolution.getBoxes().size()-1);
 		int destinationBoxIndex = -1;
 		do {
-			destinationBoxIndex = r.nextInt(instance.getBoxes().size()-1);
+			destinationBoxIndex = r.nextInt(newSolution.getBoxes().size()-1);
 			}while(sourceBoxIndex == destinationBoxIndex);
 		 
 		//pick random rectangle
 		System.out.println("take element from box" + sourceBoxIndex);
-		MBox sourceBox = instance.getBoxes().get(sourceBoxIndex); 
+		MBox sourceBox = newSolution.getBoxes().get(sourceBoxIndex); 
 		int sourceBoxInclude = sourceBox.getMRectangles().size(); 
 		MRectangle m = null;
 		if(sourceBoxInclude > 0) {
@@ -80,14 +81,19 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 		}
 		
 		//insert this rectangle into new box
-		MBox destinationBox = instance.getBoxes().get(destinationBoxIndex);
+		MBox destinationBox = newSolution.getBoxes().get(destinationBoxIndex);
 		System.out.println("take element into box" + destinationBoxIndex);
 		if(destinationBox.insert(m)) {
 			sourceBox.getMRectangles().remove(m);
+			if(sourceBox.getMRectangles().isEmpty()) {
+				newSolution.getBoxes().remove(sourceBox);
+			}
 		}else {
+			System.out.println("can not insert");
 			return false;
 		}
-		
+		this.nextSolution = newSolution;
+		System.out.println("found next solution");
 		return true;
 	}
 
