@@ -45,7 +45,7 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 		System.out.println("attempt to find next solution");
 		MSolution newSolution = ((MSolution)this.currentSolution).clone();
 		Random r = new Random();
-		MInstance instance = (MInstance) this.getInstance();
+	
 		if(newSolution.getBoxes().size()<2) {
 			return false;
 		}
