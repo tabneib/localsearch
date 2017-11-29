@@ -1,4 +1,4 @@
-package de.tud.optalgos.controller.algos;
+iewpackage de.tud.optalgos.controller.algos;
 import java.util.Random;
 import de.tud.optalgos.model.MBox;
 import de.tud.optalgos.model.MInstance;
