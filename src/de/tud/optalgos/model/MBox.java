@@ -7,7 +7,7 @@ import java.util.Random;
 public class MBox extends Rectangle implements Cloneable{
 	
 	private static final long serialVersionUID = 1L;
-	public static final int SMOOTH_DEGREE = 10;
+	public static final int SMOOTH_DEGREE = 100;
 	public static final int ATTEMPTS =1000000;
 	private final int boxLength;
 	private int gridStep;
@@ -39,17 +39,17 @@ public class MBox extends Rectangle implements Cloneable{
 	 * automatic insert in random position
 	 */
 	public boolean insert(MRectangle m) {
-		System.out.println("insert");
+		
 		Random r = new Random();
 		int maxRange = this.boxLength/this.gridStep;
-		MRectangle cloneM = m.clone();
 		
 		if(this.getFreeArea() < m.getArea()) {
 			return false;
 		}
+		
 		int attempt = 0;
 		while(attempt < ATTEMPTS) {
-			if(this.insert(cloneM, r.nextInt(maxRange)*gridStep, r.nextInt(maxRange)*gridStep, r.nextBoolean())) {
+			if(this.insert(m, r.nextInt(maxRange)*gridStep, r.nextInt(maxRange)*gridStep, r.nextBoolean())) {
 				return true;
 			}
 			attempt++;
@@ -64,7 +64,7 @@ public class MBox extends Rectangle implements Cloneable{
 	public boolean insert(MRectangle m, int x, int y, boolean rotated) {
 		//check overlapping
 		if(rotated) {
-			m.rotate();
+			m = m.rotate();
 		}
 		m.setLocation(x, y);
 		if(!this.contains(m)) {
@@ -76,7 +76,7 @@ public class MBox extends Rectangle implements Cloneable{
 		    }
 		}
 		//insert this Rectangle into Box
-		mRectangles.add(m);
+		this.mRectangles.add(m);
 		//update grid step
 		if(m.getMinSize() < gridStep*SMOOTH_DEGREE) {
 			this.gridStep = m.getMinSize()/SMOOTH_DEGREE;
@@ -124,7 +124,7 @@ public class MBox extends Rectangle implements Cloneable{
 		for (MRectangle internM : this.mRectangles) {
 			coveredArea += internM.getArea();
 		}
-		return (coveredArea / this.boxLength*this.boxLength);
+		return coveredArea/(this.boxLength*this.boxLength);
 	}
 
 	public HashSet<MRectangle> getMRectangles() {

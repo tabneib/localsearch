@@ -151,15 +151,15 @@ public class GUI extends JFrame {
 		ArrayList<MBoxPanel> boxPanels = new ArrayList<>();
 		//TODO
 		OptProblem optProblem = new OptProblem(this.mInstance, OptProblem.Direction.MAXIMALMIZING);
-		MSolution startSolution = new MSolution(optProblem,this.mInstance.getBoxes());
-		GeometryBasedNeighborhood neighborhood = new GeometryBasedNeighborhood(this.mInstance, startSolution);
-		LocalSearch localSearch = new LocalSearch(optProblem, neighborhood, startSolution); 
+		MSolution startSolution = new MSolution(optProblem,this.mInstance.getClonedBoxes());
+		GeometryBasedNeighborhood neighborhood = new GeometryBasedNeighborhood(this.mInstance, startSolution.clone());
+		LocalSearch localSearch = new LocalSearch(optProblem, neighborhood, startSolution.clone()); 
 		System.out.println("tryout");
 		localSearch.run();
 		//boxes = mInstance.getBoxes();
 		MSolution finalSolution = ((MSolution) localSearch.getOptimum());
 		boxes = finalSolution.getBoxes();
-		
+		System.out.println("The final solution has "+boxes.size()+" boxes");
 		int gridX = BOXES_CONTAINER_WIDTH / (boxLength + 2 * BOXES_PADDING);
 		int gridY = boxes.size()/gridX + (boxes.size() % gridX == 0 ? 0 : 1);
 

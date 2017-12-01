@@ -22,6 +22,17 @@ public class MInstance extends Instance{
 	public ArrayList<MBox> getBoxes() {
 		return boxes;
 	}
+	
+	public ArrayList<MBox> getClonedBoxes() {
+		ArrayList<MBox> newBoxes = new ArrayList<MBox>();
+		for (MBox mBox : this.boxes) {
+			if(!mBox.getMRectangles().isEmpty()) {
+				newBoxes.add(mBox.clone());
+			}
+			
+		}
+		return newBoxes;
+	}
 
 	public int getBoxLength() {
 		return boxLength;

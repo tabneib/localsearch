@@ -8,14 +8,13 @@ import de.tud.optalgos.model.Solution;
 
 public class GeometryBasedNeighborhood extends Neighborhood{
 
-	public static final int ATTEMPTS =10;
+	public static final int ATTEMPTS =50;
 	
 	private MSolution nextSolution;
 	private boolean findNext;
 	
 	public GeometryBasedNeighborhood(MInstance instance, MSolution currentSolution) {
 		super(instance, currentSolution);
-		System.out.println("init GeometryBasedNeighborhood");
 		this.nextSolution = null;
 		this.findNext = false;
 	}
@@ -23,14 +22,16 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 	@Override
 	public boolean hasNext() {
 		//findNext process was executed
-		System.out.println("init hasNext");
 		this.findNext = true;
+		this.nextSolution = null;
 		
 		
 		//attempt to find next solution
 		int attempt = 0;
 		while(attempt < ATTEMPTS) {
 			if(this.attempt()) {
+				//new solution was found
+				this.findNext = true;
 				return true;
 			}
 			attempt++;
@@ -42,7 +43,7 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 	
 	
 	public boolean attempt() {
-		System.out.println("attempt to find next solution");
+		
 		MSolution newSolution = ((MSolution)this.currentSolution).clone();
 		Random r = new Random();
 	
@@ -58,57 +59,63 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 			}while(sourceBoxIndex == destinationBoxIndex);
 		 
 		//pick random rectangle
-		System.out.println("take element from box" + sourceBoxIndex);
 		MBox sourceBox = newSolution.getBoxes().get(sourceBoxIndex); 
-		int sourceBoxInclude = sourceBox.getMRectangles().size(); 
+		int sourceBoxSize = sourceBox.getMRectangles().size(); 
 		MRectangle m = null;
-		if(sourceBoxInclude > 0) {
+		if(sourceBoxSize > 0) {
 			int item = 0;
-			if(sourceBoxInclude > 1) {
-				item = r.nextInt(sourceBoxInclude-1);
+			if(sourceBoxSize > 1) {
+				item = r.nextInt(sourceBoxSize-1);
 			}
-			
 			int i = 0;
-			for(MRectangle temp : sourceBox.getMRectangles())
+			for(MRectangle tempRectangle : sourceBox.getMRectangles())
 			{
 			    if (i == item)
-			        m = temp;
+			        m = tempRectangle;
 			    i++;
 			}
-		
 		}else {
 			return false;
 		}
 		
 		//insert this rectangle into new box
 		MBox destinationBox = newSolution.getBoxes().get(destinationBoxIndex);
-		System.out.println("take element into box" + destinationBoxIndex);
-		if(destinationBox.insert(m)) {
+		if(destinationBox.insert(m.clone())) {
 			sourceBox.getMRectangles().remove(m);
 			if(sourceBox.getMRectangles().isEmpty()) {
-				newSolution.getBoxes().remove(sourceBox);
+				newSolution.removeEmptyBox(sourceBoxIndex);
 			}
 		}else {
-			System.out.println("can not insert");
 			return false;
 		}
+		
 		this.nextSolution = newSolution;
-		System.out.println("found next solution");
 		return true;
 	}
 
 	@Override
 	public Solution next() {
 		if(this.findNext) {
+			//the searching process for new solution was executed
 			this.findNext = false;
-			return nextSolution;
+			
+
+			return this.nextSolution;
 		}else {
 			if(this.hasNext()) {
+				//execute a new searching process for new solution
 				this.findNext = false;
-				return nextSolution;
+				
+				return this.nextSolution;
 			}else {
 				return null;
 			}
 		}
+	}
+
+	@Override
+	public void onCurrentSolutionChange(Solution newSolution) {
+		this.currentSolution = (MSolution)newSolution;
+		this.nextSolution = null;
 	}
 }

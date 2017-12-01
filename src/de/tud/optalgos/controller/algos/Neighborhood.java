@@ -4,6 +4,7 @@ package de.tud.optalgos.controller.algos;
 import java.util.Iterator;
 
 import de.tud.optalgos.model.Instance;
+import de.tud.optalgos.model.MSolution;
 import de.tud.optalgos.model.Solution;
 
 public abstract class Neighborhood implements Iterator<Solution> {
@@ -20,9 +21,7 @@ public abstract class Neighborhood implements Iterator<Solution> {
 	 * 
 	 * @param newSolution
 	 */
-	public void onCurrentSolutionChange(Solution newSolution) {
-		this.currentSolution = newSolution;
-	}
+	public abstract void onCurrentSolutionChange(Solution newSolution);
 
 	protected Instance getInstance() {
 		return instance;
@@ -30,8 +29,7 @@ public abstract class Neighborhood implements Iterator<Solution> {
 
 	
 	protected Solution getCurrentSolution() {
-		return currentSolution;
+		return this.currentSolution;
 	}
-
 	
 }
