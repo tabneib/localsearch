@@ -21,7 +21,7 @@ public class GUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	// Default parameters for instance generation
-	public static final int DEFAULT_AMOUNT = 200;
+	public static final int DEFAULT_AMOUNT = 1000;
 	public static final int DEFAULT_MIN_LENGTH = 10;
 	public static final int DEFAULT_MAX_LENGTH = 150;
 	public static final int DEFAULT_BOX_LENGTH = 150;

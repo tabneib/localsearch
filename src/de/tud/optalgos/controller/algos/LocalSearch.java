@@ -5,8 +5,8 @@ import de.tud.optalgos.model.Solution;
 
 public class LocalSearch extends NeighborhoodBased {
 
-	//maximal number of unsuccessful attempt at searching for better neighbor
-	public static final int ATTEMPTS =10;
+	//maximal number of continuous unsuccessful attempt at searching for better neighbor
+	public static final int ATTEMPTS =15;
 
 	private boolean terminated = false;
 		
@@ -20,12 +20,13 @@ public class LocalSearch extends NeighborhoodBased {
 	 * Run the algorithm 
 	 */
 	public void run() {
+		
 		System.out.println("start searching");
+		long startTime = System.currentTimeMillis();
 		int attempt = 0;
 		while (neighborhood.hasNext() && attempt <ATTEMPTS) {
 			Solution neighbor = neighborhood.next(); 
 			if (neighbor.isBetterThan(this.currentSolution)) {
-				System.out.println("New solution is better");
 				this.currentSolution = neighbor;
 				neighborhood.onCurrentSolutionChange(neighbor);
 				attempt = 0;
@@ -34,6 +35,9 @@ public class LocalSearch extends NeighborhoodBased {
 			
 		}
 		terminated = true;
+		long endTime   = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		System.out.println("running time: "+totalTime/1000+" s");
 	}
 	
 

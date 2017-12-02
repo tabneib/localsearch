@@ -7,8 +7,8 @@ import java.util.Random;
 public class MBox extends Rectangle implements Cloneable{
 	
 	private static final long serialVersionUID = 1L;
-	public static final int SMOOTH_DEGREE = 100;
-	public static final int ATTEMPTS =1000000;
+	public static final int SMOOTH_DEGREE = 10;
+	public static final int ATTEMPTS =10000;
 	private final int boxLength;
 	private int gridStep;
 	private HashSet<MRectangle> mRectangles;
@@ -75,14 +75,69 @@ public class MBox extends Rectangle implements Cloneable{
 		    	return false;
 		    }
 		}
-		//insert this Rectangle into Box
-		this.mRectangles.add(m);
+		
 		//update grid step
 		if(m.getMinSize() < gridStep*SMOOTH_DEGREE) {
 			this.gridStep = m.getMinSize()/SMOOTH_DEGREE;
 		}
+		//optimization: move to edge (move)
+		
+		this.optimalMove(m, 1,this.gridStep);
+		this.optimalMove(m, 2,this.gridStep);
+		
+		//insert this Rectangle into Box
+		this.mRectangles.add(m);
 		return true;
 	}
+	
+	public void optimalSort() {
+		HashSet<MRectangle> oldSet = this.mRectangles;
+		this.mRectangles = new HashSet<MRectangle>();
+		for (MRectangle internM : oldSet) {
+			this.insert(internM);
+		}
+	}
+	private void optimalMove(MRectangle m, int direction, int step) {
+	
+		if (step==0) {
+			return;
+		}
+		int tempX = (int)m.getX();
+		int tempY = (int)m.getY();
+		switch (direction) {
+		case 1:{
+			
+			
+			if(this.fit(m, tempX-step, tempY, false)) {
+				
+				m.setLocation(tempX-step, tempY);
+				this.optimalMove(m, direction, step);
+			}else {
+				
+				this.optimalMove(m, direction, step/2);
+			}
+			break;
+		}
+		case 2:{
+			if(this.fit(m, tempX, tempY-step, false)) {
+				
+				m.setLocation(tempX, tempY-step);
+				this.optimalMove(m, direction, step);
+			}else {
+				
+				this.optimalMove(m, direction, step/2);
+			}
+			break;
+		}
+			
+		default:
+			break;
+		}
+
+	}
+	
+	
+	
 	
 	/*
 	 * check if this box can insert a rectangle in definite location with or without rotation
@@ -90,17 +145,41 @@ public class MBox extends Rectangle implements Cloneable{
 	public boolean fit(MRectangle m, int x, int y, boolean rotated) {
 		if(rotated) {
 			m.rotate();
+		}else {
+			m = m.clone();
 		}
 		m.setLocation(x, y);
 		if(!this.contains(m)) {
+			
 			return false;
 		}
 		for (MRectangle internM : this.mRectangles) {
 		    if(internM.intersects(m)) {
+		    	
 		    	return false;
 		    }
 		}
 		return true;
+	}
+	
+	public int getRandomRectangleIndexForMove(){
+		double thisArea = this.width * this.height;
+		double total = 0;
+		for (MRectangle m : this.mRectangles) 
+		{
+			total += thisArea- m.getArea();
+		}
+		double random = total*Math.random();
+		int index = 0;
+		for (MRectangle m : this.mRectangles) 
+		{
+			random -= thisArea- m.getArea();
+			if(random<=0) {
+				return index;
+			}
+			index++;
+		}
+		return 0;
 	}
 	
 	

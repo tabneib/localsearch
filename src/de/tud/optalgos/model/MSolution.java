@@ -38,9 +38,49 @@ public class MSolution extends Solution implements Cloneable{
 		MSolution newSolution = new MSolution(this.optProblem, newBoxes);
 		return newSolution;
 	}
+	
+	
 
 	public ArrayList<MBox> getBoxes() {
 		return this.boxes;
+	}
+	
+	public int getRandomBoxIndexForEmpty(){
+		double totalFreeArea = 0;
+		for (MBox mBox : this.boxes) 
+		{
+			totalFreeArea += mBox.getFreeArea();
+		}
+		double random = totalFreeArea*Math.random();
+		int index = 0;
+		for (MBox mBox : this.boxes) 
+		{
+			random -= mBox.getFreeArea();
+			if(random<=0) {
+				return index;
+			}
+			index++;
+		}
+		return this.boxes.size()-1;
+	}
+	
+	public int getRandomBoxIndexForFilling(){
+		double totalUsedArea = 0;
+		for (MBox mBox : this.boxes) 
+		{
+			totalUsedArea += mBox.getFillGrade();
+		}
+		double random = totalUsedArea*Math.random();
+		int index = 0;
+		for (MBox mBox : this.boxes) 
+		{
+			random -= mBox.getFillGrade();
+			if(random<=0) {
+				return index;
+			}
+			index++;
+		}
+		return 0;
 	}
 	
 	public void removeEmptyBox(int indexOfEmptyBox) {

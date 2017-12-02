@@ -8,7 +8,7 @@ import de.tud.optalgos.model.Solution;
 
 public class GeometryBasedNeighborhood extends Neighborhood{
 
-	public static final int ATTEMPTS =50;
+	public static final int ATTEMPTS =60;
 	
 	private MSolution nextSolution;
 	private boolean findNext;
@@ -52,11 +52,8 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 		}
 		
 		//pick two random boxes
-		int sourceBoxIndex = r.nextInt(newSolution.getBoxes().size()-1);
-		int destinationBoxIndex = -1;
-		do {
-			destinationBoxIndex = r.nextInt(newSolution.getBoxes().size()-1);
-			}while(sourceBoxIndex == destinationBoxIndex);
+		int sourceBoxIndex = newSolution.getRandomBoxIndexForEmpty();
+		int destinationBoxIndex = newSolution.getRandomBoxIndexForEmpty();
 		 
 		//pick random rectangle
 		MBox sourceBox = newSolution.getBoxes().get(sourceBoxIndex); 
@@ -84,6 +81,8 @@ public class GeometryBasedNeighborhood extends Neighborhood{
 			sourceBox.getMRectangles().remove(m);
 			if(sourceBox.getMRectangles().isEmpty()) {
 				newSolution.removeEmptyBox(sourceBoxIndex);
+			}else {
+				sourceBox.optimalSort();
 			}
 		}else {
 			return false;
