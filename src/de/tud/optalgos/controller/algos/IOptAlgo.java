@@ -16,4 +16,9 @@ public interface IOptAlgo {
 	 */
 	public Solution getOptimum();
 
+	/**
+	 * 
+	 * @return
+	 */
+	public long getRunningTime();
 }
