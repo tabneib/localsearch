@@ -41,7 +41,7 @@ public class LocalSearch extends NeighborhoodBased {
 
 	@Override
 	public Solution getOptimum() {
-		if (runningTime == -1)
+		if (runningTime != -1)
 			return currentSolution;
 		else
 			throw new RuntimeException("The Algorithm has not yet terminated!");
