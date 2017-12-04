@@ -5,45 +5,43 @@ import de.tud.optalgos.model.Solution;
 
 public class LocalSearch extends NeighborhoodBased {
 
-	//maximal number of continuous unsuccessful attempt at searching for better neighbor
-	public static final int ATTEMPTS =15;
+	// maximal number of consecutive unsuccessful attempts at searching for better
+	// neighbor
+	public static final int ATTEMPTS = 15;
 
-	private boolean terminated = false;
-		
-	public LocalSearch (OptProblem optProblem, 
-			Neighborhood neighborhood, Solution startSolution) {
+	private long runningTime = -1;
+
+	public LocalSearch(OptProblem optProblem, Neighborhood neighborhood,
+			Solution startSolution) {
 		super(optProblem, neighborhood, startSolution);
 	}
-	
 
-	/**
-	 * Run the algorithm 
-	 */
+	@Override
 	public void run() {
-		
-		System.out.println("start searching");
+
 		long startTime = System.currentTimeMillis();
 		int attempt = 0;
-		while (neighborhood.hasNext() && attempt <ATTEMPTS) {
-			Solution neighbor = neighborhood.next(); 
+		while (neighborhood.hasNext() && attempt < ATTEMPTS) {
+			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				this.currentSolution = neighbor;
 				neighborhood.onCurrentSolutionChange(neighbor);
 				attempt = 0;
 			}
 			attempt++;
-			
+
 		}
-		terminated = true;
-		long endTime   = System.currentTimeMillis();
-		long totalTime = endTime - startTime;
-		System.out.println("running time: "+totalTime/1000+" s");
+		runningTime = System.currentTimeMillis() - startTime;
 	}
-	
+
+	@Override
+	public long getRunningTime() {
+		return runningTime;
+	}
 
 	@Override
 	public Solution getOptimum() {
-		if (terminated)
+		if (runningTime != -1)
 			return currentSolution;
 		else
 			throw new RuntimeException("The Algorithm has not yet terminated!");
