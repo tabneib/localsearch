@@ -93,9 +93,20 @@ public class MBox extends Rectangle implements Cloneable{
 	public void optimalSort() {
 		HashSet<MRectangle> oldSet = this.mRectangles;
 		this.mRectangles = new HashSet<MRectangle>();
-		for (MRectangle internM : oldSet) {
-			this.insert(internM);
+		while (!oldSet.isEmpty()) {
+			MRectangle biggest = null;
+			double biggestArea = 0;
+			for (MRectangle mRectangle : oldSet) {
+				if(mRectangle.getArea()>biggestArea) {
+					biggest = mRectangle;
+					biggestArea = mRectangle.getArea();
+				}
+			}
+			oldSet.remove(biggest);
+			this.insert(biggest);
+			
 		}
+		
 	}
 	private void optimalMove(MRectangle m, int direction, int step) {
 	
