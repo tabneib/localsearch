@@ -4,7 +4,6 @@ package de.tud.optalgos.controller.algos;
 import java.util.Iterator;
 
 import de.tud.optalgos.model.Instance;
-import de.tud.optalgos.model.MSolution;
 import de.tud.optalgos.model.Solution;
 
 public abstract class Neighborhood implements Iterator<Solution> {

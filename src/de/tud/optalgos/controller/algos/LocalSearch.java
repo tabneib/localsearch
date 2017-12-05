@@ -27,6 +27,7 @@ public class LocalSearch extends NeighborhoodBased {
 				this.currentSolution = neighbor;
 				neighborhood.onCurrentSolutionChange(neighbor);
 				attempt = 0;
+				
 			}
 			attempt++;
 

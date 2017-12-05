@@ -107,4 +107,13 @@ public class MSolution extends Solution implements Cloneable {
 			rects.addAll(box.getMRectangles());
 		return rects;
 	}
+	
+	public int countRechtangles() {
+		int count = 0;
+		for (MBox box : this.boxes)
+			count += box.getMRectangles().size();
+		return count;
+	}
+	
+	
 }

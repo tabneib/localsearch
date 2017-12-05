@@ -65,6 +65,8 @@ public class MBox extends Rectangle implements Cloneable{
 		//check overlapping
 		if(rotated) {
 			m = m.rotate();
+		}else {
+			m = m.clone();
 		}
 		m.setLocation(x, y);
 		if(!this.contains(m)) {
@@ -92,19 +94,9 @@ public class MBox extends Rectangle implements Cloneable{
 	
 	public void optimalSort() {
 		HashSet<MRectangle> oldSet = this.mRectangles;
-		this.mRectangles = new HashSet<MRectangle>();
-		while (!oldSet.isEmpty()) {
-			MRectangle biggest = null;
-			double biggestArea = 0;
-			for (MRectangle mRectangle : oldSet) {
-				if(mRectangle.getArea()>biggestArea) {
-					biggest = mRectangle;
-					biggestArea = mRectangle.getArea();
-				}
-			}
-			oldSet.remove(biggest);
-			this.insert(biggest);
-			
+		for (MRectangle mRectangle : oldSet) {
+			this.optimalMove(mRectangle, 1,this.gridStep);
+			this.optimalMove(mRectangle, 2,this.gridStep);
 		}
 		
 	}
@@ -154,18 +146,19 @@ public class MBox extends Rectangle implements Cloneable{
 	 * check if this box can insert a rectangle in definite location with or without rotation
 	 */
 	public boolean fit(MRectangle m, int x, int y, boolean rotated) {
+		MRectangle clonedM;
 		if(rotated) {
-			m.rotate();
+			clonedM = m.rotate();
 		}else {
-			m = m.clone();
+			clonedM = m.clone();
 		}
-		m.setLocation(x, y);
-		if(!this.contains(m)) {
+		clonedM.setLocation(x, y);
+		if(!this.contains(clonedM)) {
 			
 			return false;
 		}
 		for (MRectangle internM : this.mRectangles) {
-		    if(internM.intersects(m)) {
+		    if(internM.intersects(clonedM) && !m.equals(internM)) {
 		    	
 		    	return false;
 		    }
