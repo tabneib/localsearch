@@ -3,10 +3,11 @@ package test;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.tud.optalgos.model.InstanceFactory;
-import de.tud.optalgos.model.MBox;
-import de.tud.optalgos.model.MInstance;
-import de.tud.optalgos.model.MRectangle;
+import de.tud.optalgos.model.MInstanceFactory;
+import de.tud.optalgos.model.MOptProblem;
+import de.tud.optalgos.model.geometry.MBox;
+import de.tud.optalgos.model.geometry.MRectangle;
+
 import static org.junit.Assert.*;
 
 
@@ -66,47 +67,47 @@ public class InstanceFactoryTest {
 		int[] input;
 		
 		input = getInstanceRandom_ValidInput1;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 
 		input = getInstanceRandom_ValidInput2;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 		
 		input = getInstanceRandom_ValidInput3;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 		
 		input = getInstanceRandom_ValidInput4;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 		
 		input = getInstanceRandom_ValidInput5;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 		
 		input = getInstanceRandom_ValidInput6;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 		
 		input = getInstanceRandom_ValidInput7;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 		
 		input = getInstanceRandom_ValidInput8;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 		
 		input = getInstanceRandom_ValidInput9;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceRandom(input[0], input[1], input[2], input[3]), 
 				input[3], input[1], input[3]);
 	}
@@ -119,47 +120,47 @@ public class InstanceFactoryTest {
 		int[] input;
 
 		input = getInstanceSplit_ValidInput1;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput2;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput3;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput4;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput5;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput6;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput7;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput8;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput9;
-		assertValidMInstance(InstanceFactory.
+		assertValidMInstance(MInstanceFactory.
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 		
@@ -178,17 +179,17 @@ public class InstanceFactoryTest {
 	 * @param maxLength
 	 */
 	private void assertValidMInstance(
-			MInstance mInstance, int expectedBoxLength, int minLength, int maxLength) {
+			MOptProblem mInstance, int expectedBoxLength, int minLength, int maxLength) {
 		
 		assertEquals(expectedBoxLength, mInstance.getBoxLength());
 		
 		for (MRectangle r : mInstance.getRechtangles()) {
 			assertValidMRectangle(r, mInstance.getBoxLength(), minLength, maxLength);
 			// Box referenced from this rectangle are included in the instance
-			assertTrue(mInstance.getBoxes().contains(r.getmBox()));
+			assertTrue(mInstance.getInitSolution().getBoxes().contains(r.getmBox()));
 		}
 		
-		for (MBox b : mInstance.getBoxes()) {
+		for (MBox b : mInstance.getInitSolution().getBoxes()) {
 			assertValidMbox(b, mInstance.getBoxLength());
 			// All rectangles referenced from this box are included in the instance
 			for (MRectangle r : b.getMRectangles())

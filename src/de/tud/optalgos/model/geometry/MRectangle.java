@@ -1,4 +1,4 @@
-package de.tud.optalgos.model;
+package de.tud.optalgos.model.geometry;
 
 import java.awt.Rectangle;
 

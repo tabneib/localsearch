@@ -7,17 +7,20 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
-import de.tud.optalgos.controller.algos.GeometryBasedNeighborhood;
 import de.tud.optalgos.controller.algos.LocalSearch;
-import de.tud.optalgos.controller.algos.Neighborhood;
 import de.tud.optalgos.controller.algos.NeighborhoodBased;
-import de.tud.optalgos.model.InstanceFactory;
-import de.tud.optalgos.model.MBox;
-import de.tud.optalgos.model.MInstance;
-import de.tud.optalgos.model.MRectangle;
+import de.tud.optalgos.controller.neighborhood.GeometryBasedNeighborhood;
+import de.tud.optalgos.controller.neighborhood.Neighborhood;
+import de.tud.optalgos.model.MInstanceFactory;
+import de.tud.optalgos.model.MOptProblem;
 import de.tud.optalgos.model.MSolution;
-import de.tud.optalgos.model.OptProblem;
+import de.tud.optalgos.model.geometry.MBox;
+import de.tud.optalgos.model.geometry.MRectangle;
 
+/**
+ * GUI starter
+ *
+ */
 public class GUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -48,7 +51,7 @@ public class GUI extends JFrame {
 	private static final String ALGO_TABOO = "Taboo-Search-Algorithm";
 
 	// Data
-	private MInstance mInstance;
+	private MOptProblem mInstance;
 	private MSolution mSolution;
 	private ArrayList<MBox> boxes;
 
@@ -89,10 +92,8 @@ public class GUI extends JFrame {
 	}
 
 	public GUI() {
-
 		// Init data
 		makeInstance();
-
 		// Job for the event-dispatching thread
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -162,7 +163,7 @@ public class GUI extends JFrame {
 		ArrayList<MBoxPanel> boxPanels = new ArrayList<>();
 
 		if (mSolution == null)
-			boxes = mInstance.getBoxes();
+			boxes = mInstance.getInitSolution().getBoxes();
 		else
 			boxes = mSolution.getBoxes();
 
@@ -280,8 +281,8 @@ public class GUI extends JFrame {
 		// Neighborhoods
 
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-		separator.setPreferredSize(
-				new Dimension(MENU_CONTAINER_WIDTH + DUMMY_PADDING, 1));
+		separator
+				.setPreferredSize(new Dimension(MENU_CONTAINER_WIDTH + DUMMY_PADDING, 1));
 		c.gridx = 0;
 		c.gridy = 5;
 		c.gridwidth = 3;
@@ -365,7 +366,7 @@ public class GUI extends JFrame {
 		radioNeighborPerm.setEnabled(false);
 		radioAlgoSim.setEnabled(false);
 		radioAlgoTaboo.setEnabled(false);
-		
+
 		setListeners();
 		return panel;
 	}
@@ -421,11 +422,14 @@ public class GUI extends JFrame {
 						throw new Exception();
 					}
 
+					// Generating instance might throw exceptions if the given
+					// arguments are still invalid
+					makeInstance();
+
 					javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 						@Override
 						public void run() {
-							makeInstance();
 							Component bContainer = frame.getContentPane().getComponent(0);
 							GridBagLayout l = (GridBagLayout) frame.getContentPane()
 									.getLayout();
@@ -441,7 +445,6 @@ public class GUI extends JFrame {
 					JOptionPane.showMessageDialog(null, "Invalid arguments!", "Error",
 							JOptionPane.INFORMATION_MESSAGE);
 				}
-
 			}
 		});
 
@@ -450,10 +453,7 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				OptProblem optProblem = new OptProblem(mInstance,
-						OptProblem.Direction.MAXIMALMIZING);
-				MSolution startSolution = new MSolution(optProblem,
-						mInstance.getClonedBoxes());
+				MSolution startSolution = mInstance.getInitSolution();
 				Neighborhood neighborhut;
 				NeighborhoodBased algorhythm;
 
@@ -474,7 +474,7 @@ public class GUI extends JFrame {
 				// Setup algorithm
 				switch (algorithm) {
 				case ALGO_LOCAL:
-					algorhythm = new LocalSearch(optProblem, neighborhut, startSolution.clone());
+					algorhythm = new LocalSearch(mInstance, neighborhut, startSolution);
 					break;
 				case ALGO_SIM:
 				case ALGO_TABOO:
@@ -498,12 +498,12 @@ public class GUI extends JFrame {
 
 						frame.getContentPane().remove(bContainer);
 						frame.getContentPane().add(makeBoxesContainer(), c, 0);
-						labelStatusBar.setText(labelStatusBar.getText() + 
-								"   Running time: " + algorhythm.getRunningTime()/1000 + "s");
+						labelStatusBar
+								.setText(labelStatusBar.getText() + "   Running time: "
+										+ algorhythm.getRunningTime() / 1000 + "s");
 						frame.getContentPane().validate();
 					}
 				});
-
 			}
 		});
 	}
@@ -519,11 +519,11 @@ public class GUI extends JFrame {
 
 		switch (this.generator) {
 		case GEN_RANDOM:
-			mInstance = InstanceFactory.getInstanceRandom(amount, minLength, maxLength,
+			mInstance = MInstanceFactory.getInstanceRandom(amount, minLength, maxLength,
 					boxLength);
 			break;
 		case GEN_SPLIT:
-			mInstance = InstanceFactory.getInstanceSplit(initLength, boxLength,
+			mInstance = MInstanceFactory.getInstanceSplit(initLength, boxLength,
 					minLength);
 			break;
 		}

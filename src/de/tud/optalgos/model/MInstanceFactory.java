@@ -6,11 +6,17 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Random;
 
+import de.tud.optalgos.model.OptProblem.Direction;
+import de.tud.optalgos.model.geometry.MBox;
+import de.tud.optalgos.model.geometry.MRectangle;
+
 /**
  * Factory class for generating instances as inputs for the algorithms
  *
  */
-public class InstanceFactory {
+public class MInstanceFactory {
+	
+	private static final String direction = OptProblem.Direction.MAXIMIZING;
 
 	/**
 	 * 
@@ -20,7 +26,7 @@ public class InstanceFactory {
 	 * @param boxLength
 	 * @return
 	 */
-	public static MInstance getInstanceRandom(int amount, int minLength, int maxLength,
+	public static MOptProblem getInstanceRandom(int amount, int minLength, int maxLength,
 			int boxLength) {
 
 		ArrayList<MRectangle> rectangles = new ArrayList<>();
@@ -42,7 +48,7 @@ public class InstanceFactory {
 			rectangles.add(rectangle);
 			boxes.add(box);
 		}
-		return new MInstance(boxLength, rectangles, boxes);
+		return new MOptProblem(direction, boxLength, rectangles, boxes);
 	}
 
 	/**
@@ -52,7 +58,7 @@ public class InstanceFactory {
 	 * @param minLength
 	 * @return
 	 */
-	public static MInstance getInstanceSplit(int initLength, int boxLength,
+	public static MOptProblem getInstanceSplit(int initLength, int boxLength,
 			int minLength) {
 
 		// Create rectangles
@@ -72,7 +78,7 @@ public class InstanceFactory {
 			boxes.add(box);
 		}
 
-		return new MInstance(boxLength, rectangles, boxes);
+		return new MOptProblem(direction, boxLength, rectangles, boxes);
 	}
 
 	// ---------------------------------------------------------------------------------->

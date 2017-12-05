@@ -7,9 +7,9 @@ import java.util.HashSet;
 
 import javax.swing.JFrame;
 
-import de.tud.optalgos.model.InstanceFactory;
-import de.tud.optalgos.model.MBox;
-import de.tud.optalgos.model.MRectangle;
+import de.tud.optalgos.model.MInstanceFactory;
+import de.tud.optalgos.model.geometry.MBox;
+import de.tud.optalgos.model.geometry.MRectangle;
 
 public class Test extends JFrame {
 
@@ -59,7 +59,7 @@ public class Test extends JFrame {
 		*/
 		HashSet<MRectangle> rectSet = new HashSet<>();
 		rectSet.addAll(
-				InstanceFactory.splitter(INIT_LENGTH, INIT_LENGTH, INIT_LENGTH / 100));
+				MInstanceFactory.splitter(INIT_LENGTH, INIT_LENGTH, INIT_LENGTH / 100));
 
 		new Test(new MBox(INIT_LENGTH, rectSet));
 	}
