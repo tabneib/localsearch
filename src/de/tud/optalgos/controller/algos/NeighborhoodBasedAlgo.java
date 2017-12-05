@@ -8,7 +8,7 @@ import de.tud.optalgos.model.Solution;
  * Abstract class represents the class of neighborhood-based optimization algorithms
  *
  */
-public abstract class NeighborhoodBased implements IOptAlgo {
+public abstract class NeighborhoodBasedAlgo implements IOptAlgo {
 
 	/**
 	 * The optimization problem instance this algorithm has to solve
@@ -24,7 +24,7 @@ public abstract class NeighborhoodBased implements IOptAlgo {
 	// current solution regarding the theory?
 	protected Solution currentSolution;
 
-	public NeighborhoodBased(OptProblem optProblem, Neighborhood neighborhood,
+	public NeighborhoodBasedAlgo(OptProblem optProblem, Neighborhood neighborhood,
 			Solution startSolution) {
 		this.optProblem = optProblem;
 		this.neighborhood = neighborhood;

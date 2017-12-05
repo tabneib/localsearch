@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 import de.tud.optalgos.controller.algos.LocalSearch;
-import de.tud.optalgos.controller.algos.NeighborhoodBased;
+import de.tud.optalgos.controller.algos.NeighborhoodBasedAlgo;
 import de.tud.optalgos.controller.neighborhood.GeometryBasedNeighborhood;
 import de.tud.optalgos.controller.neighborhood.Neighborhood;
 import de.tud.optalgos.model.MInstanceFactory;
@@ -455,7 +455,7 @@ public class GUI extends JFrame {
 
 				MSolution startSolution = mInstance.getInitSolution();
 				Neighborhood neighborhut;
-				NeighborhoodBased algorhythm;
+				NeighborhoodBasedAlgo algorhythm;
 
 				// Setup neighborhood
 				switch (neighborhood) {
