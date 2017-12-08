@@ -8,7 +8,7 @@ import de.tud.optalgos.model.Solution;
  * Class represents the basic local search algorithm.
  *
  */
-public class LocalSearch extends NeighborhoodBased {
+public class LocalSearch extends NeighborhoodBasedAlgo {
 
 	/**
 	 * Maximal number of consecutive unsuccessful attempts at searching for
