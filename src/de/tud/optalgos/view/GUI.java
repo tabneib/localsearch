@@ -11,6 +11,7 @@ import de.tud.optalgos.controller.algos.LocalSearch;
 import de.tud.optalgos.controller.algos.NeighborhoodBased;
 import de.tud.optalgos.controller.neighborhood.GeometryBasedNeighborhood;
 import de.tud.optalgos.controller.neighborhood.Neighborhood;
+import de.tud.optalgos.model.GeometryBasedSolution;
 import de.tud.optalgos.model.MInstanceFactory;
 import de.tud.optalgos.model.MOptProblem;
 import de.tud.optalgos.model.MSolution;
@@ -28,8 +29,8 @@ public class GUI extends JFrame {
 	// Default parameters for instance generation
 	public static final int DEFAULT_AMOUNT = 1000;
 	public static final int DEFAULT_MIN_LENGTH = 10;
-	public static final int DEFAULT_MAX_LENGTH = 150;
-	public static final int DEFAULT_BOX_LENGTH = 150;
+	public static final int DEFAULT_MAX_LENGTH = 50;
+	public static final int DEFAULT_BOX_LENGTH = 200;
 	public static final int DEFAULT_INIT_LENGTH = 500;
 
 	// GUI Constants
@@ -459,10 +460,12 @@ public class GUI extends JFrame {
 
 				// Setup neighborhood
 				switch (neighborhood) {
-				case NEIGHBORHOOD_GEO:
+				case NEIGHBORHOOD_GEO:{
+					GeometryBasedSolution startGeoSolution = new GeometryBasedSolution(startSolution.getOptProblem(), startSolution.getBoxes());
 					neighborhut = new GeometryBasedNeighborhood(mInstance,
-							startSolution.clone());
+							startGeoSolution.clone());
 					break;
+				}
 				case NEIGHBORHOOD_PERM:
 				case NEIGHBORHOOD_OVERL:
 					// TODO

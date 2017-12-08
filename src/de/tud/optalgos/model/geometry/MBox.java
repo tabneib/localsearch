@@ -2,13 +2,11 @@ package de.tud.optalgos.model.geometry;
 
 import java.awt.Rectangle;
 import java.util.HashSet;
-import java.util.Random;
 
 public class MBox extends Rectangle implements Cloneable{
 	
 	private static final long serialVersionUID = 1L;
-	public static final int SMOOTH_DEGREE = 10;
-	public static final int ATTEMPTS =10000;
+	public static final int SMOOTH_DEGREE = 2;
 	private final int boxLength;
 	private int gridStep;
 	private HashSet<MRectangle> mRectangles;
@@ -18,6 +16,13 @@ public class MBox extends Rectangle implements Cloneable{
 		this.boxLength = boxLength;
 		this.mRectangles = mRectangles;
 		this.gridStep = this.boxLength/SMOOTH_DEGREE;
+	}
+	
+	public MBox(int boxLength, HashSet<MRectangle> mRectangles, int gridStep) {
+		super.setRect(0, 0, boxLength, boxLength);
+		this.boxLength = boxLength;
+		this.mRectangles = mRectangles;
+		this.gridStep = gridStep;
 	}
 	
 	public MBox(int boxLength) {
@@ -36,25 +41,27 @@ public class MBox extends Rectangle implements Cloneable{
 	
 	
 	/*
-	 * automatic insert in random position
+	 * automatic insert 
 	 */
 	public boolean insert(MRectangle m) {
-		
-		Random r = new Random();
 		int maxRange = this.boxLength/this.gridStep;
 		
 		if(this.getFreeArea() < m.getArea()) {
 			return false;
 		}
 		
-		int attempt = 0;
-		while(attempt < ATTEMPTS) {
-			if(this.insert(m, r.nextInt(maxRange)*gridStep, r.nextInt(maxRange)*gridStep, r.nextBoolean())) {
-				return true;
-			}
-			attempt++;
+		for (int i = 0; i < maxRange; i++) {
+			for (int j = 0; j < maxRange; j++) {
+				if(this.insert(m, i*gridStep, j*gridStep, false)) {
+					return true;
+				}else {
+					if(this.insert(m, i*gridStep, j*gridStep, true)) {
+						return true;
+					}
+				}
+			}	
 		}
-		
+			
 		return false;
 	}
 	
@@ -82,8 +89,14 @@ public class MBox extends Rectangle implements Cloneable{
 		if(m.getMinSize() < gridStep*SMOOTH_DEGREE) {
 			this.gridStep = m.getMinSize()/SMOOTH_DEGREE;
 		}
+		if(this.gridStep ==0) {
+			this.gridStep = 1;
+		}
+		
 		//optimization: move to edge (move)
 		
+		this.optimalMove(m, 1,this.gridStep);
+		this.optimalMove(m, 2,this.gridStep);
 		this.optimalMove(m, 1,this.gridStep);
 		this.optimalMove(m, 2,this.gridStep);
 		
@@ -93,13 +106,12 @@ public class MBox extends Rectangle implements Cloneable{
 	}
 	
 	public void optimalSort() {
-		HashSet<MRectangle> oldSet = this.mRectangles;
-		for (MRectangle mRectangle : oldSet) {
+		for (MRectangle mRectangle : this.mRectangles) {
 			this.optimalMove(mRectangle, 1,this.gridStep);
 			this.optimalMove(mRectangle, 2,this.gridStep);
 		}
-		
 	}
+	
 	private void optimalMove(MRectangle m, int direction, int step) {
 	
 		if (step==0) {
@@ -109,38 +121,28 @@ public class MBox extends Rectangle implements Cloneable{
 		int tempY = (int)m.getY();
 		switch (direction) {
 		case 1:{
-			
-			
 			if(this.fit(m, tempX-step, tempY, false)) {
-				
 				m.setLocation(tempX-step, tempY);
 				this.optimalMove(m, direction, step);
 			}else {
-				
 				this.optimalMove(m, direction, step/2);
 			}
 			break;
 		}
 		case 2:{
 			if(this.fit(m, tempX, tempY-step, false)) {
-				
 				m.setLocation(tempX, tempY-step);
 				this.optimalMove(m, direction, step);
 			}else {
-				
 				this.optimalMove(m, direction, step/2);
 			}
 			break;
 		}
-			
 		default:
 			break;
 		}
 
 	}
-	
-	
-	
 	
 	/*
 	 * check if this box can insert a rectangle in definite location with or without rotation
@@ -154,12 +156,10 @@ public class MBox extends Rectangle implements Cloneable{
 		}
 		clonedM.setLocation(x, y);
 		if(!this.contains(clonedM)) {
-			
 			return false;
 		}
 		for (MRectangle internM : this.mRectangles) {
 		    if(internM.intersects(clonedM) && !m.equals(internM)) {
-		    	
 		    	return false;
 		    }
 		}
@@ -225,7 +225,7 @@ public class MBox extends Rectangle implements Cloneable{
 		for (MRectangle mRectangle : this.mRectangles) {
 			clonedRectangles.add(mRectangle.clone());
 		}
-		MBox newBox = new MBox(this.boxLength,clonedRectangles);
+		MBox newBox = new MBox(this.boxLength,clonedRectangles,this.gridStep);
 		return newBox;
 	};
 }

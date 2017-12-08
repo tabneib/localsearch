@@ -34,12 +34,12 @@ public class MOptProblem extends OptProblem {
 		super(direction);
 		this.boxLength = boxLength;
 		this.rechtangles = rectangles;
-		this.initSolution = new MSolution(this, boxes);
+		this.initSolution = new GeometryBasedSolution(this, boxes);
 	}
 
 	public MSolution getInitSolution() {
 		return this.initSolution;
-	}
+	} 
 
 	public ArrayList<MRectangle> getRechtangles() {
 		return rechtangles;
