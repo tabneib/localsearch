@@ -11,10 +11,12 @@ import de.tud.optalgos.controller.algos.LocalSearch;
 import de.tud.optalgos.controller.algos.NeighborhoodBasedAlgo;
 import de.tud.optalgos.controller.neighborhood.GeometryBasedNeighborhood;
 import de.tud.optalgos.controller.neighborhood.Neighborhood;
+import de.tud.optalgos.controller.neighborhood.RuleBasedNeighborhood;
 import de.tud.optalgos.model.GeometryBasedSolution;
 import de.tud.optalgos.model.MInstanceFactory;
 import de.tud.optalgos.model.MOptProblem;
 import de.tud.optalgos.model.MSolution;
+import de.tud.optalgos.model.RuleBasedSolution;
 import de.tud.optalgos.model.geometry.MBox;
 import de.tud.optalgos.model.geometry.MRectangle;
 
@@ -364,7 +366,7 @@ public class GUI extends JFrame {
 
 		// TODO: remove this when all features are implemented
 		radioNeighborOverl.setEnabled(false);
-		radioNeighborPerm.setEnabled(false);
+		// radioNeighborPerm.setEnabled(false);
 		radioAlgoSim.setEnabled(false);
 		radioAlgoTaboo.setEnabled(false);
 
@@ -461,12 +463,18 @@ public class GUI extends JFrame {
 				// Setup neighborhood
 				switch (neighborhood) {
 				case NEIGHBORHOOD_GEO:{
-					GeometryBasedSolution startGeoSolution = new GeometryBasedSolution(startSolution.getOptProblem(), startSolution.getBoxes());
+					startSolution = mInstance.getInitSolution();
+					GeometryBasedSolution startGeoSolution = new GeometryBasedSolution(startSolution.getOptProblem(), null);
 					neighborhut = new GeometryBasedNeighborhood(mInstance,
 							startGeoSolution.clone());
 					break;
 				}
-				case NEIGHBORHOOD_PERM:
+				case NEIGHBORHOOD_PERM:{
+					RuleBasedSolution startRuleSolution = new RuleBasedSolution(startSolution.getOptProblem(), null);
+					neighborhut = new RuleBasedNeighborhood(mInstance,
+							startRuleSolution);
+					break;
+				}
 				case NEIGHBORHOOD_OVERL:
 					// TODO
 

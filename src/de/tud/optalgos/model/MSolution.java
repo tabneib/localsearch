@@ -2,7 +2,6 @@ package de.tud.optalgos.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import de.tud.optalgos.model.geometry.MBox;
 import de.tud.optalgos.model.geometry.MRectangle;

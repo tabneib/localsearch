@@ -6,7 +6,7 @@ import java.util.HashSet;
 public class MBox extends Rectangle implements Cloneable{
 	
 	private static final long serialVersionUID = 1L;
-	public static final int SMOOTH_DEGREE = 2;
+	public static final int SMOOTH_DEGREE = 1;
 	private final int boxLength;
 	private int gridStep;
 	private HashSet<MRectangle> mRectangles;
@@ -29,6 +29,7 @@ public class MBox extends Rectangle implements Cloneable{
 		super.setRect(0, 0, boxLength, boxLength);
 		this.boxLength = boxLength;
 		this.mRectangles = new HashSet<MRectangle>();
+		this.gridStep = this.boxLength/SMOOTH_DEGREE;
 	}
 
 	public static long getSerialversionuid() {

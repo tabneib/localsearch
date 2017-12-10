@@ -14,7 +14,7 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 	 * Maximal number of consecutive unsuccessful attempts at searching for
 	 * better neighbor
 	 */
-	public static final int MAX_SEARCHING_ATTEMPTS = 50;
+	public static final int MAX_SEARCHING_ATTEMPTS = 100;
 
 	/**
 	 * Running time of the algorithm
@@ -40,8 +40,10 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 				this.currentSolution = neighbor;
 				neighborhood.onCurrentSolutionChange(neighbor);
 				attempt = 0;
+				System.out.println("better score: "+this.currentSolution.getObjective());
 				
 			}
+			System.out.println("new score: "+neighbor.getObjective());
 			attempt++;
 		}
 		runningTime = System.currentTimeMillis() - startTime;

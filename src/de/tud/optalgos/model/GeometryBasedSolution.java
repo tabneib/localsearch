@@ -4,12 +4,23 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import de.tud.optalgos.model.geometry.MBox;
+import de.tud.optalgos.model.geometry.MRectangle;
 
 public class GeometryBasedSolution extends MSolution {
 
 	public GeometryBasedSolution(OptProblem optProblem, ArrayList<MBox> boxes) {
 		super(optProblem, boxes);
-		// TODO Auto-generated constructor stub
+		if(boxes==null) {
+			this.optProblem = optProblem;
+			this.boxes = new ArrayList<MBox>();
+			MOptProblem instance = (MOptProblem)this.optProblem; 
+			for (MRectangle m : instance.getRechtangles()) {
+				MBox mBox = new MBox(instance.getBoxLength());
+				mBox.insert(m);
+				this.boxes.add(mBox);
+			}
+		}
+		
 	}
 	
 	/**

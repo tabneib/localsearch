@@ -33,6 +33,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		super(instance, currentSolution);
 		this.nextNeighborSolution = null;
 		this.findNext = false;
+		
 	}
 
 	@Override
@@ -45,6 +46,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		while (attempt < MAX_REPOSITIONING_ATTEMPTS) {
 			if (this.attempt()) {
 				// new solution was found
+				
 				this.findNext = true;
 				return true;
 			}
@@ -60,7 +62,6 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 	 * @return
 	 */
 	public boolean attempt() {
-
 		GeometryBasedSolution newSolution = ((GeometryBasedSolution) this.currentSolution).clone();
 		Random r = new Random();
 
@@ -90,7 +91,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 			}
 		} else
 			return false;
-
+		System.out.println("here1");
 		// insert this rectangle into new box
 		
 		MBox destinationBox = newSolution.getBoxes().get(destinationBoxIndex);
@@ -102,6 +103,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 			else
 				sourceBox.optimalSort();
 		} else {
+			System.out.println("here2");
 			return false;
 		}
 			
