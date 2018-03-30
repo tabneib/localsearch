@@ -27,10 +27,10 @@ public class GUI extends JFrame {
 
 	// Default parameters for instance generation
 	public static final int DEFAULT_AMOUNT = 1000;
-	public static final int DEFAULT_MIN_LENGTH = 10;
+	public static final int DEFAULT_MIN_LENGTH = 50;
 	public static final int DEFAULT_MAX_LENGTH = 150;
 	public static final int DEFAULT_BOX_LENGTH = 150;
-	public static final int DEFAULT_INIT_LENGTH = 500;
+	public static final int DEFAULT_INIT_LENGTH = 2000;
 
 	// GUI Constants
 	public static final int WINDOW_HEIGHT = 650;
