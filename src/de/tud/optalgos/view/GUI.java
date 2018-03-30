@@ -11,9 +11,12 @@ import de.tud.optalgos.controller.algos.LocalSearch;
 import de.tud.optalgos.controller.algos.NeighborhoodBasedAlgo;
 import de.tud.optalgos.controller.neighborhood.GeometryBasedNeighborhood;
 import de.tud.optalgos.controller.neighborhood.Neighborhood;
+import de.tud.optalgos.controller.neighborhood.RuleBasedNeighborhood;
+import de.tud.optalgos.model.GeometryBasedSolution;
 import de.tud.optalgos.model.MInstanceFactory;
 import de.tud.optalgos.model.MOptProblem;
 import de.tud.optalgos.model.MSolution;
+import de.tud.optalgos.model.RuleBasedSolution;
 import de.tud.optalgos.model.geometry.MBox;
 import de.tud.optalgos.model.geometry.MRectangle;
 
@@ -27,10 +30,10 @@ public class GUI extends JFrame {
 
 	// Default parameters for instance generation
 	public static final int DEFAULT_AMOUNT = 1000;
-	public static final int DEFAULT_MIN_LENGTH = 50;
-	public static final int DEFAULT_MAX_LENGTH = 150;
-	public static final int DEFAULT_BOX_LENGTH = 150;
-	public static final int DEFAULT_INIT_LENGTH = 2000;
+	public static final int DEFAULT_MIN_LENGTH = 10;
+	public static final int DEFAULT_MAX_LENGTH = 50;
+	public static final int DEFAULT_BOX_LENGTH = 200;
+	public static final int DEFAULT_INIT_LENGTH = 500;
 
 	// GUI Constants
 	public static final int WINDOW_HEIGHT = 650;
@@ -363,7 +366,7 @@ public class GUI extends JFrame {
 
 		// TODO: remove this when all features are implemented
 		radioNeighborOverl.setEnabled(false);
-		radioNeighborPerm.setEnabled(false);
+		// radioNeighborPerm.setEnabled(false);
 		radioAlgoSim.setEnabled(false);
 		radioAlgoTaboo.setEnabled(false);
 
@@ -459,11 +462,19 @@ public class GUI extends JFrame {
 
 				// Setup neighborhood
 				switch (neighborhood) {
-				case NEIGHBORHOOD_GEO:
+				case NEIGHBORHOOD_GEO:{
+					startSolution = mInstance.getInitSolution();
+					GeometryBasedSolution startGeoSolution = new GeometryBasedSolution(startSolution.getOptProblem(), null);
 					neighborhut = new GeometryBasedNeighborhood(mInstance,
-							startSolution.clone());
+							startGeoSolution.clone());
 					break;
-				case NEIGHBORHOOD_PERM:
+				}
+				case NEIGHBORHOOD_PERM:{
+					RuleBasedSolution startRuleSolution = new RuleBasedSolution(startSolution.getOptProblem(), null);
+					neighborhut = new RuleBasedNeighborhood(mInstance,
+							startRuleSolution);
+					break;
+				}
 				case NEIGHBORHOOD_OVERL:
 					// TODO
 

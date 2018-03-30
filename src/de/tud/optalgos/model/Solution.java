@@ -30,7 +30,7 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 	@Override
 	public int compareTo(Solution other) {
 		if (this.getObjective() < other.getObjective())
-			return optProblem.getDirection().equals(OptProblem.Direction.MINIMIZING) ? -1
+			return optProblem.getDirection().equals(OptProblem.Direction.MAXIMIZING) ? -1
 					: 1;
 		else if (this.getObjective() > other.getObjective())
 			return optProblem.getDirection().equals(OptProblem.Direction.MAXIMIZING) ? 1

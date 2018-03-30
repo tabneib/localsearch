@@ -2,8 +2,8 @@ package de.tud.optalgos.controller.neighborhood;
 
 import java.util.Random;
 
+import de.tud.optalgos.model.GeometryBasedSolution;
 import de.tud.optalgos.model.MOptProblem;
-import de.tud.optalgos.model.MSolution;
 import de.tud.optalgos.model.Solution;
 import de.tud.optalgos.model.geometry.MBox;
 import de.tud.optalgos.model.geometry.MRectangle;
@@ -17,22 +17,23 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 	/**
 	 * Maximal number of attempts to reposition the rectangles between boxes.
 	 */
-	public static final int MAX_REPOSITIONING_ATTEMPTS = 60;
+	public static final int MAX_REPOSITIONING_ATTEMPTS = 100;
 
 	/**
 	 * The next neighbor to be returned
 	 */
-	private MSolution nextNeighborSolution;
+	private GeometryBasedSolution nextNeighborSolution;
 
 	/**
 	 * Flag to determine whether process was executed
 	 */
 	private boolean findNext;
 
-	public GeometryBasedNeighborhood(MOptProblem instance, MSolution currentSolution) {
+	public GeometryBasedNeighborhood(MOptProblem instance, GeometryBasedSolution currentSolution) {
 		super(instance, currentSolution);
 		this.nextNeighborSolution = null;
 		this.findNext = false;
+		
 	}
 
 	@Override
@@ -45,6 +46,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		while (attempt < MAX_REPOSITIONING_ATTEMPTS) {
 			if (this.attempt()) {
 				// new solution was found
+				
 				this.findNext = true;
 				return true;
 			}
@@ -60,8 +62,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 	 * @return
 	 */
 	public boolean attempt() {
-
-		MSolution newSolution = ((MSolution) this.currentSolution).clone();
+		GeometryBasedSolution newSolution = ((GeometryBasedSolution) this.currentSolution).clone();
 		Random r = new Random();
 
 		if (newSolution.getBoxes().size() < 2)
@@ -70,6 +71,9 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		// pick two random boxes
 		int sourceBoxIndex = newSolution.getRandomBoxIndexForEmpty();
 		int destinationBoxIndex = newSolution.getRandomBoxIndexForEmpty();
+		if(sourceBoxIndex == destinationBoxIndex) {
+			return false;
+		}
 
 		// pick random rectangle
 		MBox sourceBox = newSolution.getBoxes().get(sourceBoxIndex);
@@ -87,18 +91,23 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 			}
 		} else
 			return false;
-
+		System.out.println("here1");
 		// insert this rectangle into new box
+		
 		MBox destinationBox = newSolution.getBoxes().get(destinationBoxIndex);
+		destinationBox.optimalSort();
 		if (destinationBox.insert(m.clone())) {
 			sourceBox.getMRectangles().remove(m);
 			if (sourceBox.getMRectangles().isEmpty())
 				newSolution.removeEmptyBox(sourceBoxIndex);
 			else
 				sourceBox.optimalSort();
-		} else
+		} else {
+			System.out.println("here2");
 			return false;
-
+		}
+			
+		
 		this.nextNeighborSolution = newSolution;
 		return true;
 	}
@@ -121,7 +130,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 
 	@Override
 	public void onCurrentSolutionChange(Solution newSolution) {
-		this.currentSolution = (MSolution) newSolution;
+		this.currentSolution = (GeometryBasedSolution) newSolution;
 		this.nextNeighborSolution = null;
 	}
 }
