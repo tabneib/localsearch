@@ -40,14 +40,10 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 				this.currentSolution = neighbor;
 				neighborhood.onCurrentSolutionChange(neighbor);
 				attempt = 0;
-				//System.out.println("better score: "+this.currentSolution.getObjective());
-				
 			}
-			//System.out.println("new score: "+neighbor.getObjective());
 			attempt++;
 		}
 		runningTime = System.currentTimeMillis() - startTime;
-		//System.out.println("Step: "+countStep);
 	}
 
 	@Override

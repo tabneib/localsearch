@@ -1,84 +1,104 @@
 package de.tud.optalgos.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 
 import de.tud.optalgos.model.geometry.MBox;
 import de.tud.optalgos.model.geometry.MRectangle;
 
+/**
+ * Class representing a rule-based solution. The solution depends on a permutation of
+ * the rectangles and a method that inserting the rectangles in the permutation into 
+ * boxes.
+ *
+ */
 public class RuleBasedSolution extends MSolution {
-	private int[] permutation;
+	
+	private ArrayList<MRectangle> permutation;
 
-	public RuleBasedSolution(OptProblem optProblem,  int[] permutation) {
+	public RuleBasedSolution(
+			OptProblem optProblem, ArrayList<MRectangle> initPermutation) {
 		super(optProblem, null);
 		
-		if(permutation == null) {
-			this.permutation = new int[((MOptProblem)this.optProblem).getRechtangles().size()];
-			for (int i = 0; i < this.permutation.length; i++) {
-				this.permutation[i]=i;
-			}
-		}else {
-			this.permutation = permutation;
+		if(initPermutation == null){
+			this.boxes = new ArrayList<>();
+			// Insert all rectangles in the instance into the permutation
+			permutation = new ArrayList<>();
+			
+			// Insert all rectangles in the permutation 
+			for (MRectangle r : ((MOptProblem) optProblem).getRechtangles())
+				permutation.add(r);
+			// Sort the rectangles first
+			Collections.sort(permutation, new Comparator<MRectangle>() {
+
+				@Override
+				public int compare(MRectangle o1, MRectangle o2) {
+					if (o1.getArea() < o2.getArea())
+						return 1;
+					else if (o1.getArea() == o2.getArea())
+						return 0;
+					else return -1;
+					}
+			});
+			// Then permute for a lot of times
+			this.permute(permutation.size());
 		}
-		
-		
-		
+		else {
+			this.permutation = initPermutation;
+			this.revalidate();
+		}
 	}
-	public boolean autoInsert() {
-		MOptProblem instance = ((MOptProblem)this.getOptProblem());
-		ArrayList<MRectangle> rechtangles = instance.getRechtangles();
-		int boxLength = instance.getBoxLength();
-		if(this.boxes == null) {
-			this.boxes = new ArrayList<MBox>();
-			for (int i = 0; i < permutation.length; i++) {
-				MRectangle m = rechtangles.get(permutation[i]);
-				if(!arrange(m)) {
-					//add new empty box;
-					MBox mbox = new MBox(boxLength);
-					mbox.insert(m.clone());
-					this.boxes.add(mbox);
-				}
+
+	
+	/**
+	 * Re-insert the rectangles in the permutation into boxes. This will replace the old 
+	 * boxes with the new ones.
+	 *
+	 */
+	private void revalidate(){
+		this.boxes = new ArrayList<>();
+		MBox box = new MBox(((MOptProblem) this.optProblem).getBoxLength());
+		for (MRectangle r : permutation) {
+			box.optimalSort();
+			while (!box.insert(r)){
+				box.optimalSort();
+				this.boxes.add(box);
+				box = new MBox(((MOptProblem) this.optProblem).getBoxLength());
 			}
-			return true;
 		}
-		return false;
-		
+		this.boxes.add(box);
 	}
 	
-	private boolean arrange(MRectangle m ) {
-		if(this.boxes.size()!=0) {
-			for (MBox mBox : this.boxes) {
-				if (mBox.insert(m.clone())) {
-					return true;
-				}
-			}
-			return false;
-		}else {
-			return false;
+	/**
+	 * Randomly make an one-step change in the permutation. This will yield a neighbor of
+	 * the current solution. 
+	 * Current approach: switch a random rectangle in the first half with another random 
+	 * one in the other half and do this for a given time. 
+	 * 
+	 * @param randomScore	The number of time to switch a pair of rectangles
+	 */
+	public void permute(int randomScore) {
+		for (int i = 0; i <= randomScore; i++) {
+			int pos0 = new Random().nextInt(permutation.size() / 2);
+			int pos1 = new Random().nextInt(permutation.size() / 2) + permutation.size() / 2;
+			Collections.swap(permutation, pos0, pos1);
 		}
-		
+		this.revalidate();
 	}
 	
-	public boolean permutate(int x, int y) {
-		MOptProblem instance = (MOptProblem)this.getOptProblem();
-		if(x == y || 0 > x || 0 > y || x >= instance.getRechtangles().size() || y >= instance.getRechtangles().size()) {
-			return false;
-		}else {
-			int temp = this.permutation[x];
-			this.permutation[x] = this.permutation[y];
-			this.permutation[y] = temp;
-			return true;
-		}
-		
+	private RuleBasedSolution setPermutation(ArrayList<MRectangle> permutation) {
+		this.permutation = permutation;
+		return this;
 	}
 	
 	@Override
 	public RuleBasedSolution clone() {
-		int[] clonedPermutation = new int[this.permutation.length];
-		for (int i = 0; i < this.permutation.length; i++) {
-			clonedPermutation[i]=this.permutation[i];
-		}
-		RuleBasedSolution newSolution = new RuleBasedSolution(this.optProblem, clonedPermutation);
-		return newSolution;
+	
+		ArrayList<MRectangle> clonedPermutation = new ArrayList<>();
+		clonedPermutation.addAll(permutation);
+		return new RuleBasedSolution(this.optProblem, null).
+				setPermutation(clonedPermutation);
 	}
-
 }

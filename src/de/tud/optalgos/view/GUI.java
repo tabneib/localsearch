@@ -463,16 +463,19 @@ public class GUI extends JFrame {
 				// Setup neighborhood
 				switch (neighborhood) {
 				case NEIGHBORHOOD_GEO:{
-					startSolution = mInstance.getInitSolution();
-					GeometryBasedSolution startGeoSolution = new GeometryBasedSolution(startSolution.getOptProblem(), null);
+					GeometryBasedSolution startGeoBasedSolution = 
+							new GeometryBasedSolution(startSolution.getOptProblem(), null);
 					neighborhut = new GeometryBasedNeighborhood(mInstance,
-							startGeoSolution.clone());
+							startGeoBasedSolution.clone());
+					startSolution = startGeoBasedSolution;
 					break;
 				}
 				case NEIGHBORHOOD_PERM:{
-					RuleBasedSolution startRuleSolution = new RuleBasedSolution(startSolution.getOptProblem(), null);
-					neighborhut = new RuleBasedNeighborhood(mInstance,
-							startRuleSolution);
+					RuleBasedSolution startRuleBasedSolution = 
+							new RuleBasedSolution(startSolution.getOptProblem(), null);
+					neighborhut = new RuleBasedNeighborhood(mInstance, 
+							startRuleBasedSolution.clone());
+					startSolution = startRuleBasedSolution;
 					break;
 				}
 				case NEIGHBORHOOD_OVERL:

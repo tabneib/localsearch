@@ -74,37 +74,37 @@ public class MBox extends Rectangle implements Cloneable{
 	/*
 	 * insert in definite location with or without rotation
 	 */
-	public boolean insert(MRectangle m, int x, int y, boolean rotated) {
+	public boolean insert(MRectangle rect, int x, int y, boolean rotated) {
 		//check overlapping
 		if(rotated) 
-			m = m.rotate();
+			rect = rect.rotate();
 		else 
-			m = m.clone();
+			rect = rect.clone();
 		
-		m.setLocation(x, y);
-		if(!this.contains(m)) 
+		rect.setLocation(x, y);
+		if(!this.contains(rect)) 
 			return false;
 		
-		for (MRectangle internM : this.mRectangles) 
-		    if(internM.intersects(m)) 
+		for (MRectangle internalRect : this.mRectangles) 
+		    if(internalRect.intersects(rect)) 
 		    	return false;
-		
+
 		//update grid step
-		if(m.getMinSize() < gridStep*SMOOTH_DEGREE) 
-			this.gridStep = m.getMinSize()/SMOOTH_DEGREE;
+		if(rect.getMinSize() < gridStep*SMOOTH_DEGREE) 
+			this.gridStep = rect.getMinSize()/SMOOTH_DEGREE;
 		if(this.gridStep ==0) 
 			this.gridStep = 1;
 		
 		//optimization: move to edge (move)		
-		this.optimalMove(m, 1,this.gridStep);
-		this.optimalMove(m, 2,this.gridStep);
-		this.optimalMove(m, 1,this.gridStep);
-		this.optimalMove(m, 2,this.gridStep);
-		
+		this.optimalMove(rect, VERTICAL, this.gridStep);
+		this.optimalMove(rect, HORIZONTAL, this.gridStep);
+		this.optimalMove(rect, VERTICAL, this.gridStep);
+		this.optimalMove(rect, HORIZONTAL, this.gridStep);
+
 		//insert this Rectangle into Box
-		this.mRectangles.add(m);
-		this.freeArea = this.getFreeArea() - m.getArea();
-		this.fillArea = this.getFillArea() + m.getArea();
+		this.mRectangles.add(rect);
+		this.freeArea = this.getFreeArea() - rect.getArea();
+		this.fillArea = this.getFillArea() + rect.getArea();
 		return true;
 	}
 	
@@ -131,14 +131,13 @@ public class MBox extends Rectangle implements Cloneable{
 	
 		if (stepLength == 0) 
 			return;
-		
 		int tempX = (int) m.getX();
 		int tempY = (int) m.getY();
 		
 		switch (direction) {
 		case VERTICAL:{
-			if(this.fit(m, tempX-stepLength, tempY, false)) {
-				m.setLocation(tempX-stepLength, tempY);
+			if(this.fit(m, tempX+stepLength, tempY, false)) {
+				m.setLocation(tempX+stepLength, tempY);
 				this.optimalMove(m, direction, stepLength);
 			}
 			else 
@@ -146,8 +145,8 @@ public class MBox extends Rectangle implements Cloneable{
 			break;
 		}
 		case HORIZONTAL:{
-			if(this.fit(m, tempX, tempY-stepLength, false)) {
-				m.setLocation(tempX, tempY-stepLength);
+			if(this.fit(m, tempX, tempY+stepLength, false)) {
+				m.setLocation(tempX, tempY+stepLength);
 				this.optimalMove(m, direction, stepLength);
 			}
 			else 
