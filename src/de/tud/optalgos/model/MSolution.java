@@ -18,30 +18,36 @@ public abstract class MSolution extends Solution implements Cloneable {
 	 * the corresponding instance of the optimization problem.
 	 */
 	protected ArrayList<MBox> boxes;
+	
+	private double objectiveValue = -1;
 
 	public MSolution(OptProblem optProblem, ArrayList<MBox> boxes) {
 		super(optProblem);
 		this.boxes = boxes;
 	}
 
-	
-
 	@Override
 	public double getObjective() {
-		int num = ((MOptProblem) optProblem).getRechtangles().size();
-		ArrayList<Double> fillGrades = new ArrayList<Double>();
-		for (MBox box : this.boxes)
-			fillGrades.add((Double) box.getFillGrade());
-		Collections.sort(fillGrades);
-		Collections.reverse(fillGrades);
-		double score = 0;
-		for (int i = 0; i < fillGrades.size(); i++) {
-			score += fillGrades.get(i) * (num - i);
+		if (this.objectiveValue == -1){
+			int totalRects = ((MOptProblem) optProblem).getRechtangles().size();
+			ArrayList<Double> fillGrades = new ArrayList<Double>();
+			for (MBox box : this.boxes)
+				fillGrades.add((Double) box.getFillRate());
+			Collections.sort(fillGrades);
+			Collections.reverse(fillGrades);
+			this.objectiveValue = 0;
+			for (int i = 0; i < fillGrades.size(); i++) 
+				this.objectiveValue += fillGrades.get(i) * (totalRects - i);
 		}
-		return score;
+		return this.objectiveValue;
 	}
-
 	
+	/**
+	 * This method forces the objective value to be updated (recomputed) the next time.
+	 */
+	public void updateObjective() {
+		this.objectiveValue = -1;
+	}
 
 	/**
 	 * Retrieve the list of all rectangles stored in the boxes of this solution.
@@ -61,17 +67,5 @@ public abstract class MSolution extends Solution implements Cloneable {
 
 	public void setBoxes(ArrayList<MBox> boxes) {
 		this.boxes = boxes;
-	}
-	
-	/**
-	 * TODO: Comment me
-	 * 
-	 * @return
-	 */
-	public int countRechtangles() {
-		int count = 0;
-		for (MBox box : this.boxes)
-			count += box.getMRectangles().size();
-		return count;
 	}
 }

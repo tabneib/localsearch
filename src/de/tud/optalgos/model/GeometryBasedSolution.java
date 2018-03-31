@@ -19,16 +19,16 @@ public class GeometryBasedSolution extends MSolution {
 				mBox.insert(m);
 				this.boxes.add(mBox);
 			}
-		}
-		
+		}	
 	}
 	
 	/**
-	 * TODO: Comment me
+	 * Randomly select a box in this solution. The probability that a box is selected is
+	 * proportional to its free area.
 	 * 
-	 * @return
+	 * @return	index of the selected box
 	 */
-	public int getRandomBoxIndexForEmpty() {
+	public int getRandomBoxProportionally() {
 		double totalFreeArea = 0;
 		for (MBox mBox : this.boxes)
 			totalFreeArea += mBox.getFreeArea();
@@ -43,23 +43,25 @@ public class GeometryBasedSolution extends MSolution {
 		return this.boxes.size() - 1;
 	}
 
+	
 	/**
-	 * TODO: Comment me
+	 * Randomly select a box in this solution.
 	 * 
-	 * @return
+	 * @return	index of the selected box
 	 */
-	public int getRandomBoxIndexForFilling() {
+	public int getRandomBox() {
 		Random r = new Random();
 		return r.nextInt(this.boxes.size())-1;
 	}
 
+	
 	/**
-	 * TODO: Comment me
+	 * Remove a box from this solution
 	 * 
-	 * @param indexOfEmptyBox
+	 * @param index of the box
 	 */
-	public void removeEmptyBox(int indexOfEmptyBox) {
-		this.boxes.remove(indexOfEmptyBox);
+	public void removeBox(int index) {
+		this.boxes.remove(index);
 	}
 	
 	@Override
@@ -70,6 +72,4 @@ public class GeometryBasedSolution extends MSolution {
 		GeometryBasedSolution newSolution = new GeometryBasedSolution(this.optProblem, newBoxes);
 		return newSolution;
 	}
-	
-	
 }

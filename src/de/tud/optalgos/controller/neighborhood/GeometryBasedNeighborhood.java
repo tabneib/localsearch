@@ -55,60 +55,60 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		// if no solution was found
 		return false;
 	}
+	
 
 	/**
-	 * TODO: Comment me
+	 * Attempt to find the next neighbor
 	 * 
 	 * @return
 	 */
 	public boolean attempt() {
-		GeometryBasedSolution newSolution = ((GeometryBasedSolution) this.currentSolution).clone();
-		Random r = new Random();
-
-		if (newSolution.getBoxes().size() < 2)
+		
+		if (((GeometryBasedSolution) this.currentSolution).getBoxes().size() < 2)
 			return false;
+		
+		GeometryBasedSolution nextSolution = 
+				((GeometryBasedSolution) this.currentSolution).clone();
 
-		// pick two random boxes
-		int sourceBoxIndex = newSolution.getRandomBoxIndexForEmpty();
-		int destinationBoxIndex = newSolution.getRandomBoxIndexForEmpty();
+		// Pick two random boxes
+		int sourceBoxIndex = nextSolution.getRandomBoxProportionally();
+		int destinationBoxIndex = nextSolution.getRandomBoxProportionally();
 		if(sourceBoxIndex == destinationBoxIndex) {
 			return false;
 		}
 
-		// pick random rectangle
-		MBox sourceBox = newSolution.getBoxes().get(sourceBoxIndex);
+		// Pick random rectangle
+		MBox sourceBox = nextSolution.getBoxes().get(sourceBoxIndex);
 		int sourceBoxSize = sourceBox.getMRectangles().size();
 		MRectangle m = null;
 		if (sourceBoxSize > 0) {
-			int item = 0;
-			if (sourceBoxSize > 1)
-				item = r.nextInt(sourceBoxSize - 1);
+			int item = sourceBoxSize > 1 ? new Random().nextInt(sourceBoxSize - 1) : 0;
 			int i = 0;
 			for (MRectangle tempRectangle : sourceBox.getMRectangles()) {
-				if (i == item)
+				if (i == item){
 					m = tempRectangle;
+					break;
+				}
 				i++;
 			}
 		} else
 			return false;
-		System.out.println("here1");
-		// insert this rectangle into new box
 		
-		MBox destinationBox = newSolution.getBoxes().get(destinationBoxIndex);
-		destinationBox.optimalSort();
+		// Insert this rectangle into the destination box	
+		MBox destinationBox = nextSolution.getBoxes().get(destinationBoxIndex);
+		//destinationBox.optimalSort(); <- No need to sort the destination box due to optimal insert
 		if (destinationBox.insert(m.clone())) {
-			sourceBox.getMRectangles().remove(m);
+			sourceBox.removeRect(m);
 			if (sourceBox.getMRectangles().isEmpty())
-				newSolution.removeEmptyBox(sourceBoxIndex);
+				nextSolution.removeBox(sourceBoxIndex);
 			else
 				sourceBox.optimalSort();
-		} else {
-			System.out.println("here2");
+		} else 
 			return false;
-		}
-			
 		
-		this.nextNeighborSolution = newSolution;
+		// Don't forget to update the objective value of the next solution
+		nextSolution.updateObjective();	
+		this.nextNeighborSolution = nextSolution;
 		return true;
 	}
 
