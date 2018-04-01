@@ -14,6 +14,11 @@ import de.tud.optalgos.model.geometry.MRectangle;
 public abstract class MSolution extends Solution implements Cloneable {
 
 	/**
+	 * Total number of rounds that the algorithm has run
+	 */
+	private static int round = 0;
+	
+	/**
 	 * List of the boxes used by this solution to store the rectangles given by
 	 * the corresponding instance of the optimization problem.
 	 */
@@ -39,7 +44,21 @@ public abstract class MSolution extends Solution implements Cloneable {
 			for (int i = 0; i < fillGrades.size(); i++) 
 				this.objectiveValue += fillGrades.get(i) * (totalRects - i);
 		}
+		//System.out.println("objectiveValue = " + this.objectiveValue);
+		//System.out.println("penalty = " + MSolution.getPenaltyRate() * this.getTotalOverlapArea());
+		this.objectiveValue += MSolution.getPenaltyRate() * this.getTotalOverlapArea();
 		return this.objectiveValue;
+	}
+	
+	/**
+	 * Sum up all overlap area of the boxes
+	 * @return	The total overlap area
+	 */
+	private double getTotalOverlapArea(){
+		double total = 0;
+		for (MBox box : this.boxes) 
+			total += box.getOverlapArea();
+		return total;
 	}
 	
 	/**
@@ -67,5 +86,17 @@ public abstract class MSolution extends Solution implements Cloneable {
 
 	public void setBoxes(ArrayList<MBox> boxes) {
 		this.boxes = boxes;
+	}
+	
+	public static double getPenaltyRate() {
+		return Math.pow(round, 1.5);
+	}
+	
+	public static void increaseRound() {
+		round++;
+	}
+	
+	public static void resetRound() {
+		round = 0;
 	}
 }

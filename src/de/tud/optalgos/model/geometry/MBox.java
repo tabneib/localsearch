@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Class representing a rectangles contained in the boxes
+ * Class representing a box that contains rectangles
  *
  */
 public class MBox extends Rectangle implements Cloneable{
@@ -21,6 +21,7 @@ public class MBox extends Rectangle implements Cloneable{
 	private double freeArea = -1;
 	private double fillArea = -1;
 	private double fillRate = -1;
+	private double overlapArea = 0;
 	
 	
 	public MBox(int boxLength, ArrayList<MRectangle> mRectangles) {
@@ -96,6 +97,7 @@ public class MBox extends Rectangle implements Cloneable{
 		if(!this.contains(rect)) 
 			return false;
 		
+		// Check if no rectangles currently in this box intersect the given rectangle
 		for (MRectangle internalRect : this.mRectangles) 
 		    if(internalRect.intersects(rect)) 
 		    	return false;
@@ -106,7 +108,7 @@ public class MBox extends Rectangle implements Cloneable{
 		if(this.gridStep == 0) 
 			this.gridStep = 1;
 		
-		//optimization: move to edge (move)		
+		// Optimization: push the rectangle to edges		
 		if (new Random().nextBoolean()){
 			this.push(rect, VERTICAL, this.gridStep);
 			this.push(rect, HORIZONTAL, this.gridStep);
@@ -120,10 +122,26 @@ public class MBox extends Rectangle implements Cloneable{
 			this.push(rect, VERTICAL, this.gridStep);
 		}
 
-		//insert this Rectangle into Box
+		// Compute filled and free area.
+		// In case overlap is permitted, then also total overlapped area
+		if (MRectangle.getOverlap()) {
+			Rectangle union = rect.clone();
+			for (MRectangle internalRect : this.mRectangles) {
+				union = union.union(internalRect);
+				Rectangle intersektion = internalRect.intersection(rect);
+				this.overlapArea += intersektion.getWidth() * intersektion.getHeight();
+			}
+			this.fillArea = union.getWidth() * union.getHeight();
+			this.freeArea = Math.pow(this.boxLength, 2) - this.fillArea;
+		}
+		else {
+			this.freeArea = this.getFreeArea() - rect.getArea();
+			this.fillArea = this.getFillArea() + rect.getArea();
+		}
+		
+		// Insert this Rectangle into Box
 		this.mRectangles.add(rect);
-		this.freeArea = this.getFreeArea() - rect.getArea();
-		this.fillArea = this.getFillArea() + rect.getArea();
+		
 		return true;
 	}
 	
@@ -256,14 +274,32 @@ public class MBox extends Rectangle implements Cloneable{
 		return  this.fillRate;
 	}
 
+	public double getOverlapArea() {
+		return this.overlapArea;
+	}
+	
 	/**
 	 * Remove the given rectangle from this box
 	 * @param rect
 	 */
 	public void removeRect(MRectangle rect) {
-		this.mRectangles.remove(rect);
-		this.fillArea = this.getFillArea() - rect.getArea();
-		this.freeArea = this.getFreeArea() + rect.getArea();
+		if (MRectangle.getOverlap()) {
+			// Case overlapping is permitted
+			this.mRectangles.remove(rect);
+			Rectangle union = null;
+			for (MRectangle internalRect : this.mRectangles) {
+				union = union == null ? internalRect : union.union(internalRect);
+				Rectangle intersektion = internalRect.intersection(rect);
+				this.overlapArea -= intersektion.getWidth() * intersektion.getHeight();
+			}
+			this.fillArea = union == null ? 0 : union.getWidth() * union.getHeight();
+			this.freeArea = Math.pow(this.boxLength, 2) - this.fillArea;
+		}
+		else {
+			this.mRectangles.remove(rect);
+			this.fillArea = this.getFillArea() - rect.getArea();
+			this.freeArea = this.getFreeArea() + rect.getArea();
+		}
 	}
 	
 	/**

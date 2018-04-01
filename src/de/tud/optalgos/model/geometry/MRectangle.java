@@ -5,10 +5,22 @@ import java.awt.Rectangle;
 public class MRectangle extends Rectangle {
 	
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * If overlapping of rectangles is permitted
+	 */
+	private static boolean overlap = false;
+	
+	/**
+	 * The percentage of permitted overlapping area
+	 */
+	private static double overlapRate = 1.0;
+	
 	private int boxLength;
 	private MBox mBox;
 	private final int maxSize;
 	private final int minSize;
+	
 	
 	public MRectangle(int x, int y,int width, int height, int boxLength) {
 		super.setRect(x, y, width, height);
@@ -22,6 +34,38 @@ public class MRectangle extends Rectangle {
 		this.boxLength = boxLength;
 		this.maxSize = Math.max(width, height);
 		this.minSize = Math.min(width, height);
+	}
+
+
+	@Override
+	public boolean intersects(Rectangle r) {
+		if (!overlap)
+			return super.intersects(r);
+		else{
+			// Case overlapping is permitted 
+			if (!super.intersects(r))
+				return false;
+			else {
+				Rectangle intersection = super.intersection(r);
+				if (intersection.getWidth() * intersection.getHeight() / 
+						Math.max(this.getArea(), ((MRectangle) r).getArea()) <= overlapRate) 
+					return false;
+				else
+					return true;
+			}
+		}
+	}
+	
+	public static void setOverlap(boolean ouverlap) {
+		overlap = ouverlap;
+	}
+	
+	public static boolean getOverlap() {
+		return overlap;
+	}
+	
+	public static void setOverlapRate(double rate) {
+		overlapRate = rate;
 	}
 
 	public MBox getmBox() {
@@ -67,5 +111,3 @@ public class MRectangle extends Rectangle {
 		return cloneM;
 	};
 }
-
-

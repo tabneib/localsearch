@@ -1,6 +1,7 @@
 package de.tud.optalgos.controller.algos;
 
 import de.tud.optalgos.controller.neighborhood.Neighborhood;
+import de.tud.optalgos.model.MSolution;
 import de.tud.optalgos.model.OptProblem;
 import de.tud.optalgos.model.Solution;
 
@@ -31,6 +32,7 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 
 	@Override
 	public void run() {
+		MSolution.resetRound();
 		long startTime = System.currentTimeMillis();
 		int attempt = 0;
 		while (neighborhood.hasNext() && attempt < MAX_SEARCHING_ATTEMPTS) {
@@ -39,6 +41,7 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				this.currentSolution = neighbor;
 				neighborhood.onCurrentSolutionChange(neighbor);
+				MSolution.increaseRound();
 				attempt = 0;
 			}
 			attempt++;
