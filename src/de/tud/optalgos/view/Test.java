@@ -3,6 +3,7 @@ package de.tud.optalgos.view;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.swing.JFrame;
@@ -57,7 +58,7 @@ public class Test extends JFrame {
 		rectangles.add(r2);
 		rectangles.add(r3);
 		*/
-		HashSet<MRectangle> rectSet = new HashSet<>();
+		ArrayList<MRectangle> rectSet = new ArrayList<>();
 		rectSet.addAll(
 				MInstanceFactory.splitter(INIT_LENGTH, INIT_LENGTH, INIT_LENGTH / 100));
 

@@ -33,7 +33,7 @@ public class GUI extends JFrame {
 	public static final int DEFAULT_MIN_LENGTH = 10;
 	public static final int DEFAULT_MAX_LENGTH = 50;
 	public static final int DEFAULT_BOX_LENGTH = 200;
-	public static final int DEFAULT_INIT_LENGTH = 500;
+	public static final int DEFAULT_INIT_LENGTH = 635;
 
 	// GUI Constants
 	public static final int WINDOW_HEIGHT = 650;

@@ -16,6 +16,8 @@ import de.tud.optalgos.model.geometry.MRectangle;
 public class MInstanceFactory {
 	
 	private static final String direction = OptProblem.Direction.MAXIMIZING;
+	
+	private static final int REDUCE_COMP = 4; 
 
 	/**
 	 * 
@@ -35,12 +37,12 @@ public class MInstanceFactory {
 
 		MRectangle rectangle;
 		MBox box;
-		HashSet<MRectangle> initRectSet;
+		ArrayList<MRectangle> initRectSet;
 		for (int i = 0; i < amount; i++) {
 			rectangle = new MRectangle(0, 0,
 					widthR.nextInt(maxLength - minLength + 1) + minLength,
 					heightR.nextInt(maxLength - minLength + 1) + minLength, boxLength);
-			initRectSet = new HashSet<MRectangle>();
+			initRectSet = new ArrayList<MRectangle>();
 			initRectSet.add(rectangle);
 			box = new MBox(boxLength, initRectSet);
 			rectangle.setmBox(box);
@@ -66,11 +68,11 @@ public class MInstanceFactory {
 		// Create corresponding boxes
 		ArrayList<MBox> boxes = new ArrayList<>();
 		MBox box;
-		HashSet<MRectangle> initRectSet;
+		ArrayList<MRectangle> initRectSet;
 		for (MRectangle rect : rectangles) {
 			// Set the anchor to (0,0)
 			rect.setLocation(0, 0);
-			initRectSet = new HashSet<MRectangle>();
+			initRectSet = new ArrayList<MRectangle>();
 			initRectSet.add(rect);
 			box = new MBox(boxLength, initRectSet);
 			rect.setmBox(box);
@@ -112,21 +114,21 @@ public class MInstanceFactory {
 
 		MRectangle r;
 		MRectangle[] rSplit;
-		while (!rects.isEmpty() && rects.peek().getMaxSize() >= boxLength
+		while (!rects.isEmpty() && rects.peek().getMaxSize() >= boxLength / REDUCE_COMP
 				&& rects.peek().getMaxSize() >= minLength * 2) {
 			r = getRandomRect(rects);
 			rects.remove(r);
 
 			// Check if r has an edge that cannot be split any further
 			// and the other edge is not needed to split any further
-			if (r.getMaxSize() <= boxLength && r.getMinSize() < minLength * 2)
+			if (r.getMaxSize() <= boxLength / REDUCE_COMP && r.getMinSize() < minLength * 2)
 				results.add(r);
 			else {
 				rSplit = randomlySplit(r, minLength);
 
 				for (int i = 0; i < 2; i++) {
 					if (rSplit[i].getMinSize() < minLength * 2
-							&& rSplit[i].getMaxSize() <= boxLength) {
+							&& rSplit[i].getMaxSize() <= boxLength / REDUCE_COMP) {
 						results.add(rSplit[i]);
 					} else
 						rects.add(rSplit[i]);

@@ -1,8 +1,13 @@
 package de.tud.optalgos.model.geometry;
 
 import java.awt.Rectangle;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Random;
 
+/**
+ * Class representing a rectangles contained in the boxes
+ *
+ */
 public class MBox extends Rectangle implements Cloneable{
 	
 	private static final long serialVersionUID = 1L;
@@ -12,13 +17,13 @@ public class MBox extends Rectangle implements Cloneable{
 	private final int boxLength;
 	private int gridStep;
 	private int maxRange;
-	private HashSet<MRectangle> mRectangles;
+	private ArrayList<MRectangle> mRectangles;
 	private double freeArea = -1;
 	private double fillArea = -1;
 	private double fillRate = -1;
 	
 	
-	public MBox(int boxLength, HashSet<MRectangle> mRectangles) {
+	public MBox(int boxLength, ArrayList<MRectangle> mRectangles) {
 		super.setRect(0, 0, boxLength, boxLength);
 		this.boxLength = boxLength;
 		this.mRectangles = mRectangles;
@@ -26,7 +31,7 @@ public class MBox extends Rectangle implements Cloneable{
 		this.maxRange = this.boxLength / this.gridStep;
 	}
 	
-	public MBox(int boxLength, HashSet<MRectangle> mRectangles, int gridStep) {
+	public MBox(int boxLength, ArrayList<MRectangle> mRectangles, int gridStep) {
 		super.setRect(0, 0, boxLength, boxLength);
 		this.boxLength = boxLength;
 		this.mRectangles = mRectangles;
@@ -37,7 +42,7 @@ public class MBox extends Rectangle implements Cloneable{
 	public MBox(int boxLength) {
 		super.setRect(0, 0, boxLength, boxLength);
 		this.boxLength = boxLength;
-		this.mRectangles = new HashSet<MRectangle>();
+		this.mRectangles = new ArrayList<MRectangle>();
 		this.gridStep = this.boxLength/SMOOTH_DEGREE;
 		this.maxRange = this.boxLength / this.gridStep;
 	}
@@ -55,11 +60,12 @@ public class MBox extends Rectangle implements Cloneable{
 	 * @param m	The given rectangle
 	 * @return	True if inserted, False otherwise
 	 */
-	public boolean insert(MRectangle m) {
+	public boolean optimalInsert(MRectangle m) {
 		
 		if(this.getFreeArea() < m.getArea()) 
 			return false;
 		
+		// Try to insert with/without rotating at different position
 		for (int i = 0; i < maxRange; i++){
 			for (int j = 0; j < maxRange; j++) {
 				if(this.insert(m, i*gridStep, j*gridStep, false)) 
@@ -71,8 +77,13 @@ public class MBox extends Rectangle implements Cloneable{
 		return false;
 	}
 	
-	/*
-	 * insert in definite location with or without rotation
+	/**
+	 * Insert at the given location with or without rotation
+	 * @param rect
+	 * @param x
+	 * @param y
+	 * @param rotated
+	 * @return
 	 */
 	public boolean insert(MRectangle rect, int x, int y, boolean rotated) {
 		//check overlapping
@@ -89,17 +100,25 @@ public class MBox extends Rectangle implements Cloneable{
 		    if(internalRect.intersects(rect)) 
 		    	return false;
 
-		//update grid step
+		// Update grid step
 		if(rect.getMinSize() < gridStep*SMOOTH_DEGREE) 
 			this.gridStep = rect.getMinSize()/SMOOTH_DEGREE;
-		if(this.gridStep ==0) 
+		if(this.gridStep == 0) 
 			this.gridStep = 1;
 		
 		//optimization: move to edge (move)		
-		this.optimalMove(rect, VERTICAL, this.gridStep);
-		this.optimalMove(rect, HORIZONTAL, this.gridStep);
-		this.optimalMove(rect, VERTICAL, this.gridStep);
-		this.optimalMove(rect, HORIZONTAL, this.gridStep);
+		if (new Random().nextBoolean()){
+			this.push(rect, VERTICAL, this.gridStep);
+			this.push(rect, HORIZONTAL, this.gridStep);
+			this.push(rect, VERTICAL, this.gridStep);
+			this.push(rect, HORIZONTAL, this.gridStep);
+		}
+		else {
+			this.push(rect, HORIZONTAL, this.gridStep);
+			this.push(rect, VERTICAL, this.gridStep);
+			this.push(rect, HORIZONTAL, this.gridStep);
+			this.push(rect, VERTICAL, this.gridStep);
+		}
 
 		//insert this Rectangle into Box
 		this.mRectangles.add(rect);
@@ -113,13 +132,13 @@ public class MBox extends Rectangle implements Cloneable{
 	 */
 	public void optimalSort() {
 		for (MRectangle mRectangle : this.mRectangles) {
-			this.optimalMove(mRectangle, VERTICAL, this.gridStep);
-			this.optimalMove(mRectangle, HORIZONTAL, this.gridStep);
+			this.push(mRectangle, VERTICAL, this.gridStep);
+			this.push(mRectangle, HORIZONTAL, this.gridStep);
 		}
 	}
 	
 	/**
-	 * Move the given rectangle step by step in the given direction with the given initial
+	 * Push the given rectangle step by step in the given direction with the given initial
 	 * step length until the step length is reduced to 0. The rectangle must always fit 
 	 * the current state of this box. 
 	 * 
@@ -127,7 +146,7 @@ public class MBox extends Rectangle implements Cloneable{
 	 * @param direction		The direction to move the rectangle
 	 * @param stepLength	The length of the moving step 
 	 */
-	private void optimalMove(MRectangle m, int direction, int stepLength) {
+	private void push(MRectangle m, int direction, int stepLength) {
 	
 		if (stepLength == 0) 
 			return;
@@ -138,19 +157,19 @@ public class MBox extends Rectangle implements Cloneable{
 		case VERTICAL:{
 			if(this.fit(m, tempX+stepLength, tempY, false)) {
 				m.setLocation(tempX+stepLength, tempY);
-				this.optimalMove(m, direction, stepLength);
+				this.push(m, direction, stepLength);
 			}
 			else 
-				this.optimalMove(m, direction, stepLength/2);
+				this.push(m, direction, stepLength/2);
 			break;
 		}
 		case HORIZONTAL:{
 			if(this.fit(m, tempX, tempY+stepLength, false)) {
 				m.setLocation(tempX, tempY+stepLength);
-				this.optimalMove(m, direction, stepLength);
+				this.push(m, direction, stepLength);
 			}
 			else 
-				this.optimalMove(m, direction, stepLength/2);
+				this.push(m, direction, stepLength/2);
 			break;
 		}
 		default:
@@ -251,7 +270,7 @@ public class MBox extends Rectangle implements Cloneable{
 	 * Get all the rectangles currently contained in this box
 	 * @return	The HashSet of all rectangles
 	 */
-	public HashSet<MRectangle> getMRectangles() {
+	public ArrayList<MRectangle> getMRectangles() {
 		return mRectangles;
 	}
 	
@@ -263,7 +282,7 @@ public class MBox extends Rectangle implements Cloneable{
 	
 	@Override
 	public MBox clone(){
-		HashSet<MRectangle> clonedRectangles = new HashSet<MRectangle>();
+		ArrayList<MRectangle> clonedRectangles = new ArrayList<MRectangle>();
 		for (MRectangle mRectangle : this.mRectangles) {
 			clonedRectangles.add(mRectangle.clone());
 		}

@@ -16,7 +16,7 @@ public class GeometryBasedSolution extends MSolution {
 			MOptProblem instance = (MOptProblem)this.optProblem; 
 			for (MRectangle m : instance.getRechtangles()) {
 				MBox mBox = new MBox(instance.getBoxLength());
-				mBox.insert(m);
+				mBox.optimalInsert(m);
 				this.boxes.add(mBox);
 			}
 		}	

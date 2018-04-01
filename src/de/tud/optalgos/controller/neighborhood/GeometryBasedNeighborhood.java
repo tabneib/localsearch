@@ -97,7 +97,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		// Insert this rectangle into the destination box	
 		MBox destinationBox = nextSolution.getBoxes().get(destinationBoxIndex);
 		//destinationBox.optimalSort(); <- No need to sort the destination box due to optimal insert
-		if (destinationBox.insert(m.clone())) {
+		if (destinationBox.optimalInsert(m.clone())) {
 			sourceBox.removeRect(m);
 			if (sourceBox.getMRectangles().isEmpty())
 				nextSolution.removeBox(sourceBoxIndex);

@@ -16,6 +16,11 @@ public class MOptProblem extends OptProblem {
 	 * The rectangles to be placed into the boxes
 	 */
 	private ArrayList<MRectangle> rechtangles;
+	
+	/**
+	 * The total area of the rectangles
+	 */
+	private double rectArea = 0;
 
 	/**
 	 * The edge length of the boxes
@@ -35,6 +40,8 @@ public class MOptProblem extends OptProblem {
 		this.boxLength = boxLength;
 		this.rechtangles = rectangles;
 		this.initSolution = new GeometryBasedSolution(this, boxes);
+		for (MRectangle r : rectangles) 
+			this.rectArea += r.getArea();
 	}
 
 	public MSolution getInitSolution() {
@@ -47,5 +54,9 @@ public class MOptProblem extends OptProblem {
 
 	public int getBoxLength() {
 		return boxLength;
+	}
+	
+	public double getTotalRectArea() {
+		return this.rectArea;
 	}
 }
