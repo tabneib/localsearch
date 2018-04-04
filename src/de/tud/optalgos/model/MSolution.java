@@ -2,7 +2,6 @@ package de.tud.optalgos.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
 import de.tud.optalgos.model.geometry.MBox;
 import de.tud.optalgos.model.geometry.MRectangle;
 
@@ -17,6 +16,11 @@ public abstract class MSolution extends Solution implements Cloneable {
 	 * Total number of rounds that the algorithm has run
 	 */
 	private static int round = 0;
+	
+	/**
+	 * The percentage amount to reduce the overlap rate in one reduction step.
+	 */
+	private static final double OVERLAP_RATE_REDUCE_STEP = 0.1; 
 	
 	/**
 	 * List of the boxes used by this solution to store the rectangles given by
@@ -44,9 +48,10 @@ public abstract class MSolution extends Solution implements Cloneable {
 			for (int i = 0; i < fillGrades.size(); i++) 
 				this.objectiveValue += fillGrades.get(i) * (totalRects - i);
 		}
-		//System.out.println("objectiveValue = " + this.objectiveValue);
-		//System.out.println("penalty = " + MSolution.getPenaltyRate() * this.getTotalOverlapArea());
-		this.objectiveValue += MSolution.getPenaltyRate() * this.getTotalOverlapArea();
+		
+		if (MRectangle.isOverlapPermitted())
+			this.objectiveValue -= MSolution.getPenaltyRate() * this.getTotalOverlapArea();
+
 		return this.objectiveValue;
 	}
 	
@@ -89,11 +94,19 @@ public abstract class MSolution extends Solution implements Cloneable {
 	}
 	
 	public static double getPenaltyRate() {
-		return Math.pow(round, 1.5);
+		if (MRectangle.isOverlapPermitted())
+			return Math.pow(round, 1.2);
+		else 
+			throw new RuntimeException("Cannot get penalty rate in case overlap is not permitted!");
 	}
 	
+	/**
+	 * Increase the counted round of the algorithm. This is used for the penalty of overlapping
+	 */
 	public static void increaseRound() {
 		round++;
+		if (MRectangle.isOverlapPermitted() && MRectangle.getOverlapRate() > MRectangle.MIN_OVERLAP_RATE)
+			MRectangle.setOverlapRate(MRectangle.getOverlapRate() - OVERLAP_RATE_REDUCE_STEP);
 	}
 	
 	public static void resetRound() {

@@ -26,6 +26,8 @@ public class GeometryBasedSolution extends MSolution {
 	 * Randomly select a box in this solution. The probability that a box is selected is
 	 * proportional to its free area.
 	 * 
+	 * TODO: adapt for the case
+	 * 
 	 * @return	index of the selected box
 	 */
 	public int getRandomBoxProportionally() {

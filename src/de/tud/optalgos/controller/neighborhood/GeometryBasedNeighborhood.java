@@ -78,8 +78,13 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		}
 
 		// Pick random rectangle
+		// TODO: Move this to MBox, adapt for the overlap case
 		MBox sourceBox = nextSolution.getBoxes().get(sourceBoxIndex);
-		int sourceBoxSize = sourceBox.getMRectangles().size();
+		MRectangle m = sourceBox.getRandomRect();
+		if (m == null)
+			return false;
+		
+		/*int sourceBoxSize = sourceBox.getMRectangles().size();
 		MRectangle m = null;
 		if (sourceBoxSize > 0) {
 			int item = sourceBoxSize > 1 ? new Random().nextInt(sourceBoxSize - 1) : 0;
@@ -92,7 +97,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 				i++;
 			}
 		} else
-			return false;
+			return false;*/
 		
 		// Insert this rectangle into the destination box	
 		MBox destinationBox = nextSolution.getBoxes().get(destinationBoxIndex);

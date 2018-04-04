@@ -81,7 +81,7 @@ public class GUI extends JFrame {
 	private JLabel labelAlgo;
 	private JRadioButton radioNeighborGeo;
 	private JRadioButton radioNeighborPerm;
-	private JRadioButton radioNeighborOverl;
+	private JCheckBox checkboxNeighborOverl;
 	private JRadioButton radioAlgoLocal;
 	private JRadioButton radioAlgoSim;
 	private JRadioButton radioAlgoTaboo;
@@ -311,16 +311,16 @@ public class GUI extends JFrame {
 		c.gridwidth = 1;
 		panel.add(radioNeighborPerm, c);
 
-		radioNeighborOverl = new JRadioButton("Overlap");
+		checkboxNeighborOverl = new JCheckBox("Overlap");
 		c.gridx = 2;
 		c.gridy = 7;
 		c.gridwidth = 1;
-		panel.add(radioNeighborOverl, c);
+		panel.add(checkboxNeighborOverl, c);
 
 		ButtonGroup groupNeighbor = new ButtonGroup();
 		groupNeighbor.add(radioNeighborGeo);
 		groupNeighbor.add(radioNeighborPerm);
-		groupNeighbor.add(radioNeighborOverl);
+		//groupNeighbor.add(radioNeighborOverl);
 		radioNeighborGeo.setSelected(true);
 
 		// Algos
@@ -365,7 +365,7 @@ public class GUI extends JFrame {
 		panel.add(buttonRun, c);
 
 		// TODO: remove this when all features are implemented
-		radioNeighborOverl.setEnabled(false);
+		// checkboxNeighborOverl.setEnabled(false);
 		// radioNeighborPerm.setEnabled(false);
 		radioAlgoSim.setEnabled(false);
 		radioAlgoTaboo.setEnabled(false);
@@ -384,7 +384,7 @@ public class GUI extends JFrame {
 		radioSplitGen.addActionListener(new GenSelectListener());
 		radioNeighborGeo.addActionListener(new NeighborSelectListener());
 		radioNeighborPerm.addActionListener(new NeighborSelectListener());
-		radioNeighborOverl.addActionListener(new NeighborSelectListener());
+		checkboxNeighborOverl.addActionListener(new NeighborSelectListener());
 		radioAlgoLocal.addActionListener(new AlgoSelectListener());
 		radioAlgoSim.addActionListener(new AlgoSelectListener());
 		radioAlgoTaboo.addActionListener(new AlgoSelectListener());
@@ -520,6 +520,15 @@ public class GUI extends JFrame {
 				});
 			}
 		});
+		
+		checkboxNeighborOverl.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MRectangle.setOverlap(checkboxNeighborOverl.isSelected());
+					
+			}
+		});
 	}
 
 	/**
@@ -607,7 +616,7 @@ public class GUI extends JFrame {
 				neighborhood = NEIGHBORHOOD_GEO;
 			else if (radioNeighborPerm.isSelected())
 				neighborhood = NEIGHBORHOOD_PERM;
-			else if (radioNeighborOverl.isSelected())
+			else if (checkboxNeighborOverl.isSelected())
 				neighborhood = NEIGHBORHOOD_OVERL;
 		}
 	}

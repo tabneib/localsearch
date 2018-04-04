@@ -2,6 +2,7 @@ package de.tud.optalgos.model.geometry;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -11,12 +12,26 @@ import java.util.Random;
 public class MBox extends Rectangle implements Cloneable{
 	
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * TODO: comment me
+	 */
 	public static final int SMOOTH_DEGREE = 1;
+	
 	public static final int VERTICAL = 1;
 	public static final int HORIZONTAL = 2;
 	private final int boxLength;
+	
+	/**
+	 * TODO: comment me
+	 */
 	private int gridStep;
+	
+	/**
+	 * TODO: comment me
+	 */
 	private int maxRange;
+	
 	private ArrayList<MRectangle> mRectangles;
 	private double freeArea = -1;
 	private double fillArea = -1;
@@ -57,7 +72,7 @@ public class MBox extends Rectangle implements Cloneable{
 	}
 	
 	/**
-	 * Insert the given rectangle into this box at an optimal position.
+	 * Automatically insert the given rectangle into this box at an optimal position.
 	 * @param m	The given rectangle
 	 * @return	True if inserted, False otherwise
 	 */
@@ -66,11 +81,15 @@ public class MBox extends Rectangle implements Cloneable{
 		if(this.getFreeArea() < m.getArea()) 
 			return false;
 		
-		// Try to insert with/without rotating at different position
+		// Try to insert at different positions
+		// Along horizontal axis
 		for (int i = 0; i < maxRange; i++){
+			// Along vertical axis
 			for (int j = 0; j < maxRange; j++) {
+				// Try to insert without rotating
 				if(this.insert(m, i*gridStep, j*gridStep, false)) 
 					return true;
+				// Try to insert with rotating
 				else if(this.insert(m, i*gridStep, j*gridStep, true)) 
 						return true;
 			}
@@ -79,15 +98,17 @@ public class MBox extends Rectangle implements Cloneable{
 	}
 	
 	/**
-	 * Insert at the given location with or without rotation
+	 * Insert a clone of the given rectangle at the given location.
+	 * After inserting successfully at the given location, optimize by pushing the rectangle
+	 * to the edges.
 	 * @param rect
 	 * @param x
 	 * @param y
 	 * @param rotated
-	 * @return
+	 * @return	True if inserted, False otherwise
 	 */
 	public boolean insert(MRectangle rect, int x, int y, boolean rotated) {
-		//check overlapping
+
 		if(rotated) 
 			rect = rect.rotate();
 		else 
@@ -97,58 +118,86 @@ public class MBox extends Rectangle implements Cloneable{
 		if(!this.contains(rect)) 
 			return false;
 		
-		// Check if no rectangles currently in this box intersect the given rectangle
+		// Check if no rectangle currently in this box intersect the given rectangle
+		// For this check overlapping is not permitted, hence intersection method is used
 		for (MRectangle internalRect : this.mRectangles) 
-		    if(internalRect.intersects(rect)) 
+		    if(!internalRect.intersection(rect).isEmpty()) 
 		    	return false;
 
+		// The given rectangle can be inserted !
+		
 		// Update grid step
-		if(rect.getMinSize() < gridStep*SMOOTH_DEGREE) 
+		//if(rect.getMinSize() < gridStep*SMOOTH_DEGREE) 	// TODO <- This is not necessary?
 			this.gridStep = rect.getMinSize()/SMOOTH_DEGREE;
 		if(this.gridStep == 0) 
 			this.gridStep = 1;
 		
 		// Optimization: push the rectangle to edges		
 		if (new Random().nextBoolean()){
-			this.push(rect, VERTICAL, this.gridStep);
-			this.push(rect, HORIZONTAL, this.gridStep);
-			this.push(rect, VERTICAL, this.gridStep);
-			this.push(rect, HORIZONTAL, this.gridStep);
+			for (int i = 0; i <= 2; i++){
+				this.push(rect, VERTICAL, this.gridStep);
+				this.push(rect, HORIZONTAL, this.gridStep);
+			}
 		}
 		else {
-			this.push(rect, HORIZONTAL, this.gridStep);
-			this.push(rect, VERTICAL, this.gridStep);
-			this.push(rect, HORIZONTAL, this.gridStep);
-			this.push(rect, VERTICAL, this.gridStep);
+			for (int i = 0; i <= 2; i++){
+				this.push(rect, HORIZONTAL, this.gridStep);
+				this.push(rect, VERTICAL, this.gridStep);
+			}
 		}
 
-		// Compute filled and free area.
-		// In case overlap is permitted, then also total overlapped area
-		if (MRectangle.getOverlap()) {
-			Rectangle union = rect.clone();
-			for (MRectangle internalRect : this.mRectangles) {
-				union = union.union(internalRect);
-				Rectangle intersektion = internalRect.intersection(rect);
-				this.overlapArea += intersektion.getWidth() * intersektion.getHeight();
+		// After pushing, compute filled, free and total overlapped area
+		if (MRectangle.isOverlapPermitted()) {
+			// In case overlap is permitted
+			HashMap<MRectangle, Rectangle> intersektions = new HashMap<>();
+			for (MRectangle r : this.mRectangles) {
+				if (!rect.equals(r) && !rect.intersects(r) && !rect.intersection(r).isEmpty())
+					// If there exists valid overlapping
+					intersektions.put(r, rect.intersection(r));
+				else if (rect.intersects(r))
+					throw new RuntimeException(
+							"The to be inserted rectangle overlaps invalidly other rectangle(s)!");
 			}
-			this.fillArea = union.getWidth() * union.getHeight();
+			
+			// No 3-layer-overlapping is allowed
+			// TODO this check is for safety, if other parts are correct, this can be removed
+			ArrayList<Rectangle> interzektions = new ArrayList<>();
+			interzektions.addAll(intersektions.keySet());
+			if (interzektions.size() >= 2) {
+				for (int i = 0; i < interzektions.size(); i++)
+					for (int j = i + 1; j < interzektions.size(); j++) 
+						if (interzektions.get(i).intersects(interzektions.get(j)))
+							throw new RuntimeException(
+									"3-layer-overlapping by insertion!");
+			}
+			
+			// Update the intersection list of the rectangles
+			double diff = rect.updateIntersections(intersektions);
+			this.overlapArea += diff;
+			this.fillArea += (rect.getArea() - diff);
 			this.freeArea = Math.pow(this.boxLength, 2) - this.fillArea;
 		}
 		else {
+			// No Overlapping 
 			this.freeArea = this.getFreeArea() - rect.getArea();
 			this.fillArea = this.getFillArea() + rect.getArea();
 		}
 		
-		// Insert this Rectangle into Box
+		// Insert the given rectangle into this Box
 		this.mRectangles.add(rect);
-		
+		//System.out.println("Inserted rect, #rect = " + this.mRectangles.size());
+		//this.optimalSort();
 		return true;
 	}
 	
 	/**
 	 * TODO comment me
+	 * 
 	 */
 	public void optimalSort() {
+		// TODO: Debug: This is a hack: No pushing if overlapping is permitted
+		if (MRectangle.isOverlapPermitted() && MRectangle.getOverlapRate() > 0) 
+			return;
 		for (MRectangle mRectangle : this.mRectangles) {
 			this.push(mRectangle, VERTICAL, this.gridStep);
 			this.push(mRectangle, HORIZONTAL, this.gridStep);
@@ -158,36 +207,41 @@ public class MBox extends Rectangle implements Cloneable{
 	/**
 	 * Push the given rectangle step by step in the given direction with the given initial
 	 * step length until the step length is reduced to 0. The rectangle must always fit 
-	 * the current state of this box. 
+	 * the current state of this box. The given rectangle might be already included in this
+	 * block (case optimalSort).
 	 * 
-	 * @param m				The rectangle to move
+	 * @param rect				The rectangle to move
 	 * @param direction		The direction to move the rectangle
 	 * @param stepLength	The length of the moving step 
 	 */
-	private void push(MRectangle m, int direction, int stepLength) {
-	
-		if (stepLength == 0) 
+	private void push(MRectangle rect, int direction, int stepLength) {
+		
+		if (stepLength <= 0) 
 			return;
-		int tempX = (int) m.getX();
-		int tempY = (int) m.getY();
+		int tempX = (int) rect.getX();
+		int tempY = (int) rect.getY();
 		
 		switch (direction) {
 		case VERTICAL:{
-			if(this.fit(m, tempX+stepLength, tempY, false)) {
-				m.setLocation(tempX+stepLength, tempY);
-				this.push(m, direction, stepLength);
+			if(this.fit(rect, tempX + stepLength, tempY, false)) {
+				// Pushing further by 1 step is OK
+				rect.setLocation(tempX + stepLength, tempY);
+				this.push(rect, direction, stepLength);
 			}
 			else 
-				this.push(m, direction, stepLength/2);
+				// Next step does not fit, reduce step length and continue
+				this.push(rect, direction, stepLength/2);
 			break;
 		}
 		case HORIZONTAL:{
-			if(this.fit(m, tempX, tempY+stepLength, false)) {
-				m.setLocation(tempX, tempY+stepLength);
-				this.push(m, direction, stepLength);
+			if(this.fit(rect, tempX, tempY+stepLength, false)) {
+				// Pushing further by 1 step is OK
+				rect.setLocation(tempX, tempY+stepLength);
+				this.push(rect, direction, stepLength);
 			}
 			else 
-				this.push(m, direction, stepLength/2);
+				// Next step does not fit, reduce step length and continue
+				this.push(rect, direction, stepLength/2);
 			break;
 		}
 		default:
@@ -196,49 +250,64 @@ public class MBox extends Rectangle implements Cloneable{
 	}
 	
 	/**
-	 * Check if the given rectangle can be inserted into this box at the given position
+	 * Check if the given rectangle can be inserted into this box at the given position.
+	 * Note that the given rectangle might be already included in this box (case 
+	 * {@link #optimalSort() optimalSort} is called).
 	 * 
-	 * @param m	The given rectangle
+	 * @param r	The given rectangle
 	 * @param x	x-coordinate of the inserting position to be checked
 	 * @param y	y-coordinate of the inserting position to be checked
 	 * @param rotated	If the rectangle is rotated before checking
 	 * @return	True if fit, False otherwise
 	 */
-	public boolean fit(MRectangle m, int x, int y, boolean rotated) {
-		MRectangle clonedM;
+	public boolean fit(MRectangle r, int x, int y, boolean rotated) {
+		MRectangle clonedR;
 		if(rotated) 
-			clonedM = m.rotate();
+			clonedR = r.rotate();
 		else 
-			clonedM = m.clone();
-		clonedM.setLocation(x, y);
+			clonedR = r.clone();
+		
+		clonedR.setLocation(x, y);
 		
 		// Correctness: the given rectangle must be inside the box
-		if(!this.contains(clonedM)) 
+		if(!this.contains(clonedR)) 
 			return false;
 		
-		for (MRectangle internalM : this.mRectangles) 
-		    if(!m.equals(internalM) && internalM.intersects(clonedM)) 
-		    	return false;
-		return true;
+		return clonedR.checkPlaceable(this.mRectangles);
 	}
 	
 	/**
-	 * Select a rectangle from this box. The probability that a rectangle is selected is
-	 * proportional to its area.
+	 * Select a rectangle from this box. 
+	 * If overlapping is permitted, the probability that a rectangle is selected is
+	 * proportional to its overlap area.
 	 * 
-	 * @return	The index of the selected rectangle
+	 * @return	The index of the selected rectangle, null if this box is empty
 	 */
-	public int getRandomRectProportionally(){
-		double thisArea = this.width * this.height;
-		double random = this.getFillArea()*Math.random();
-		int index = 0;
-		for (MRectangle m : this.mRectangles){
-			random -= thisArea - m.getArea();
-			if(random<=0) 
-				return index;
-			index++;
+	public MRectangle getRandomRect() {
+		if (MRectangle.isOverlapPermitted()) {
+			// Case overlapping is permitted
+			if (this.mRectangles.size() > 0) {
+				int randomPart = new Random().nextInt((int)this.getOverlapArea() + 1);
+				for (MRectangle m : this.mRectangles){
+					randomPart -= m.getOverlapArea();
+					if(randomPart <= 0) 
+						return m;
+				}
+				throw new RuntimeException("Cannot get a random rectangle from this box!");
+			}
+			return null;
 		}
-		return 0;
+		else {
+			if (this.mRectangles.size() > 0) {
+				if (this.mRectangles.size() == 1)
+					return this.mRectangles.get(0);
+				else
+					return this.mRectangles.get(new Random().
+						nextInt(this.mRectangles.size() - 1));	// TODO -1 is not necessary ?
+			} 
+			else
+				return null;
+		}
 	}
 
 	/**
@@ -283,16 +352,15 @@ public class MBox extends Rectangle implements Cloneable{
 	 * @param rect
 	 */
 	public void removeRect(MRectangle rect) {
-		if (MRectangle.getOverlap()) {
+		if (MRectangle.isOverlapPermitted()) {
 			// Case overlapping is permitted
 			this.mRectangles.remove(rect);
-			Rectangle union = null;
-			for (MRectangle internalRect : this.mRectangles) {
-				union = union == null ? internalRect : union.union(internalRect);
-				Rectangle intersektion = internalRect.intersection(rect);
-				this.overlapArea -= intersektion.getWidth() * intersektion.getHeight();
-			}
-			this.fillArea = union == null ? 0 : union.getWidth() * union.getHeight();
+			double diff = 0;
+			for (MRectangle intersectedRect : rect.getIntersections().keySet())
+				diff += intersectedRect.removeIntersection(
+						rect, rect.getIntersections().get(intersectedRect));
+			this.overlapArea += diff;
+			this.fillArea -= (rect.getArea() + diff);
 			this.freeArea = Math.pow(this.boxLength, 2) - this.fillArea;
 		}
 		else {
