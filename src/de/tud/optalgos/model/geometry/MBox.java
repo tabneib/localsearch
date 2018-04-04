@@ -191,11 +191,12 @@ public class MBox extends Rectangle implements Cloneable{
 	}
 	
 	/**
-	 * TODO comment me
+	 * Try to push each rectangle in this box in different directions to optimize the
+	 * placement of the rectangles (to eliminate "holes").
+	 * Note: This should be called after removing a rectangle from this box.
 	 * 
 	 */
 	public void optimalSort() {
-		// TODO: Debug: This is a hack: No pushing if overlapping is permitted
 		if (MRectangle.isOverlapPermitted() && MRectangle.getOverlapRate() > 0) 
 			return;
 		for (MRectangle mRectangle : this.mRectangles) {

@@ -6,8 +6,7 @@ import de.tud.optalgos.model.geometry.MBox;
 import de.tud.optalgos.model.geometry.MRectangle;
 
 /**
- * This class represents a solution for the optimization problem targeted in
- * this project.
+ * This class represents a solution for the optimization problem targeted in this project.
  *
  */
 public abstract class MSolution extends Solution implements Cloneable {

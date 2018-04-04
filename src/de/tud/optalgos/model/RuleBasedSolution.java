@@ -118,9 +118,10 @@ public class RuleBasedSolution extends MSolution {
 			}
 		});
 		
-		double totalFreeArea = boxes.size() * 
-				Math.pow(((MOptProblem) this.getOptProblem()).getBoxLength(), 2)
-				- ((MOptProblem) this.getOptProblem()).getTotalRectArea();
+		double totalFreeArea = 0;
+		
+		for (MBox box : boxes)
+			totalFreeArea += box.getFreeArea();
 		
 		// We do not touch the boxes that are already optimal
 		ArrayList<MBox> optimalBoxes = new ArrayList<>();
@@ -150,7 +151,7 @@ public class RuleBasedSolution extends MSolution {
 			}
 		}
 		if (randomIndex == 0){
-			double randomPart = new Random().nextInt((int)totalFreeArea);
+			double randomPart = new Random().nextInt((int) totalFreeArea);
 			
 			for (MBox box : tmpBoxes) {
 				randomPart -= box.getFillArea();
