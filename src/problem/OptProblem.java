@@ -1,4 +1,4 @@
-package de.tud.optalgos.model;
+package problem;
 
 /**
  * This class represents an abstracted optimization problem.

@@ -1,4 +1,4 @@
-package de.tud.optalgos.model.geometry;
+package problem.geometry;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;

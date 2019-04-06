@@ -1,9 +1,10 @@
-package de.tud.optalgos.controller.neighborhood;
+package de.nhd.localseach.neighborhood;
 
 import java.util.Iterator;
 
-import de.tud.optalgos.model.OptProblem;
-import de.tud.optalgos.model.Solution;
+import de.nhd.localseach.solution.Solution;
+import problem.MOptProblem;
+import problem.OptProblem;
 
 /**
  * Abstract class that defines the basic functionalities of a neighborhood relation
@@ -12,17 +13,17 @@ import de.tud.optalgos.model.Solution;
 public abstract class Neighborhood implements Iterator<Solution> {
 
 	/**
-	 * The instance of the optimization problem that this
+	 * The instance of the optimization problem that this neighborhood corresponds to 
 	 */
-	private OptProblem instance;
+	private MOptProblem problem;
 
 	/**
-	 * The solution that this neighborhood corresponds to.
+	 * The solution that this neighborhood corresponds to
 	 */
 	protected Solution currentSolution;
 
-	public Neighborhood(OptProblem instance, Solution currentSolution) {
-		this.instance = instance;
+	public Neighborhood(MOptProblem problem, Solution currentSolution) {
+		this.problem = problem;
 		this.currentSolution = currentSolution;
 	}
 
@@ -35,11 +36,15 @@ public abstract class Neighborhood implements Iterator<Solution> {
 	 */
 	public abstract void onCurrentSolutionChange(Solution newSolution);
 
-	protected OptProblem getInstance() {
-		return instance;
+	protected OptProblem getProblem() {
+		return problem;
 	}
 
 	protected Solution getCurrentSolution() {
 		return this.currentSolution;
 	}
+	
+	/*public void reset(){
+		this.currentSolution = this.problem.getInitSolution();
+	}*/
 }

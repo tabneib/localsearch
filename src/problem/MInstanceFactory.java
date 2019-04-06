@@ -1,4 +1,4 @@
-package de.tud.optalgos.model;
+package problem;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,18 +6,28 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Random;
 
-import de.tud.optalgos.model.geometry.MBox;
-import de.tud.optalgos.model.geometry.MRectangle;
+import problem.geometry.MBox;
+import problem.geometry.MRectangle;
 
 /**
  * Factory class for generating instances as inputs for the algorithms
  *
  */
 public class MInstanceFactory {
-	
+
 	private static final String direction = OptProblem.Direction.MAXIMIZING;
+
+	/**
+	 * ratio between box size and the maximum size of the resulted rects.
+	 * Value 1 means the longer size rects can be as large as the box size
+	 */
+	private static final double MAX_SIZE_RATIO = 1.5;
 	
-	private static final int REDUCE_COMP = 4; 
+	/**
+	 * ratio between box size and the minimum size of the resulted rects.
+	 * Value 1 means the shorter size rects can be as large as the box size
+	 */
+	private static final double MIN_SIZE_RATIO = 10;
 
 	/**
 	 * 
@@ -45,7 +55,7 @@ public class MInstanceFactory {
 			initRectSet = new ArrayList<MRectangle>();
 			initRectSet.add(rectangle);
 			box = new MBox(boxLength, initRectSet);
-			rectangle.setmBox(box);
+			rectangle.setBox(box);
 			rectangles.add(rectangle);
 			boxes.add(box);
 		}
@@ -63,7 +73,7 @@ public class MInstanceFactory {
 			int minLength) {
 
 		// Create rectangles
-		ArrayList<MRectangle> rectangles = splitter(initLength, boxLength, minLength);
+		ArrayList<MRectangle> rectangles = split(initLength, boxLength, minLength);
 
 		// Create corresponding boxes
 		ArrayList<MBox> boxes = new ArrayList<>();
@@ -75,7 +85,7 @@ public class MInstanceFactory {
 			initRectSet = new ArrayList<MRectangle>();
 			initRectSet.add(rect);
 			box = new MBox(boxLength, initRectSet);
-			rect.setmBox(box);
+			rect.setBox(box);
 			boxes.add(box);
 		}
 
@@ -93,9 +103,13 @@ public class MInstanceFactory {
 	 * @param boxLength
 	 * @return
 	 */
-	public static ArrayList<MRectangle> splitter(int initLength, int boxLength,
+	public static ArrayList<MRectangle> split(int initLength, int boxLength,
 			int minLength) {
 
+		if (minLength < 0) {
+			minLength = (int) (boxLength / MIN_SIZE_RATIO);
+		}
+		
 		PriorityQueue<MRectangle> rects = new PriorityQueue<>(
 				new Comparator<MRectangle>() {
 
@@ -114,25 +128,25 @@ public class MInstanceFactory {
 
 		MRectangle r;
 		MRectangle[] rSplit;
-		while (!rects.isEmpty() && rects.peek().getMaxSize() >= boxLength / REDUCE_COMP
+		while (!rects.isEmpty() && rects.peek().getMaxSize() >= boxLength / MAX_SIZE_RATIO
 				&& rects.peek().getMaxSize() >= minLength * 2) {
 			r = getRandomRect(rects);
 			rects.remove(r);
 
 			// Check if r has an edge that cannot be split any further
 			// and the other edge is not needed to split any further
-			if (r.getMaxSize() <= boxLength / REDUCE_COMP && r.getMinSize() < minLength * 2)
+			if (r.getMaxSize() <= boxLength / MAX_SIZE_RATIO
+					&& r.getMinSize() < minLength * 2)
 				results.add(r);
 			else {
 				rSplit = randomlySplit(r, minLength);
 
-				for (int i = 0; i < 2; i++) {
-					if (rSplit[i].getMinSize() < minLength * 2
-							&& rSplit[i].getMaxSize() <= boxLength / REDUCE_COMP) {
-						results.add(rSplit[i]);
-					} else
-						rects.add(rSplit[i]);
-				}
+				for (MRectangle rekt : rSplit)
+					if (rekt.getMinSize() < minLength * 2
+							&& rekt.getMaxSize() <= boxLength / MAX_SIZE_RATIO)
+						results.add(rekt);
+					else
+						rects.add(rekt);
 			}
 		}
 
@@ -172,13 +186,13 @@ public class MInstanceFactory {
 	private static MRectangle[] randomlySplit(MRectangle rect, int minLength) {
 		MRectangle[] result = new MRectangle[2];
 
-		double randomNum = Math.random() * (rect.getHeight() + rect.getWidth());
-
 		if (rect.getHeight() < 2 * minLength && rect.getWidth() < 2 * minLength)
-			throw new RuntimeException("Both edges cannot be split : (" + 
-					rect.getWidth() + ", " + rect.getHeight() + ")");
+			throw new RuntimeException("Both edges cannot be split : (" + rect.getWidth()
+					+ ", " + rect.getHeight() + ")");
 
+		double randomNum = Math.random() * (rect.getHeight() + rect.getWidth());
 		boolean splitVertically;
+		
 		if ((randomNum - rect.getHeight()) <= 0)
 			// Height edge is chosen..
 			if (rect.getHeight() >= 2 * minLength)
@@ -188,15 +202,14 @@ public class MInstanceFactory {
 				// It cannot be split further => split the other edge instead
 				splitVertically = true;
 		else
-			// Width edge is chosen..
-			if (rect.getWidth() >= 2 * minLength)
-				// ..and it can be split further
-				splitVertically = true;
-			else
-				// It cannot be split further => split the other edge instead
-				splitVertically = false;
+		// Width edge is chosen..
+		if (rect.getWidth() >= 2 * minLength)
+			// ..and it can be split further
+			splitVertically = true;
+		else
+			// It cannot be split further => split the other edge instead
+			splitVertically = false;
 
-		
 		if (!splitVertically) {
 			// split horizontally
 			// minLength <= splitY <= (height - minLength)

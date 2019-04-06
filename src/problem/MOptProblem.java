@@ -1,9 +1,9 @@
-package de.tud.optalgos.model;
+package problem;
 
 import java.util.ArrayList;
 
-import de.tud.optalgos.model.geometry.MBox;
-import de.tud.optalgos.model.geometry.MRectangle;
+import problem.geometry.MBox;
+import problem.geometry.MRectangle;
 
 /**
  * Class represents the concrete optimization problem to be solved in this
@@ -16,7 +16,7 @@ public class MOptProblem extends OptProblem {
 	 * The rectangles to be placed into the boxes
 	 */
 	private ArrayList<MRectangle> rechtangles;
-	
+
 	/**
 	 * The total area of the rectangles
 	 */
@@ -27,26 +27,14 @@ public class MOptProblem extends OptProblem {
 	 */
 	private final int boxLength;
 
-	/**
-	 * Initial (dummy) solution which we include here for convenience. In this
-	 * solution we place one rectangle into one box. That means the number of
-	 * boxes and rectangles in this initial solution are equal.
-	 */
-	private MSolution initSolution;
-
 	public MOptProblem(String direction, int boxLength, ArrayList<MRectangle> rectangles,
 			ArrayList<MBox> boxes) {
 		super(direction);
 		this.boxLength = boxLength;
 		this.rechtangles = rectangles;
-		this.initSolution = new GeometryBasedSolution(this, boxes);
-		for (MRectangle r : rectangles) 
+		for (MRectangle r : rectangles)
 			this.rectArea += r.getArea();
 	}
-
-	public MSolution getInitSolution() {
-		return this.initSolution;
-	} 
 
 	public ArrayList<MRectangle> getRechtangles() {
 		return rechtangles;
@@ -55,7 +43,7 @@ public class MOptProblem extends OptProblem {
 	public int getBoxLength() {
 		return boxLength;
 	}
-	
+
 	public double getTotalRectArea() {
 		return this.rectArea;
 	}

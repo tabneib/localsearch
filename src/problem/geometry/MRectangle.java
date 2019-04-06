@@ -1,4 +1,4 @@
-package de.tud.optalgos.model.geometry;
+package problem.geometry;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class MRectangle extends Rectangle {
 	/**
 	 * If overlapping of rectangles is permitted
 	 */
-	private static boolean overlap = true;
+	private static boolean overlap = false;
 	
 	/**
 	 * The current percentage of permitted overlapping area.
@@ -50,7 +50,7 @@ public class MRectangle extends Rectangle {
 	private HashMap<MRectangle, Rectangle> intersections = new HashMap<>();
 	
 	private int boxLength;
-	private MBox mBox;
+	private MBox box;
 	private final int maxSize;
 	private final int minSize;
 	
@@ -184,7 +184,6 @@ public class MRectangle extends Rectangle {
 	 * @return the difference of total overlapping area
 	 */
 	public double updateIntersections(HashMap<MRectangle, Rectangle> newIntersections) {
-		
 		if (newIntersections.isEmpty())
 			return 0;
 		
@@ -256,12 +255,12 @@ public class MRectangle extends Rectangle {
 		System.out.println("OverlapRate = " + overlapRate);
 	}
 
-	public MBox getmBox() {
-		return mBox;
+	public MBox getBox() {
+		return box;
 	}
 
-	public void setmBox(MBox mBox) {
-		this.mBox = mBox;
+	public void setBox(MBox box) {
+		this.box = box;
 	}
 	
 	public int getBoxLength() {

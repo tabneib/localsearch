@@ -1,4 +1,4 @@
-package de.tud.optalgos.model;
+package de.nhd.localseach.solution;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,8 +6,12 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Random;
 
-import de.tud.optalgos.model.geometry.MBox;
-import de.tud.optalgos.model.geometry.MRectangle;
+import de.nhd.localseach.neighborhood.Neighborhood;
+import de.nhd.localseach.neighborhood.RuleBasedNeighborhood;
+import problem.MOptProblem;
+import problem.OptProblem;
+import problem.geometry.MBox;
+import problem.geometry.MRectangle;
 
 /**
  * Class representing a rule-based solution. The solution depends on a permutation of
@@ -83,13 +87,13 @@ public class RuleBasedSolution extends MSolution {
 	 */
 	private void revalidate(){
 		this.boxes = new ArrayList<>();
-		MBox box = new MBox(((MOptProblem) this.optProblem).getBoxLength());
+		MBox box = new MBox(((MOptProblem) this.problem).getBoxLength());
 		for (MRectangle r : permutation) {
 			box.optimalSort();
 			while (!box.optimalInsert(r)){
 				box.optimalSort();
 				this.boxes.add(box);
-				box = new MBox(((MOptProblem) this.optProblem).getBoxLength());
+				box = new MBox(((MOptProblem) this.problem).getBoxLength());
 			}
 		}
 		this.boxes.add(box);
@@ -187,11 +191,16 @@ public class RuleBasedSolution extends MSolution {
 	}
 	
 	@Override
+	public Neighborhood getNeighborhood() {
+		return new RuleBasedNeighborhood((MOptProblem) this.problem, this);
+	}
+	
+	@Override
 	public RuleBasedSolution clone() {
 	
 		ArrayList<MRectangle> clonedPermutation = new ArrayList<>();
 		clonedPermutation.addAll(permutation);
-		return new RuleBasedSolution(this.optProblem, null).
+		return new RuleBasedSolution(this.problem, null).
 				setPermutation(clonedPermutation);
 	}
 }

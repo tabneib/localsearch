@@ -3,10 +3,10 @@ package test;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.tud.optalgos.model.MInstanceFactory;
-import de.tud.optalgos.model.MOptProblem;
-import de.tud.optalgos.model.geometry.MBox;
-import de.tud.optalgos.model.geometry.MRectangle;
+import problem.MInstanceFactory;
+import problem.MOptProblem;
+import problem.geometry.MBox;
+import problem.geometry.MRectangle;
 
 import static org.junit.Assert.*;
 

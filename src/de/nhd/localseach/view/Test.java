@@ -1,4 +1,4 @@
-package de.tud.optalgos.view;
+package de.nhd.localseach.view;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,9 +8,9 @@ import java.util.HashSet;
 
 import javax.swing.JFrame;
 
-import de.tud.optalgos.model.MInstanceFactory;
-import de.tud.optalgos.model.geometry.MBox;
-import de.tud.optalgos.model.geometry.MRectangle;
+import problem.MInstanceFactory;
+import problem.geometry.MBox;
+import problem.geometry.MRectangle;
 
 public class Test extends JFrame {
 
@@ -60,7 +60,7 @@ public class Test extends JFrame {
 		*/
 		ArrayList<MRectangle> rectSet = new ArrayList<>();
 		rectSet.addAll(
-				MInstanceFactory.splitter(INIT_LENGTH, INIT_LENGTH, INIT_LENGTH / 100));
+				MInstanceFactory.split(INIT_LENGTH, INIT_LENGTH, INIT_LENGTH / 100));
 
 		new Test(new MBox(INIT_LENGTH, rectSet));
 	}

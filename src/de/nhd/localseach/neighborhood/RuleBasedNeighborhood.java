@@ -1,15 +1,16 @@
-package de.tud.optalgos.controller.neighborhood;
+package de.nhd.localseach.neighborhood;
 
-import de.tud.optalgos.model.MSolution;
-import de.tud.optalgos.model.OptProblem;
-import de.tud.optalgos.model.RuleBasedSolution;
-import de.tud.optalgos.model.Solution;
+import de.nhd.localseach.solution.MSolution;
+import de.nhd.localseach.solution.RuleBasedSolution;
+import de.nhd.localseach.solution.Solution;
+import problem.MOptProblem;
+import problem.OptProblem;
 
 public class RuleBasedNeighborhood extends Neighborhood {
 
 	RuleBasedSolution clonedSolution = null;
 	
-	public RuleBasedNeighborhood(OptProblem instance, Solution currentSolution) {
+	public RuleBasedNeighborhood(MOptProblem instance, Solution currentSolution) {
 		super(instance, currentSolution);
 	}
 

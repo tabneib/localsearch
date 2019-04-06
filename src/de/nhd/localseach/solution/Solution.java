@@ -1,4 +1,8 @@
-package de.tud.optalgos.model;
+package de.nhd.localseach.solution;
+
+import de.nhd.localseach.neighborhood.Neighborhood;
+import problem.OptProblem;
+import problem.OptProblem.Direction;
 
 /**
  * Abstract class that defines the basic functionalities of a solution for a
@@ -10,11 +14,19 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 	/**
 	 * The corresponding optimization problem
 	 */
-	OptProblem optProblem;
+	OptProblem problem;
 
 	public Solution(OptProblem optProblem) {
-		this.optProblem = optProblem;
+		this.problem = optProblem;
 	}
+	
+	/**
+	 * Provide the iterator over the set of all neighboring solutions of this
+	 * solution
+	 * 
+	 * @return
+	 */
+	public abstract Neighborhood getNeighborhood();
 
 	/**
 	 * Check if this solution is better than the given one
@@ -30,10 +42,13 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 	@Override
 	public int compareTo(Solution other) {
 		if (this.getObjective() < other.getObjective())
-			return optProblem.getDirection().equals(OptProblem.Direction.MAXIMIZING) ? -1
+			// worse than => smaller if Maximizing
+			return problem.getDirection().equals(OptProblem.Direction.MAXIMIZING)
+					? -1
 					: 1;
 		else if (this.getObjective() > other.getObjective())
-			return optProblem.getDirection().equals(OptProblem.Direction.MAXIMIZING) ? 1
+			return problem.getDirection().equals(OptProblem.Direction.MAXIMIZING)
+					? 1
 					: -1;
 		else
 			return 0;
@@ -47,7 +62,10 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 	public abstract double getObjective();
 
 	public OptProblem getOptProblem() {
-		return this.optProblem;
+		return this.problem;
 	}
+
+	@Override
+	public abstract Object clone() throws CloneNotSupportedException;
 
 }
