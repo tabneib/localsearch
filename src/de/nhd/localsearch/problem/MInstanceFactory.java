@@ -1,4 +1,4 @@
-package problem;
+package de.nhd.localsearch.problem;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Random;
 
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 
 /**
  * Factory class for generating instances as inputs for the algorithms

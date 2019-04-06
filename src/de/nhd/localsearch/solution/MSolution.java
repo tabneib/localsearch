@@ -1,12 +1,12 @@
-package de.nhd.localseach.solution;
+package de.nhd.localsearch.solution;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-import problem.MOptProblem;
-import problem.OptProblem;
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.problem.MOptProblem;
+import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 
 /**
  * This class represents a solution for the optimization problem targeted in

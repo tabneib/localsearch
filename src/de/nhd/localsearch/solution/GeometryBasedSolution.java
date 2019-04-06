@@ -1,14 +1,14 @@
-package de.nhd.localseach.solution;
+package de.nhd.localsearch.solution;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import de.nhd.localseach.neighborhood.GeometryBasedNeighborhood;
-import de.nhd.localseach.neighborhood.Neighborhood;
-import problem.MOptProblem;
-import problem.OptProblem;
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.neighborhood.GeometryBasedNeighborhood;
+import de.nhd.localsearch.neighborhood.Neighborhood;
+import de.nhd.localsearch.problem.MOptProblem;
+import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 
 public class GeometryBasedSolution extends MSolution {
 

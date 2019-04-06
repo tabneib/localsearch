@@ -1,10 +1,10 @@
-package de.nhd.localseach.neighborhood;
+package de.nhd.localsearch.neighborhood;
 
 import java.util.Iterator;
 
-import de.nhd.localseach.solution.Solution;
-import problem.MOptProblem;
-import problem.OptProblem;
+import de.nhd.localsearch.problem.MOptProblem;
+import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.solution.Solution;
 
 /**
  * Abstract class that defines the basic functionalities of a neighborhood relation

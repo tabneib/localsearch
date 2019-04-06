@@ -1,4 +1,4 @@
-package de.nhd.localseach.view;
+package de.nhd.localsearch.view;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,9 +8,9 @@ import java.util.HashSet;
 
 import javax.swing.JFrame;
 
-import problem.MInstanceFactory;
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.problem.MInstanceFactory;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 
 public class Test extends JFrame {
 

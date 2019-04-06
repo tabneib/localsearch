@@ -1,4 +1,4 @@
-package de.nhd.localseach.solution;
+package de.nhd.localsearch.solution;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,12 +6,12 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Random;
 
-import de.nhd.localseach.neighborhood.Neighborhood;
-import de.nhd.localseach.neighborhood.RuleBasedNeighborhood;
-import problem.MOptProblem;
-import problem.OptProblem;
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.neighborhood.Neighborhood;
+import de.nhd.localsearch.neighborhood.RuleBasedNeighborhood;
+import de.nhd.localsearch.problem.MOptProblem;
+import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 
 /**
  * Class representing a rule-based solution. The solution depends on a permutation of

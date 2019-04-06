@@ -1,9 +1,9 @@
-package problem;
+package de.nhd.localsearch.problem;
 
 import java.util.ArrayList;
 
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 
 /**
  * Class represents the concrete optimization problem to be solved in this

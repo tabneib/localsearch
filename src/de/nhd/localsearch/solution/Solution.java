@@ -1,8 +1,8 @@
-package de.nhd.localseach.solution;
+package de.nhd.localsearch.solution;
 
-import de.nhd.localseach.neighborhood.Neighborhood;
-import problem.OptProblem;
-import problem.OptProblem.Direction;
+import de.nhd.localsearch.neighborhood.Neighborhood;
+import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.OptProblem.Direction;
 
 /**
  * Abstract class that defines the basic functionalities of a solution for a

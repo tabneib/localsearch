@@ -1,10 +1,10 @@
-package de.nhd.localseach.neighborhood;
+package de.nhd.localsearch.neighborhood;
 
-import de.nhd.localseach.solution.GeometryBasedSolution;
-import de.nhd.localseach.solution.Solution;
-import problem.MOptProblem;
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.problem.MOptProblem;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
+import de.nhd.localsearch.solution.GeometryBasedSolution;
+import de.nhd.localsearch.solution.Solution;
 
 /**
  * This class represents the geometry-based neighborhood.

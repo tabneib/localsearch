@@ -1,6 +1,6 @@
-package de.nhd.localseach.algos;
+package de.nhd.localsearch.algos;
 
-import de.nhd.localseach.solution.Solution;
+import de.nhd.localsearch.solution.Solution;
 
 /**
  * Interface that defines the basic functionalities of an optimization algorithm

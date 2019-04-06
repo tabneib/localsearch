@@ -1,10 +1,10 @@
-package de.nhd.localseach.neighborhood;
+package de.nhd.localsearch.neighborhood;
 
-import de.nhd.localseach.solution.MSolution;
-import de.nhd.localseach.solution.RuleBasedSolution;
-import de.nhd.localseach.solution.Solution;
-import problem.MOptProblem;
-import problem.OptProblem;
+import de.nhd.localsearch.problem.MOptProblem;
+import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.solution.MSolution;
+import de.nhd.localsearch.solution.RuleBasedSolution;
+import de.nhd.localsearch.solution.Solution;
 
 public class RuleBasedNeighborhood extends Neighborhood {
 

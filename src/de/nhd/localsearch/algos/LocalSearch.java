@@ -1,12 +1,12 @@
-package de.nhd.localseach.algos;
+package de.nhd.localsearch.algos;
 
-import de.nhd.localseach.neighborhood.GeometryBasedNeighborhood;
-import de.nhd.localseach.neighborhood.Neighborhood;
-import de.nhd.localseach.neighborhood.RuleBasedNeighborhood;
-import de.nhd.localseach.solution.MSolution;
-import de.nhd.localseach.solution.Solution;
-import problem.OptProblem;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.neighborhood.GeometryBasedNeighborhood;
+import de.nhd.localsearch.neighborhood.Neighborhood;
+import de.nhd.localsearch.neighborhood.RuleBasedNeighborhood;
+import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.geometry.MRectangle;
+import de.nhd.localsearch.solution.MSolution;
+import de.nhd.localsearch.solution.Solution;
 
 /**
  * Class represents the basic local search algorithm.
@@ -84,10 +84,6 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		if (!neighborhood.hasNext() || attempt >= MAX_SEARCHING_ATTEMPTS) {
 			// No more neighbor
 			this.isFinished = true;
-			System.out.println("[LocalSearch] No more better neighbor");
-			System.out.println("neighborhood.hasNext(): " + neighborhood.hasNext());
-			System.out.println("attempt < MAX_SEARCHING_ATTEMPTS: "
-					+ (attempt < MAX_SEARCHING_ATTEMPTS));
 		}
 	}
 
@@ -121,15 +117,11 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		this.runningTime = -1;
 		this.isFinished = false;
 		// this.neighborhood.reset();
-		System.out.println(
-				"BEFORE RESET: this.currentSolution.compareTo(this.startSolution) : "
-						+ (this.currentSolution.compareTo(this.startSolution)));
 		try {
 			this.currentSolution = (Solution) this.startSolution.clone();
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("[LocalSearch] reset.");
 	}
 
 	@Override

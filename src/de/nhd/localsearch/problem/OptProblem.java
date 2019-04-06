@@ -1,4 +1,4 @@
-package problem;
+package de.nhd.localsearch.problem;
 
 /**
  * This class represents an abstracted optimization problem.

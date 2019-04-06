@@ -3,10 +3,10 @@ package test;
 import org.junit.Before;
 import org.junit.Test;
 
-import problem.MInstanceFactory;
-import problem.MOptProblem;
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.problem.MInstanceFactory;
+import de.nhd.localsearch.problem.MOptProblem;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 
 import static org.junit.Assert.*;
 

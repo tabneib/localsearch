@@ -1,4 +1,4 @@
-package de.nhd.localseach.view;
+package de.nhd.localsearch.view;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,13 +8,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.*;
 
-import de.nhd.localseach.algos.LocalSearch;
-import de.nhd.localseach.algos.NeighborhoodBasedAlgo;
-import de.nhd.localseach.solution.MSolution;
-import problem.MInstanceFactory;
-import problem.MOptProblem;
-import problem.geometry.MBox;
-import problem.geometry.MRectangle;
+import de.nhd.localsearch.algos.LocalSearch;
+import de.nhd.localsearch.algos.NeighborhoodBasedAlgo;
+import de.nhd.localsearch.problem.MInstanceFactory;
+import de.nhd.localsearch.problem.MOptProblem;
+import de.nhd.localsearch.problem.geometry.MBox;
+import de.nhd.localsearch.problem.geometry.MRectangle;
+import de.nhd.localsearch.solution.MSolution;
 
 /**
  * GUI starter

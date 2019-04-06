@@ -1,4 +1,4 @@
-package problem.geometry;
+package de.nhd.localsearch.problem.geometry;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
