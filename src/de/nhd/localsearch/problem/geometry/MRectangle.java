@@ -49,6 +49,11 @@ public class MRectangle extends Rectangle {
 	 */
 	private HashMap<MRectangle, Rectangle> intersections = new HashMap<>();
 	
+	/**
+	 * If this rectangle is repositioned to generate the corresponding solution
+	 */
+	private boolean repositioned = false;
+	
 	private int boxLength;
 	private MBox box;
 	private final int maxSize;
@@ -290,5 +295,13 @@ public class MRectangle extends Rectangle {
 		MRectangle cloneM = new MRectangle(this.width, this.height, boxLength);
 		cloneM.setLocation(this.getLocation());
 		return cloneM;
+	}
+
+	public boolean isRepositioned() {
+		return repositioned;
+	}
+
+	public void setRepositioned() {
+		this.repositioned = true;
 	};
 }

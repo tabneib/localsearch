@@ -22,7 +22,7 @@ public class RuleBasedNeighborhood extends Neighborhood {
 	@Override
 	public Solution next() {
 		if (clonedSolution == null)
-			clonedSolution = ((RuleBasedSolution)this.Owner).clone(); 
+			clonedSolution = ((RuleBasedSolution)this.owner).clone(); 
 		clonedSolution.permute();
 		return clonedSolution;
 	}

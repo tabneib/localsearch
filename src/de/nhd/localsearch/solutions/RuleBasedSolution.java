@@ -78,7 +78,6 @@ public class RuleBasedSolution extends MSolution {
 			this.revalidate();
 		}
 	}
-
 	
 	/**
 	 * Re-insert the rectangles in the permutation into boxes. This will replace the old 
@@ -90,7 +89,7 @@ public class RuleBasedSolution extends MSolution {
 		MBox box = new MBox(((MOptProblem) this.problem).getBoxLength());
 		for (MRectangle r : permutation) {
 			box.optimalSort();
-			while (!box.optimalInsert(r)){
+			while (box.optimalInsert(r) == null){
 				box.optimalSort();
 				this.boxes.add(box);
 				box = new MBox(((MOptProblem) this.problem).getBoxLength());

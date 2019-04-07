@@ -20,11 +20,11 @@ public abstract class Neighborhood implements Iterator<Solution> {
 	/**
 	 * The solution that holds this neighborhood
 	 */
-	protected Solution Owner;
-
+	protected Solution owner;
+	
 	public Neighborhood(MOptProblem problem, Solution owner) {
 		this.problem = problem;
-		this.Owner = owner;
+		this.owner = owner;
 	}
 
 	protected OptProblem getProblem() {
@@ -32,7 +32,7 @@ public abstract class Neighborhood implements Iterator<Solution> {
 	}
 
 	protected Solution getOwner() {
-		return this.Owner;
+		return this.owner;
 	}
 	
 	/*public void reset(){

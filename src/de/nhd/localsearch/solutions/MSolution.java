@@ -2,6 +2,7 @@ package de.nhd.localsearch.solutions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
@@ -97,6 +98,14 @@ public abstract class MSolution extends Solution {
 
 	public void setBoxes(ArrayList<MBox> boxes) {
 		this.boxes = boxes;
+	}
+	
+	public void removeEmptyBoxes() {
+		Iterator<MBox> iter = this.boxes.iterator();
+		while (iter.hasNext()) {
+			if (((MBox) iter.next()).isEmptyBox())
+				iter.remove();
+		}
 	}
 
 	/**

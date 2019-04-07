@@ -45,6 +45,11 @@ public class GUI extends JFrame {
 	public static final int SCROLL_VIEW_PADDING = 20;
 	public static final int DUMMY_PADDING = 20; // hack
 
+	public static final Color COLOR_REPOSITIONING_SOURCE = Color.black;
+	public static final Color COLOR_REPOSITIONING_DESTINATION = Color.yellow;
+	public static final Color COLOR_REPOSITIONED_RECT = Color.red;
+	public static final Color COLOR_REMOVED_RECT = Color.lightGray;
+
 	// Other Constants
 	private static final String GEN_RANDOM = "Random-Instance-Generator";
 	private static final String GEN_SPLIT = "Split-Instance-Generator";
@@ -53,7 +58,6 @@ public class GUI extends JFrame {
 	// Data
 	private MOptProblem problem;
 	private MSolution solution;
-	// private ArrayList<MBox> boxes;
 
 	// Options
 	// private String generator = GEN_RANDOM;
@@ -728,25 +732,39 @@ public class GUI extends JFrame {
 
 		private static final long serialVersionUID = 1L;
 
-		private final MBox mBox;
+		private final MBox box;
 
-		private MBoxPanel(MBox mBox) {
-			this.mBox = mBox;
+		private MBoxPanel(MBox box) {
+			this.box = box;
 		}
 
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D) g;
-			g2.setColor(new Color(227, 227, 227));
-			g2.fill(mBox);
+			g2.setColor(this.box.isRepositionDest()
+					? COLOR_REPOSITIONING_DESTINATION
+					: this.box.isRepositionSrc()
+							? COLOR_REPOSITIONING_SOURCE
+							: new Color(227, 227, 227));
+			g2.fill(box);
 			g2.setColor(Color.BLACK);
-			g2.draw(mBox);
+			g2.draw(box);
 
-			for (MRectangle r : mBox.getMRectangles()) {
-				g2.setColor(new Color(47, 255, 228));
+			for (MRectangle r : box.getMRectangles()) {
+				g2.setColor(r.isRepositioned()
+						? COLOR_REPOSITIONED_RECT
+						: new Color(47, 255, 228));
 				g2.fill(r);
 				g2.setColor(Color.BLACK);
 				g2.draw(r);
+			}
+			
+			if (this.box.isRepositionSrc()) {
+				MRectangle removedRect = this.box.getRemovedRect();
+				g2.setColor(COLOR_REMOVED_RECT);
+				g2.fill(removedRect);
+				g2.setColor(Color.BLACK);
+				g2.draw(removedRect);
 			}
 		}
 	}

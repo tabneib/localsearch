@@ -32,6 +32,23 @@ public class MBox extends Rectangle implements Cloneable {
 	 */
 	private int maxRange;
 
+	/**
+	 * If this box is the source of the repositioning that generates the
+	 * corresponding solution
+	 */
+	private boolean repositionSrc = false;
+
+	/**
+	 * If this box is the destination of the repositioning that generates the
+	 * corresponding solution
+	 */
+	private boolean repositionDest = false;
+	
+	/**
+	 * The rectangle, if any, that was removed to generate the corresponding solution
+	 */
+	private MRectangle removedRect;
+
 	private ArrayList<MRectangle> mRectangles;
 	private double freeArea = -1;
 	private double fillArea = -1;
@@ -74,29 +91,31 @@ public class MBox extends Rectangle implements Cloneable {
 	 * Automatically insert the given rectangle into this box at an optimal
 	 * position.
 	 * 
-	 * @param m
+	 * @param rect
 	 *            The given rectangle
-	 * @return True if inserted, False otherwise
+	 * @return the inserted rectangle if inserted, null otherwise
 	 */
-	public boolean optimalInsert(MRectangle m) {
+	public MRectangle optimalInsert(MRectangle rect) {
 
-		if (this.getFreeArea() < m.getArea())
-			return false;
+		if (this.getFreeArea() < rect.getArea())
+			return null;
 
 		// Try to insert at different positions
 		// Along horizontal axis
 		for (int i = 0; i < maxRange; i++) {
 			// Along vertical axis
 			for (int j = 0; j < maxRange; j++) {
-				// Try to insert without rotating
-				if (this.insert(m, i * gridStep, j * gridStep, false))
-					return true;
-				// Try to insert with rotating
-				else if (this.insert(m, i * gridStep, j * gridStep, true))
-					return true;
+				// without rotating
+				MRectangle insertedRect = this.insert(rect, i * gridStep, j * gridStep, false);
+				if (insertedRect != null)
+					return insertedRect;
+				// with rotating
+				insertedRect = this.insert(rect, i * gridStep, j * gridStep, true);
+				if (insertedRect != null)
+					return insertedRect;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	/**
@@ -110,7 +129,7 @@ public class MBox extends Rectangle implements Cloneable {
 	 * @param rotated
 	 * @return True if inserted, False otherwise
 	 */
-	public boolean insert(MRectangle rect, int x, int y, boolean rotated) {
+	public MRectangle insert(MRectangle rect, int x, int y, boolean rotated) {
 
 		if (rotated)
 			rect = rect.rotate();
@@ -119,7 +138,7 @@ public class MBox extends Rectangle implements Cloneable {
 
 		rect.setLocation(x, y);
 		if (!this.contains(rect))
-			return false;
+			return null;
 
 		// Check if no rectangle currently in this box intersect the given
 		// rectangle
@@ -127,7 +146,7 @@ public class MBox extends Rectangle implements Cloneable {
 		// method is used
 		for (MRectangle internalRect : this.mRectangles)
 			if (!internalRect.intersection(rect).isEmpty())
-				return false;
+				return null;
 
 		// The given rectangle can be inserted !
 
@@ -194,7 +213,7 @@ public class MBox extends Rectangle implements Cloneable {
 		// System.out.println("Inserted rect, #rect = " +
 		// this.mRectangles.size());
 		// this.optimalSort();
-		return true;
+		return rect;
 	}
 
 	/**
@@ -313,8 +332,7 @@ public class MBox extends Rectangle implements Cloneable {
 			}
 			return null;
 		} else
-			return this.mRectangles
-					.get(new Random().nextInt(this.mRectangles.size()));
+			return this.mRectangles.get(new Random().nextInt(this.mRectangles.size()));
 	}
 
 	/**
@@ -407,5 +425,29 @@ public class MBox extends Rectangle implements Cloneable {
 		}
 		MBox newBox = new MBox(this.boxLength, clonedRectangles, this.gridStep);
 		return newBox;
+	}
+
+	public boolean isRepositionSrc() {
+		return repositionSrc;
+	}
+
+	public void setRepositionSrc() {
+		this.repositionSrc = true;
+	}
+
+	public boolean isRepositionDest() {
+		return repositionDest;
+	}
+
+	public void setRepositionDest() {
+		this.repositionDest = true;
 	};
+	
+	public MRectangle getRemovedRect() {
+		return removedRect;
+	}
+
+	public void setRemovedRect(MRectangle removedRect) {
+		this.removedRect = removedRect;
+	}
 }

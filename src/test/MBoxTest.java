@@ -166,8 +166,8 @@ public class MBoxTest {
 	@Test
 	public void insert_valid() {
 
-		assertTrue(box1.optimalInsert(rect_100_100));
-		assertTrue(box2.optimalInsert(rect_50_100));
+		assertNotNull(box1.optimalInsert(rect_100_100));
+		assertNotNull(box2.optimalInsert(rect_50_100));
 
 	}
 

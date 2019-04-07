@@ -2,7 +2,6 @@ package de.nhd.localsearch.algorithms;
 
 import de.nhd.localsearch.neighborhoods.Neighborhood;
 import de.nhd.localsearch.problem.OptProblem;
-import de.nhd.localsearch.problem.geometry.MRectangle;
 import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.Solution;
 
@@ -45,6 +44,7 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext() && attempt < MAX_SEARCHING_ATTEMPTS) {
+			((MSolution) this.currentSolution).removeEmptyBoxes();
 			countStep++;
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
@@ -69,8 +69,10 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		int attempt = 0;
 		// if (MRectangle.isOverlapPermitted())
 		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
+		((MSolution) this.currentSolution).removeEmptyBoxes();
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext() && attempt < MAX_SEARCHING_ATTEMPTS) {
+			//System.out.println("Moved Rect: " + neighborhood.getM);
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				this.currentSolution = neighbor;
