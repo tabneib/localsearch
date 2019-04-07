@@ -1,12 +1,10 @@
-package de.nhd.localsearch.algos;
+package de.nhd.localsearch.algorithms;
 
-import de.nhd.localsearch.neighborhood.GeometryBasedNeighborhood;
-import de.nhd.localsearch.neighborhood.Neighborhood;
-import de.nhd.localsearch.neighborhood.RuleBasedNeighborhood;
+import de.nhd.localsearch.neighborhoods.Neighborhood;
 import de.nhd.localsearch.problem.OptProblem;
 import de.nhd.localsearch.problem.geometry.MRectangle;
-import de.nhd.localsearch.solution.MSolution;
-import de.nhd.localsearch.solution.Solution;
+import de.nhd.localsearch.solutions.MSolution;
+import de.nhd.localsearch.solutions.Solution;
 
 /**
  * Class represents the basic local search algorithm.
@@ -41,21 +39,21 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 
 		int attempt = 0;
 		int countStep = 0;
-		if (MRectangle.isOverlapPermitted())
-			MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
+		// if (MRectangle.isOverlapPermitted())
+		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
 		long startTime = System.currentTimeMillis();
 
-		Neighborhood neighborhood = this.getCurrentNeighborhood();
+		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext() && attempt < MAX_SEARCHING_ATTEMPTS) {
 			countStep++;
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				MSolution.increaseRound();
 				this.currentSolution = neighbor;
-				neighborhood.onCurrentSolutionChange(neighbor);
+				neighborhood = neighbor.getNeighborhood();
 				attempt = 0;
-			}
-			attempt++;
+			} else
+				attempt++;
 		}
 		runningTime = System.currentTimeMillis() - startTime;
 		this.isFinished = true;
@@ -71,20 +69,18 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		int attempt = 0;
 		// if (MRectangle.isOverlapPermitted())
 		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
-		Neighborhood neighborhood = this.getCurrentNeighborhood();
+		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext() && attempt < MAX_SEARCHING_ATTEMPTS) {
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				this.currentSolution = neighbor;
-				neighborhood.onCurrentSolutionChange(neighbor);
 				break;
 			} else
 				attempt++;
 		}
-		if (!neighborhood.hasNext() || attempt >= MAX_SEARCHING_ATTEMPTS) {
+		if (!neighborhood.hasNext() || attempt >= MAX_SEARCHING_ATTEMPTS)
 			// No more neighbor
 			this.isFinished = true;
-		}
 	}
 
 	@Override
@@ -101,17 +97,6 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		return isFinished;
 	}
 
-	private Neighborhood getCurrentNeighborhood() {
-		switch (this.neighborhood) {
-			case NeighborhoodBasedAlgo.NEIGHBORHOOD_GEO :
-				return (GeometryBasedNeighborhood) this.currentSolution.getNeighborhood();
-			case NeighborhoodBasedAlgo.NEIGHBORHOOD_PERM :
-				return (RuleBasedNeighborhood) this.currentSolution.getNeighborhood();
-			default :
-				throw new RuntimeException("Unknown neighborhood: " + this.neighborhood);
-		}
-	}
-
 	@Override
 	public void reset() {
 		this.runningTime = -1;
@@ -122,10 +107,5 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public Solution getStartSolution() {
-		return this.startSolution;
 	}
 }

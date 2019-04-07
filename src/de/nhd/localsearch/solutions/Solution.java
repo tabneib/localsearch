@@ -1,6 +1,6 @@
-package de.nhd.localsearch.solution;
+package de.nhd.localsearch.solutions;
 
-import de.nhd.localsearch.neighborhood.Neighborhood;
+import de.nhd.localsearch.neighborhoods.Neighborhood;
 import de.nhd.localsearch.problem.OptProblem;
 import de.nhd.localsearch.problem.OptProblem.Direction;
 

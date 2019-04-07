@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.2.3" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
-  <interface id="1" language="java" name="de.nhd.localsearch.algos.IOptAlgo" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/algos/IOptAlgo.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="1" language="java" name="de.nhd.localsearch.algorithms.IOptAlgo" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/algorithms/IOptAlgo.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="131" width="132" x="745" y="-22"/>    
     <display autosize="false" stereotype="false" package="false" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
@@ -10,8 +10,9 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="2" language="java" name="de.nhd.localsearch.algos.NeighborhoodBasedAlgo" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/algos/NeighborhoodBasedAlgo.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="2" language="java" name="de.nhd.localsearch.algorithms.NeighborhoodBasedAlgo" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/algorithms/NeighborhoodBasedAlgo.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
     <position height="83" width="179" x="426" y="303"/>    
     <display autosize="false" stereotype="false" package="false" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
@@ -19,8 +20,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="3" language="java" name="de.nhd.localsearch.algos.LocalSearch" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/algos/LocalSearch.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="3" language="java" name="de.nhd.localsearch.algorithms.LocalSearch" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/algorithms/LocalSearch.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="399" y="523"/>    
     <display autosize="true" stereotype="false" package="false" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
@@ -28,8 +29,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="4" language="java" name="de.nhd.localsearch.neighborhood.Neighborhood" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/neighborhood/Neighborhood.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="4" language="java" name="de.nhd.localsearch.neighborhoods.Neighborhood" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/neighborhoods/Neighborhood.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="134" width="160" x="496" y="-23"/>    
     <display autosize="false" stereotype="false" package="false" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
@@ -37,8 +38,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="5" language="java" name="de.nhd.localsearch.neighborhood.RuleBasedNeighborhood" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/neighborhood/RuleBasedNeighborhood.java" binary="false" 
+  <class id="5" language="java" name="de.nhd.localsearch.neighborhoods.RuleBasedNeighborhood" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/neighborhoods/RuleBasedNeighborhood.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="149" width="173" x="682" y="299"/>    
     <display autosize="false" stereotype="false" package="false" initial-value="false" signature="false" 
@@ -47,8 +48,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="6" language="java" name="de.nhd.localsearch.neighborhood.GeometryBasedNeighborhood" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/neighborhood/GeometryBasedNeighborhood.java" binary="false" 
+  <class id="6" language="java" name="de.nhd.localsearch.neighborhoods.GeometryBasedNeighborhood" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/neighborhoods/GeometryBasedNeighborhood.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="188" width="198" x="902" y="299"/>    
     <display autosize="false" stereotype="false" package="false" initial-value="false" signature="false" 
@@ -75,8 +76,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="9" language="java" name="de.nhd.localsearch.solution.Solution" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/solution/Solution.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="9" language="java" name="de.nhd.localsearch.solutions.Solution" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/solutions/Solution.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="356" y="48"/>    
     <display autosize="true" stereotype="false" package="false" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
@@ -84,8 +85,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="de.nhd.localsearch.solution.MSolution" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/solution/MSolution.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="10" language="java" name="de.nhd.localsearch.solutions.MSolution" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/solutions/MSolution.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="-80" y="450"/>    
     <display autosize="true" stereotype="false" package="false" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
@@ -93,8 +94,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="11" language="java" name="de.nhd.localsearch.solution.RuleBasedSolution" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/solution/RuleBasedSolution.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="11" language="java" name="de.nhd.localsearch.solutions.RuleBasedSolution" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/solutions/RuleBasedSolution.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="177" width="164" x="174" y="707"/>    
     <display autosize="false" stereotype="false" package="false" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
@@ -102,8 +103,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="12" language="java" name="de.nhd.localsearch.solution.GeometryBasedSolution" project="localsearch" 
-    file="/localsearch/src/de/nhd/localsearch/solution/GeometryBasedSolution.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="12" language="java" name="de.nhd.localsearch.solutions.GeometryBasedSolution" project="localsearch" 
+    file="/localsearch/src/de/nhd/localsearch/solutions/GeometryBasedSolution.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="531" y="778"/>    
     <display autosize="true" stereotype="false" package="false" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      

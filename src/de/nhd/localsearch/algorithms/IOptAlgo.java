@@ -1,6 +1,6 @@
-package de.nhd.localsearch.algos;
+package de.nhd.localsearch.algorithms;
 
-import de.nhd.localsearch.solution.Solution;
+import de.nhd.localsearch.solutions.Solution;
 
 /**
  * Interface that defines the basic functionalities of an optimization algorithm
@@ -17,17 +17,9 @@ public interface IOptAlgo {
 	 * Run one single algorithm step
 	 */
 	public void runStep();
-	
 
 	/**
-	 * Get the start solution
-	 * 
-	 * @return The solution
-	 */
-	public Solution getStartSolution();
-
-	/**
-	 * Get the final optimal solution
+	 * Get the current solution
 	 * 
 	 * @return The optimal solution
 	 */

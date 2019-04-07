@@ -8,13 +8,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.*;
 
-import de.nhd.localsearch.algos.LocalSearch;
-import de.nhd.localsearch.algos.NeighborhoodBasedAlgo;
+import de.nhd.localsearch.algorithms.LocalSearch;
+import de.nhd.localsearch.algorithms.NeighborhoodBasedAlgo;
 import de.nhd.localsearch.problem.MInstanceFactory;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;
 import de.nhd.localsearch.problem.geometry.MRectangle;
-import de.nhd.localsearch.solution.MSolution;
+import de.nhd.localsearch.solutions.MSolution;
 
 /**
  * GUI starter
@@ -124,7 +124,7 @@ public class GUI extends JFrame {
 	 * create GUI window and call method to add stuff onto it
 	 */
 	public void initGUI() {
-		frame = new JFrame("Local Search GUI");
+		frame = new JFrame("Local Search");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(BOXES_CONTAINER_WIDTH + SCROLL_VIEW_PADDING
 				+ MENU_CONTAINER_WIDTH + DUMMY_PADDING, WINDOW_HEIGHT));
@@ -154,10 +154,12 @@ public class GUI extends JFrame {
 		c.anchor = GridBagConstraints.NORTHWEST;
 
 		// The container of all the boxes
-
 		c.weightx = 1.0;
 		c.gridx = 0;
-		pane.add(makeBoxesContainer(), c);
+		JScrollPane scrollPane = new JScrollPane(makeBoxesContainer());
+		scrollPane.setPreferredSize(new Dimension(
+				BOXES_CONTAINER_WIDTH + SCROLL_VIEW_PADDING, WINDOW_HEIGHT));
+		pane.add(scrollPane, c);
 
 		// The container of the menu
 		c.weightx = 0.5;
@@ -183,11 +185,7 @@ public class GUI extends JFrame {
 		ArrayList<MBoxPanel> boxPanels = new ArrayList<>();
 		ArrayList<MBox> boxes;
 
-		if (solution == null)
-			// Just reset
-			boxes = ((MSolution) this.algorithm.getStartSolution()).getBoxes();
-		else
-			boxes = solution.getBoxes();
+		boxes = solution.getBoxes();
 
 		int gridX = BOXES_CONTAINER_WIDTH / (boxLength + 2 * BOXES_PADDING);
 		int gridY = boxes.size() / gridX + (boxes.size() % gridX == 0 ? 0 : 1);
@@ -208,11 +206,6 @@ public class GUI extends JFrame {
 			boxPanels.add(boxPanel);
 		}
 
-		// The whole grid panel is contained inside a scroll pane
-		JScrollPane scrollPane = new JScrollPane(boxesContainer);
-		scrollPane.setPreferredSize(new Dimension(
-				BOXES_CONTAINER_WIDTH + SCROLL_VIEW_PADDING, WINDOW_HEIGHT));
-
 		// Update the status bar
 		if (solution == null)
 			labelStatusBar.setText("  #Box: " + boxes.size() + "   #Rect: "
@@ -221,7 +214,7 @@ public class GUI extends JFrame {
 			labelStatusBar.setText("  #Box: " + boxes.size() + "   #Rect: "
 					+ solution.getRechtangles().size() + "   boxLength: " + boxLength);
 
-		return scrollPane;
+		return boxesContainer;
 	}
 
 	/**
@@ -519,22 +512,15 @@ public class GUI extends JFrame {
 	 * instance with the obvious solution for the new instance.
 	 */
 	private void genInstance() {
-		// Reset the solution
-		// this.solution = null;
-
 		switch (this.generatorName) {
 			case GEN_RANDOM :
 				problem = MInstanceFactory.getInstanceRandom(amount, minLength, maxLength,
 						boxLength);
 				break;
 			case GEN_SPLIT :
-				// mInstance = MInstanceFactory.getInstanceSplit(initLength,
-				// boxLength,
-				// minLength);
 				problem = MInstanceFactory.getInstanceSplit(initLength, boxLength, -1);
 				break;
 		}
-		// this.solution = this.problem.getInitSolution();
 	}
 
 	/**
@@ -559,15 +545,11 @@ public class GUI extends JFrame {
 
 			@Override
 			public void run() {
-				Component bContainer = frame.getContentPane().getComponent(0);
-				GridBagLayout l = (GridBagLayout) frame.getContentPane().getLayout();
-				GridBagConstraints c = l.getConstraints(bContainer);
+				((JScrollPane) frame.getContentPane().getComponent(0))
+						.setViewportView(makeBoxesContainer());
 
-				frame.getContentPane().remove(bContainer);
-				frame.getContentPane().add(makeBoxesContainer(), c, 0);
 				if (statusMsg != null)
 					labelStatusBar.setText(labelStatusBar.getText() + statusMsg);
-				frame.getContentPane().validate();
 			}
 		});
 	}

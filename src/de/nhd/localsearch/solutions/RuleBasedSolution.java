@@ -1,4 +1,4 @@
-package de.nhd.localsearch.solution;
+package de.nhd.localsearch.solutions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Random;
 
-import de.nhd.localsearch.neighborhood.Neighborhood;
-import de.nhd.localsearch.neighborhood.RuleBasedNeighborhood;
+import de.nhd.localsearch.neighborhoods.Neighborhood;
+import de.nhd.localsearch.neighborhoods.RuleBasedNeighborhood;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;

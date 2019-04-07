@@ -1,10 +1,10 @@
-package de.nhd.localsearch.solution;
+package de.nhd.localsearch.solutions;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import de.nhd.localsearch.neighborhood.GeometryBasedNeighborhood;
-import de.nhd.localsearch.neighborhood.Neighborhood;
+import de.nhd.localsearch.neighborhoods.GeometryBasedNeighborhood;
+import de.nhd.localsearch.neighborhoods.Neighborhood;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;

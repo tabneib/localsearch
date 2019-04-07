@@ -1,10 +1,10 @@
-package de.nhd.localsearch.algos;
+package de.nhd.localsearch.algorithms;
 
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
-import de.nhd.localsearch.solution.GeometryBasedSolution;
-import de.nhd.localsearch.solution.RuleBasedSolution;
-import de.nhd.localsearch.solution.Solution;
+import de.nhd.localsearch.solutions.GeometryBasedSolution;
+import de.nhd.localsearch.solutions.RuleBasedSolution;
+import de.nhd.localsearch.solutions.Solution;
 
 /**
  * Abstract class represents the class of neighborhood-based optimization

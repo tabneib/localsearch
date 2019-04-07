@@ -1,4 +1,4 @@
-package de.nhd.localsearch.solution;
+package de.nhd.localsearch.solutions;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,10 +1,10 @@
-package de.nhd.localsearch.neighborhood;
+package de.nhd.localsearch.neighborhoods;
 
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;
 import de.nhd.localsearch.problem.geometry.MRectangle;
-import de.nhd.localsearch.solution.GeometryBasedSolution;
-import de.nhd.localsearch.solution.Solution;
+import de.nhd.localsearch.solutions.GeometryBasedSolution;
+import de.nhd.localsearch.solutions.Solution;
 
 /**
  * This class represents the geometry-based neighborhood.
@@ -123,11 +123,5 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 			} else
 				return null;
 		}
-	}
-
-	@Override
-	public void onCurrentSolutionChange(Solution newSolution) {
-		this.currentSolution = (GeometryBasedSolution) newSolution;
-		this.nextNeighborSolution = null;
 	}
 }

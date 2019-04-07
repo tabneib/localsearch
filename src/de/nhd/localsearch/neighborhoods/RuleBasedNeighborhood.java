@@ -1,10 +1,10 @@
-package de.nhd.localsearch.neighborhood;
+package de.nhd.localsearch.neighborhoods;
 
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
-import de.nhd.localsearch.solution.MSolution;
-import de.nhd.localsearch.solution.RuleBasedSolution;
-import de.nhd.localsearch.solution.Solution;
+import de.nhd.localsearch.solutions.MSolution;
+import de.nhd.localsearch.solutions.RuleBasedSolution;
+import de.nhd.localsearch.solutions.Solution;
 
 public class RuleBasedNeighborhood extends Neighborhood {
 
@@ -25,10 +25,5 @@ public class RuleBasedNeighborhood extends Neighborhood {
 			clonedSolution = ((RuleBasedSolution)this.currentSolution).clone(); 
 		clonedSolution.permute();
 		return clonedSolution;
-	}
-
-	@Override
-	public void onCurrentSolutionChange(Solution newSolution) {
-		this.currentSolution = (MSolution) newSolution;
 	}
 }
