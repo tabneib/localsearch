@@ -39,7 +39,7 @@ public class GeometryBasedSolution extends MSolution {
 	 * 
 	 * @return index of the selected box
 	 */
-	public int getRandomBoxProportionally() {
+	public int getRandomBoxIdx() {
 		double totalFreeArea = 0;
 		for (MBox mBox : this.boxes)
 			totalFreeArea += mBox.getFreeArea();

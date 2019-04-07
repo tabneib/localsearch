@@ -72,7 +72,7 @@ public class MRectangle extends Rectangle {
 
 	@Override
 	public boolean intersects(Rectangle r) {
-		if (!overlap || overlapRate <= 0)
+		if (!MRectangle.overlap || overlapRate <= 0)
 			return super.intersects(r);
 		else{
 			// Case overlapping is permitted 
@@ -98,7 +98,7 @@ public class MRectangle extends Rectangle {
 	 * @return
 	 */
 	public boolean checkPlaceable(ArrayList<MRectangle> existingRects) {
-		if (overlap) {
+		if (MRectangle.overlap) {
 			ArrayList<Rectangle> intersektions = new ArrayList<>();
 			for (MRectangle r : existingRects) {
 				if (!this.equals(r) && !this.intersects(r) && !this.intersection(r).isEmpty())
@@ -232,13 +232,13 @@ public class MRectangle extends Rectangle {
 		return rotatedM;
 	}
 	
-	public static void setOverlap(boolean ouverlap) {
-		overlap = ouverlap;
-		System.out.println("Overlap permitted: " + overlap);
+	public static void setOverlap(boolean overlap) {
+		MRectangle.overlap = overlap;
+		System.out.println("Overlap permitted: " + MRectangle.overlap);
 	}
 	
 	public static boolean isOverlapPermitted() {
-		return overlap;
+		return MRectangle.overlap;
 	}
 
 	public static double getOverlapRate() {

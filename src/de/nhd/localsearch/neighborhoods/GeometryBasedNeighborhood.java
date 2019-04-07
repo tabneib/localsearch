@@ -20,108 +20,69 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 	/**
 	 * The next neighbor to be returned
 	 */
-	private GeometryBasedSolution nextNeighborSolution;
+	private GeometryBasedSolution nextNeighbor;
 
-	/**
-	 * Flag to determine whether process was executed
-	 */
-	private boolean findNext;
-
-	public GeometryBasedNeighborhood(MOptProblem instance,
-			GeometryBasedSolution currentSolution) {
-		super(instance, currentSolution);
-		this.nextNeighborSolution = null;
-		this.findNext = false;
-
+	public GeometryBasedNeighborhood(MOptProblem instance, GeometryBasedSolution owner) {
+		super(instance, owner);
 	}
 
 	@Override
 	public boolean hasNext() {
-		this.findNext = true;
-		this.nextNeighborSolution = null;
+		this.searchNextNeighbor();
+		return this.nextNeighbor != null;
+	}
 
-		// Attempt to find next solution
-		int attempt = 0;
-		while (attempt < MAX_REPOSITIONING_ATTEMPTS) {
-			if (this.attempt()) {
-				// new solution was found
-
-				this.findNext = true;
-				return true;
-			}
-			attempt++;
+	private void searchNextNeighbor() {
+		int attempts = 0;
+		this.nextNeighbor = (GeometryBasedSolution) this.makeRandomMove();
+		while (this.nextNeighbor == null && attempts < MAX_REPOSITIONING_ATTEMPTS) {
+			this.nextNeighbor = (GeometryBasedSolution) this.makeRandomMove();
+			attempts++;
 		}
-		// if no solution was found
-		return false;
 	}
 
 	/**
 	 * Attempt to find the next neighbor
 	 * 
-	 * @return
+	 * @return true if next neighbor solution found, otherwise false
 	 */
-	public boolean attempt() {
-
-		if (((GeometryBasedSolution) this.currentSolution).getBoxes().size() < 2)
-			return false;
-
-		GeometryBasedSolution nextSolution = ((GeometryBasedSolution) this.currentSolution)
-				.clone();
-
+	public Solution makeRandomMove() {
+		if (((GeometryBasedSolution) this.Owner).getBoxes().size() < 2)
+			return null;
+		GeometryBasedSolution neighbor = ((GeometryBasedSolution) this.Owner).clone();
 		// Pick two random boxes
-		int sourceBoxIndex = nextSolution.getRandomBoxProportionally();
-		int destinationBoxIndex = nextSolution.getRandomBoxProportionally();
-		if (sourceBoxIndex == destinationBoxIndex) {
-			return false;
+		int sourceBoxIndex = neighbor.getRandomBoxIdx();
+		int destinationBoxIndex = neighbor.getRandomBoxIdx();
+		while (sourceBoxIndex == destinationBoxIndex
+				|| neighbor.getBoxes().get(sourceBoxIndex).isEmptyBox()) {
+			sourceBoxIndex = neighbor.getRandomBoxIdx();
+			destinationBoxIndex = neighbor.getRandomBoxIdx();
 		}
 
 		// Pick random rectangle
-		// TODO: Move this to MBox, adapt for the overlap case
-		MBox sourceBox = nextSolution.getBoxes().get(sourceBoxIndex);
-		MRectangle m = sourceBox.getRandomRect();
-		if (m == null)
-			return false;
-
-		/*
-		 * int sourceBoxSize = sourceBox.getMRectangles().size(); MRectangle m =
-		 * null; if (sourceBoxSize > 0) { int item = sourceBoxSize > 1 ? new
-		 * Random().nextInt(sourceBoxSize - 1) : 0; int i = 0; for (MRectangle
-		 * tempRectangle : sourceBox.getMRectangles()) { if (i == item){ m =
-		 * tempRectangle; break; } i++; } } else return false;
-		 */
+		MBox sourceBox = neighbor.getBoxes().get(sourceBoxIndex);
+		MRectangle randomRect = sourceBox.getRandomRect();
 
 		// Insert this rectangle into the destination box
-		MBox destinationBox = nextSolution.getBoxes().get(destinationBoxIndex);
+		MBox destinationBox = neighbor.getBoxes().get(destinationBoxIndex);
 		// destinationBox.optimalSort(); <- No need to sort the destination box
 		// due to optimal insert
-		if (destinationBox.optimalInsert(m.clone())) {
-			sourceBox.removeRect(m);
-			if (sourceBox.getMRectangles().isEmpty())
-				nextSolution.removeBox(sourceBoxIndex);
+		if (destinationBox.optimalInsert(randomRect.clone())) {
+			sourceBox.removeRect(randomRect);
+			if (sourceBox.isEmptyBox())
+				neighbor.removeBox(sourceBoxIndex);
 			else
 				sourceBox.optimalSort();
 		} else
-			return false;
-
-		// Don't forget to update the objective value of the next solution
-		nextSolution.updateObjective();
-		this.nextNeighborSolution = nextSolution;
-		return true;
+			return null;
+		neighbor.revalidateObjective();
+		return neighbor;
 	}
 
 	@Override
 	public Solution next() {
-		if (this.findNext) {
-			// the searching process for new solution was executed
-			this.findNext = false;
-			return this.nextNeighborSolution;
-		} else {
-			if (this.hasNext()) {
-				// execute a new searching process for new solution
-				this.findNext = false;
-				return this.nextNeighborSolution;
-			} else
-				return null;
-		}
+		if (this.nextNeighbor == null)
+			this.searchNextNeighbor();
+		return this.nextNeighbor;
 	}
 }

@@ -18,21 +18,21 @@ public abstract class Neighborhood implements Iterator<Solution> {
 	private MOptProblem problem;
 
 	/**
-	 * The solution that this neighborhood corresponds to
+	 * The solution that holds this neighborhood
 	 */
-	protected Solution currentSolution;
+	protected Solution Owner;
 
-	public Neighborhood(MOptProblem problem, Solution currentSolution) {
+	public Neighborhood(MOptProblem problem, Solution owner) {
 		this.problem = problem;
-		this.currentSolution = currentSolution;
+		this.Owner = owner;
 	}
 
 	protected OptProblem getProblem() {
 		return problem;
 	}
 
-	protected Solution getCurrentSolution() {
-		return this.currentSolution;
+	protected Solution getOwner() {
+		return this.Owner;
 	}
 	
 	/*public void reset(){

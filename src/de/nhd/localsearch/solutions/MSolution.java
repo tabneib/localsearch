@@ -75,7 +75,7 @@ public abstract class MSolution extends Solution {
 	 * This method forces the objective value to be updated (recomputed) the
 	 * next time.
 	 */
-	public void updateObjective() {
+	public void revalidateObjective() {
 		this.objectiveValue = -1;
 	}
 
