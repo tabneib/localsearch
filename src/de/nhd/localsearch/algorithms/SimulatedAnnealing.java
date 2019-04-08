@@ -6,10 +6,16 @@ import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.Solution;
 
 /**
- * Class representing the basic local search algorithm.
+ * Class representing the simulated annealing algorithm.
  *
  */
-public class LocalSearch extends NeighborhoodBasedAlgo {
+public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
+
+	/**
+	 * Maximal number of consecutive unsuccessful attempts at searching for
+	 * better neighbor
+	 */
+	public static final int MAX_SEARCHING_ATTEMPTS = 100;
 
 	/**
 	 * Running time of the algorithm
@@ -18,7 +24,7 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 
 	private boolean isFinished = false;
 
-	public LocalSearch(OptProblem optProblem, String neighborhood) {
+	public SimulatedAnnealing(OptProblem optProblem, String neighborhood) {
 		super(optProblem, neighborhood);
 	}
 
@@ -30,13 +36,14 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		// uh huh ? TODO: why not in this class locally
 		MSolution.resetRound();
 
+		int attempt = 0;
 		int countStep = 0;
 		// if (MRectangle.isOverlapPermitted())
 		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
 		long startTime = System.currentTimeMillis();
 
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
-		while (neighborhood.hasNext()) {
+		while (neighborhood.hasNext() && attempt < MAX_SEARCHING_ATTEMPTS) {
 			((MSolution) this.currentSolution).removeEmptyBoxes();
 			countStep++;
 			Solution neighbor = neighborhood.next();
@@ -44,7 +51,9 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 				MSolution.increaseRound();
 				this.currentSolution = neighbor;
 				neighborhood = neighbor.getNeighborhood();
-			} 
+				attempt = 0;
+			} else
+				attempt++;
 		}
 		runningTime = System.currentTimeMillis() - startTime;
 		this.isFinished = true;
@@ -57,18 +66,22 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		if (this.isFinished)
 			throw new RuntimeException("Algorithm already terminated!");
 
+		int attempt = 0;
 		// if (MRectangle.isOverlapPermitted())
 		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
 		((MSolution) this.currentSolution).removeEmptyBoxes();
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
-		while (neighborhood.hasNext()) {
+		while (neighborhood.hasNext() && attempt < MAX_SEARCHING_ATTEMPTS) {
+			//System.out.println("Moved Rect: " + neighborhood.getM);
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				this.currentSolution = neighbor;
 				break;
-			} 
+			} else
+				attempt++;
 		}
-		if (!neighborhood.hasNext())
+		if (!neighborhood.hasNext() || attempt >= MAX_SEARCHING_ATTEMPTS)
+			// No more neighbor
 			this.isFinished = true;
 	}
 

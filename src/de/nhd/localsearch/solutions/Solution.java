@@ -54,13 +54,12 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 			return 0;
 	}
 
-	/**
-	 * Return the objective value of this solution
-	 * 
-	 * @return The value
-	 */
+	public double getObjDiff(Solution other) {
+		return Math.abs(this.getObjective() - other.getObjective());
+	}
+	
 	public abstract double getObjective();
-
+	
 	public OptProblem getOptProblem() {
 		return this.problem;
 	}

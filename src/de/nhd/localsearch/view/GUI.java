@@ -829,7 +829,6 @@ public class GUI extends JFrame {
 					default :
 						throw new RuntimeException("Invalid number of arguments");
 				}
-
 				// Generating instance might throw exceptions if the given
 				// arguments are still invalid
 				genInstance();

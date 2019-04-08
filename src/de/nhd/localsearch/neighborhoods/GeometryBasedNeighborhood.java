@@ -13,10 +13,17 @@ import de.nhd.localsearch.solutions.Solution;
 public class GeometryBasedNeighborhood extends Neighborhood {
 
 	/**
+	 * Maximal number of neighbors to be iterated through. This tuning
+	 * guarantees a termination of the algorithm.
+	 */
+	public static final int MAX_NEIGHBORS = 100;
+
+	/**
 	 * Maximal number of attempts to reposition the rectangles between boxes.
 	 */
 	public static final int MAX_REPOSITIONING_ATTEMPTS = 100;
 
+	private int iteratedNeighbors;
 	private boolean noMoreNeighbor = false;
 
 	/**
@@ -27,7 +34,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 	public GeometryBasedNeighborhood(MOptProblem instance, GeometryBasedSolution owner) {
 		super(instance, owner);
 	}
-	
+
 	@Override
 	public boolean hasNext() {
 		if (this.noMoreNeighbor)
@@ -57,7 +64,8 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 	 * @return the generated neighbor if found such one, otherwise null
 	 */
 	public Solution makeRandomMove() {
-		if (((GeometryBasedSolution) this.owner).getBoxes().size() < 2)
+		if (((GeometryBasedSolution) this.owner).getBoxes().size() < 2
+				|| this.iteratedNeighbors >= MAX_NEIGHBORS)
 			return null;
 		GeometryBasedSolution neighbor = ((GeometryBasedSolution) this.owner).clone();
 		// Pick two random boxes
@@ -89,6 +97,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		sourceBox.setRepositionSrc();
 		sourceBox.setRemovedRect(clonedRandomRect);
 		destinationBox.setRepositionDest();
+		this.iteratedNeighbors++;
 		return neighbor;
 	}
 
