@@ -58,4 +58,6 @@ public abstract class NeighborhoodBasedAlgo implements IOptAlgo {
 			e.printStackTrace();
 		}
 	}
+	
+	public abstract boolean isFinished();
 }

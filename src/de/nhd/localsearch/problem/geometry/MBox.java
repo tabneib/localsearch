@@ -450,4 +450,29 @@ public class MBox extends Rectangle implements Cloneable {
 	public void setRemovedRect(MRectangle removedRect) {
 		this.removedRect = removedRect;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((mRectangles == null) ? 0 : mRectangles.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MBox other = (MBox) obj;
+		if (mRectangles == null) {
+			if (other.mRectangles != null)
+				return false;
+		} else if (!mRectangles.equals(other.mRectangles))
+			return false;
+		return true;
+	}
 }

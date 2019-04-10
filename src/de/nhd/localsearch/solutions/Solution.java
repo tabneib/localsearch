@@ -15,6 +15,8 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 	 * The corresponding optimization problem
 	 */
 	OptProblem problem;
+	
+	private boolean worseThanPrevious = false;
 
 	public Solution(OptProblem optProblem) {
 		this.problem = optProblem;
@@ -66,5 +68,13 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
+
+	public boolean isWorseThanPrevious() {
+		return worseThanPrevious;
+	}
+
+	public void setWorseThanPrevious() {
+		this.worseThanPrevious = true;
+	}
 
 }

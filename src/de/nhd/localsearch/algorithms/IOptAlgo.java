@@ -31,9 +31,4 @@ public interface IOptAlgo {
 	 * @return the running time
 	 */
 	public long getRunningTime();
-	
-	/**
-	 * Remove or reset all intermediate data to rerun the algorithm
-	 */
-	public void reset();
 }

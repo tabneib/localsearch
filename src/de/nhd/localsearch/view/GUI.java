@@ -10,6 +10,7 @@ import javax.swing.*;
 
 import de.nhd.localsearch.algorithms.LocalSearch;
 import de.nhd.localsearch.algorithms.NeighborhoodBasedAlgo;
+import de.nhd.localsearch.algorithms.SimulatedAnnealing;
 import de.nhd.localsearch.problem.MInstanceFactory;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;
@@ -49,24 +50,23 @@ public class GUI extends JFrame {
 	public static final Color COLOR_REPOSITIONING_DESTINATION = Color.yellow;
 	public static final Color COLOR_REPOSITIONED_RECT = Color.red;
 	public static final Color COLOR_REMOVED_RECT = Color.lightGray;
+	public static final Color COLOR_WORSE_THAN_PREVIOUS_SOLUTION = new Color(247, 185,
+			185);
 
 	// Other Constants
+	private static final int DEFAULT_DELAY = 50;
 	private static final String GEN_RANDOM = "Random-Instance-Generator";
 	private static final String GEN_SPLIT = "Split-Instance-Generator";
-	private static final int DEFAULT_DELAY = 50;
-
-	// Data
-	private MOptProblem problem;
-	private MSolution solution;
+	private static final String ALGO_LOCAL_SEARCH = "ALGO_LOCAL_SEARCH";
+	private static final String ALGO_SIM_ANNEALING = "ALGO_SIM_ANNEALING";
+	private static final String ALGO_TABOO = "ALGO_TABOO";
 
 	// Options
-	// private String generator = GEN_RANDOM;
 	private int amount = DEFAULT_AMOUNT;
 	private int minLength = DEFAULT_MIN_LENGTH;
 	private int maxLength = DEFAULT_MAX_LENGTH;
 	private int boxLength = DEFAULT_BOX_LENGTH;
 	private int initLength = DEFAULT_INIT_LENGTH;
-	// private String algorithm = ALGO_LOCAL;
 
 	// GUI Components
 	private JLabel labelStatusBar;
@@ -82,6 +82,7 @@ public class GUI extends JFrame {
 	private JRadioButton radioNeighborGeo;
 	private JRadioButton radioNeighborPerm;
 	private JCheckBox checkboxNeighborOverl;
+	private JCheckBox checkboxShowWorse;
 	private JRadioButton radioAlgoLocal;
 	private JRadioButton radioAlgoSim;
 	private JRadioButton radioAlgoTaboo;
@@ -100,7 +101,11 @@ public class GUI extends JFrame {
 	private String generatorName = GEN_RANDOM;
 	private String neighborhood = NeighborhoodBasedAlgo.NEIGHBORHOOD_GEO;
 	private boolean overlap = false;
-	private LocalSearch algorithm;
+	private String algorithmName = ALGO_LOCAL_SEARCH;
+	private boolean showWorseSolutions = true;
+	private NeighborhoodBasedAlgo algorithm;
+	private MOptProblem problem;
+	private MSolution solution;
 
 	private Timer timer = new Timer();
 	private TimerTask algoRunTask = null;
@@ -195,6 +200,8 @@ public class GUI extends JFrame {
 		int gridY = boxes.size() / gridX + (boxes.size() % gridX == 0 ? 0 : 1);
 
 		JPanel boxesContainer = new JPanel();
+		if (this.solution.isWorseThanPrevious())
+			boxesContainer.setBackground(COLOR_WORSE_THAN_PREVIOUS_SOLUTION);
 		boxesContainer.setPreferredSize(new Dimension(BOXES_CONTAINER_WIDTH,
 				gridY * (boxLength + 2 * BOXES_PADDING)));
 
@@ -204,6 +211,8 @@ public class GUI extends JFrame {
 		MBoxPanel boxPanel;
 		for (int i = 0; i < boxes.size(); i++) {
 			boxPanel = new MBoxPanel(boxes.get(i));
+			if (this.solution.isWorseThanPrevious())
+				boxPanel.setBackground(COLOR_WORSE_THAN_PREVIOUS_SOLUTION);
 			boxPanel.setPreferredSize(new Dimension(boxes.get(i).getBoxLength(),
 					boxes.get(i).getBoxLength()));
 			boxesContainer.add(boxPanel);
@@ -328,8 +337,8 @@ public class GUI extends JFrame {
 		panel.add(radioNeighborPerm, c);
 
 		checkboxNeighborOverl = new JCheckBox("Overlap");
-		c.gridx = 2;
-		c.gridy = 7;
+		c.gridx = 0;
+		c.gridy = 8;
 		c.gridwidth = 1;
 		panel.add(checkboxNeighborOverl, c);
 
@@ -345,25 +354,25 @@ public class GUI extends JFrame {
 		labelAlgo.setFont(new Font(defaultFont.getFontName(), Font.BOLD,
 				defaultFont.getSize() + 2));
 		c.gridx = 0;
-		c.gridy = 8;
+		c.gridy = 9;
 		c.gridwidth = 3;
 		panel.add(labelAlgo, c);
 
 		radioAlgoLocal = new JRadioButton("Local Search");
 		c.gridx = 0;
-		c.gridy = 9;
+		c.gridy = 10;
 		c.gridwidth = 1;
 		panel.add(radioAlgoLocal, c);
 
 		radioAlgoSim = new JRadioButton("Simulated Annealing");
 		c.gridx = 1;
-		c.gridy = 9;
+		c.gridy = 10;
 		c.gridwidth = 1;
 		panel.add(radioAlgoSim, c);
 
 		radioAlgoTaboo = new JRadioButton("Taboo");
 		c.gridx = 2;
-		c.gridy = 9;
+		c.gridy = 10;
 		c.gridwidth = 1;
 		panel.add(radioAlgoTaboo, c);
 
@@ -373,9 +382,16 @@ public class GUI extends JFrame {
 		this.groupAlgo.add(radioAlgoTaboo);
 		radioAlgoLocal.setSelected(true);
 
+		checkboxShowWorse = new JCheckBox("Show worse solutions");
+		c.gridx = 0;
+		c.gridy = 11;
+		c.gridwidth = 1;
+		panel.add(checkboxShowWorse, c);
+		checkboxShowWorse.setSelected(this.showWorseSolutions);
+
 		buttonAnimateRun = new JButton("Animate");
 		c.gridx = 0;
-		c.gridy = 10;
+		c.gridy = 12;
 		c.gridwidth = 1;
 		buttonAnimateRun.setPreferredSize(new Dimension(130, 20));
 		panel.add(buttonAnimateRun, c);
@@ -385,7 +401,7 @@ public class GUI extends JFrame {
 				defaultFont.getSize() + 2));
 		labelDelay.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 		c.gridx = 1;
-		c.gridy = 10;
+		c.gridy = 12;
 		c.gridwidth = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		panel.add(labelDelay, c);
@@ -393,28 +409,28 @@ public class GUI extends JFrame {
 
 		textFieldDelay = new JTextField("" + DEFAULT_DELAY);
 		c.gridx = 2;
-		c.gridy = 10;
+		c.gridy = 12;
 		c.gridwidth = 1;
 		textFieldDelay.setPreferredSize(new Dimension(100, 20));
 		panel.add(textFieldDelay, c);
 
 		buttonRunStep = new JButton("1 Step");
 		c.gridx = 0;
-		c.gridy = 11;
+		c.gridy = 13;
 		c.gridwidth = 1;
 		buttonRunStep.setPreferredSize(new Dimension(100, 20));
 		panel.add(buttonRunStep, c);
 
 		buttonRun = new JButton("Run");
 		c.gridx = 1;
-		c.gridy = 11;
+		c.gridy = 13;
 		c.gridwidth = 1;
 		buttonRun.setPreferredSize(new Dimension(100, 20));
 		panel.add(buttonRun, c);
 
 		buttonReset = new JButton("Reset");
 		c.gridx = 2;
-		c.gridy = 11;
+		c.gridy = 13;
 		c.gridwidth = 1;
 		buttonReset.setPreferredSize(new Dimension(100, 20));
 		panel.add(buttonReset, c);
@@ -443,6 +459,7 @@ public class GUI extends JFrame {
 		radioAlgoLocal.addActionListener(new AlgoSelectListener());
 		radioAlgoSim.addActionListener(new AlgoSelectListener());
 		radioAlgoTaboo.addActionListener(new AlgoSelectListener());
+		checkboxShowWorse.addActionListener(new ShowWorseSelectListener());
 		buttonInsGen.addActionListener(new InsGenerateListener());
 
 		// Run the whole algorithm without delay between the steps
@@ -463,7 +480,9 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (!runStep())
 					updateState(STATE_PAUSED);
-				repaintBoxes(null);
+				if (algorithmName.equals(ALGO_LOCAL_SEARCH)
+						|| !solution.isWorseThanPrevious() || showWorseSolutions)
+					repaintBoxes(null);
 			}
 		});
 
@@ -532,7 +551,18 @@ public class GUI extends JFrame {
 	 * algorithm, neighborhood or problem is changed.
 	 */
 	private void revalidateAlgo() {
-		this.algorithm = new LocalSearch(problem, this.neighborhood);
+		switch (this.algorithmName) {
+			case ALGO_LOCAL_SEARCH :
+				this.algorithm = new LocalSearch(problem, this.neighborhood);
+				break;
+			case ALGO_SIM_ANNEALING :
+				algorithm = new SimulatedAnnealing(problem, neighborhood);
+				break;
+			case ALGO_TABOO :
+				break;
+			default :
+				throw new RuntimeException("Invalid algorithm name: " + algorithmName);
+		}
 		this.solution = (MSolution) this.algorithm.getCurrentSolution();
 		repaintBoxes(null);
 		updateState(STATE_INIT);
@@ -549,8 +579,9 @@ public class GUI extends JFrame {
 
 			@Override
 			public void run() {
-				((JScrollPane) frame.getContentPane().getComponent(0))
-						.setViewportView(makeBoxesContainer());
+				JScrollPane boxesPane = (JScrollPane) frame.getContentPane()
+						.getComponent(0);
+				boxesPane.setViewportView(makeBoxesContainer());
 
 				if (statusMsg != null)
 					labelStatusBar.setText(labelStatusBar.getText() + statusMsg);
@@ -585,7 +616,9 @@ public class GUI extends JFrame {
 			@Override
 			public void run() {
 				runStep();
-				repaintBoxes(null);
+				if (algorithmName.equals(ALGO_LOCAL_SEARCH)
+						|| !solution.isWorseThanPrevious() || showWorseSolutions)
+					repaintBoxes(null);
 			}
 		};
 	}
@@ -627,6 +660,8 @@ public class GUI extends JFrame {
 				radioAlgoLocal.setEnabled(true);
 				radioAlgoSim.setEnabled(true);
 				radioAlgoTaboo.setEnabled(true);
+				checkboxShowWorse.setEnabled(this.algorithmName.equals(ALGO_SIM_ANNEALING)
+						|| this.algorithmName.equals(ALGO_TABOO));
 
 				buttonRun.setEnabled(true);
 				buttonReset.setEnabled(false);
@@ -656,6 +691,7 @@ public class GUI extends JFrame {
 				radioAlgoLocal.setEnabled(false);
 				radioAlgoSim.setEnabled(false);
 				radioAlgoTaboo.setEnabled(false);
+				checkboxShowWorse.setEnabled(false);
 
 				buttonRun.setEnabled(false);
 				buttonReset.setEnabled(false);
@@ -685,6 +721,7 @@ public class GUI extends JFrame {
 				radioAlgoLocal.setEnabled(false);
 				radioAlgoSim.setEnabled(false);
 				radioAlgoTaboo.setEnabled(false);
+				checkboxShowWorse.setEnabled(false);
 
 				buttonRun.setEnabled(true);
 				buttonReset.setEnabled(true);
@@ -711,6 +748,7 @@ public class GUI extends JFrame {
 				radioAlgoLocal.setEnabled(false);
 				radioAlgoSim.setEnabled(false);
 				radioAlgoTaboo.setEnabled(false);
+				checkboxShowWorse.setEnabled(false);
 
 				buttonRun.setEnabled(false);
 				buttonReset.setEnabled(true);
@@ -758,7 +796,7 @@ public class GUI extends JFrame {
 				g2.setColor(Color.BLACK);
 				g2.draw(r);
 			}
-			
+
 			if (this.box.isRepositionSrc()) {
 				MRectangle removedRect = this.box.getRemovedRect();
 				g2.setColor(COLOR_REMOVED_RECT);
@@ -874,13 +912,27 @@ public class GUI extends JFrame {
 		}
 	}
 
+	private class ShowWorseSelectListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			if (checkboxShowWorse.isSelected())
+				showWorseSolutions = true;
+			else
+				showWorseSolutions = false;
+		}
+	}
+
 	private class AlgoSelectListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (radioAlgoLocal.isSelected()) {
-				algorithm = new LocalSearch(problem, neighborhood);
+				algorithmName = ALGO_LOCAL_SEARCH;
+				revalidateAlgo();
 			} else if (radioAlgoSim.isSelected()) {
+				algorithmName = ALGO_SIM_ANNEALING;
+				revalidateAlgo();
 			} else if (radioAlgoTaboo.isSelected()) {
 			} else
 				throw new RuntimeException("No algorithm selected");

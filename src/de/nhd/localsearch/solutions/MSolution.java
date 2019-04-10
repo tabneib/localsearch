@@ -16,6 +16,8 @@ import de.nhd.localsearch.problem.geometry.MRectangle;
  */
 public abstract class MSolution extends Solution {
 
+	private static final int AGGRESSIVELESSNESS = 10;
+
 	/**
 	 * Total number of rounds that the algorithm has run
 	 */
@@ -99,13 +101,33 @@ public abstract class MSolution extends Solution {
 	public void setBoxes(ArrayList<MBox> boxes) {
 		this.boxes = boxes;
 	}
-	
-	public void removeEmptyBoxes() {
+
+	/**
+	 * Remove all empty boxes or all but except the last (empty) one
+	 * 
+	 * @param aggressive
+	 *            if all empty boxes are to be removed
+	 */
+	public void removeEmptyBoxes(boolean aggressive) {
 		Iterator<MBox> iter = this.boxes.iterator();
-		while (iter.hasNext()) {
-			if (((MBox) iter.next()).isEmptyBox())
-				iter.remove();
+		if (aggressive) {
+			while (iter.hasNext()) {
+				if (((MBox) iter.next()).isEmptyBox())
+					iter.remove();
+			}
+			return;
 		}
+		ArrayList<MBox> toBeRemoved = new ArrayList<>();
+		while (iter.hasNext()) {
+			MBox box = (MBox) iter.next();
+			if (box.isEmptyBox())
+				toBeRemoved.add(box);
+		}
+		if (toBeRemoved.isEmpty() || toBeRemoved.size() <= AGGRESSIVELESSNESS)
+			return;
+		for (int i = 0; i <= AGGRESSIVELESSNESS; i++)
+			toBeRemoved.remove(toBeRemoved.size() - 1);
+		this.boxes.removeAll(toBeRemoved);
 	}
 
 	/**
