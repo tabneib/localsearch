@@ -44,7 +44,7 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 	@Override
 	public int compareTo(Solution other) {
 		if (this.getObjective() < other.getObjective())
-			// worse than => smaller if Maximizing
+			// smaller objective => worse if Maximizing
 			return problem.getDirection().equals(OptProblem.Direction.MAXIMIZING)
 					? -1
 					: 1;

@@ -13,9 +13,11 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 
 	private static final double[] TEMPERATURES = {100, 90, 80, 70, 60, 50, 40, 30, 20, 10,
 			1};
-	private static final int[] STEP_LENGTHS = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
-			200};
-
+	//private static final int[] STEP_LENGTHS = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
+	//		200};
+	private static final int[] STEP_LENGTHS = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+			20};
+	
 	/**
 	 * Maximal number of consecutive unsuccessful attempts at searching for
 	 * better neighbor

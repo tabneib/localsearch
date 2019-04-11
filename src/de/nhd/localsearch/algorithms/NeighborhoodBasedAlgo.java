@@ -13,8 +13,8 @@ import de.nhd.localsearch.solutions.Solution;
  */
 public abstract class NeighborhoodBasedAlgo implements IOptAlgo {
 
-	public static final String NEIGHBORHOOD_GEO = "NEIGHBORHOOD_GEO";
-	public static final String NEIGHBORHOOD_PERM = "NEIGHBORHOOD_PERM";
+	public static final String NEIGHBORHOOD_GEO = "GEOMETRY_BASED";
+	public static final String NEIGHBORHOOD_PERM = "PERMUTATION";
 
 	/**
 	 * The optimization problem instance this algorithm has to solve

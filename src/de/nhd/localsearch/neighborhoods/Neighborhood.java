@@ -13,6 +13,12 @@ import de.nhd.localsearch.solutions.Solution;
 public abstract class Neighborhood implements Iterator<Solution> {
 
 	/**
+	 * Maximal number of neighbors to be iterated through. This tuning
+	 * guarantees a termination of the algorithm.
+	 */
+	public static final int MAX_NEIGHBORS = 100;
+	
+	/**
 	 * The instance of the optimization problem that this neighborhood corresponds to 
 	 */
 	private MOptProblem problem;

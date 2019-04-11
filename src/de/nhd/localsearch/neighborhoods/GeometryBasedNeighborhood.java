@@ -13,12 +13,6 @@ import de.nhd.localsearch.solutions.Solution;
 public class GeometryBasedNeighborhood extends Neighborhood {
 
 	/**
-	 * Maximal number of neighbors to be iterated through. This tuning
-	 * guarantees a termination of the algorithm.
-	 */
-	public static final int MAX_NEIGHBORS = 100;
-
-	/**
 	 * Maximal number of attempts to reposition the rectangles between boxes.
 	 */
 	public static final int MAX_REPOSITIONING_ATTEMPTS = 100;

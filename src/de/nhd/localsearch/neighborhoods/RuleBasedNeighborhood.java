@@ -1,14 +1,13 @@
 package de.nhd.localsearch.neighborhoods;
 
 import de.nhd.localsearch.problem.MOptProblem;
-import de.nhd.localsearch.problem.OptProblem;
-import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.RuleBasedSolution;
 import de.nhd.localsearch.solutions.Solution;
 
 public class RuleBasedNeighborhood extends Neighborhood {
 
-	RuleBasedSolution clonedSolution = null;
+	private int iteratedNeighbors;
+	private boolean noMoreNeighbor = false;
 	
 	public RuleBasedNeighborhood(MOptProblem instance, Solution currentSolution) {
 		super(instance, currentSolution);
@@ -16,14 +15,18 @@ public class RuleBasedNeighborhood extends Neighborhood {
 
 	@Override
 	public boolean hasNext() {
-		return true;
+		return !noMoreNeighbor;
 	}
 
 	@Override
 	public Solution next() {
-		if (clonedSolution == null)
-			clonedSolution = ((RuleBasedSolution)this.owner).clone(); 
-		clonedSolution.permute();
-		return clonedSolution;
+		if (this.noMoreNeighbor || this.iteratedNeighbors > MAX_NEIGHBORS)
+			throw new RuntimeException("No more neighbor");
+		RuleBasedSolution clonedOwner = ((RuleBasedSolution) this.owner).clone(); 
+		clonedOwner.permute();
+		this.iteratedNeighbors++;
+		if (this.iteratedNeighbors > MAX_NEIGHBORS)
+			this.noMoreNeighbor = true;
+		return clonedOwner;
 	}
 }
