@@ -454,15 +454,10 @@ public class GUI extends JFrame {
 		textAreaTerminal.setForeground(COLOR_TERMINAL_FONT);
 		textAreaTerminal.setBackground(COLOR_TERMINAL_BG);
 		terminalScrollPane = new JScrollPane(textAreaTerminal);
-		terminalScrollPane.setPreferredSize(new Dimension(MENU_CONTAINER_WIDTH + 75, 160));
+		terminalScrollPane
+				.setPreferredSize(new Dimension(MENU_CONTAINER_WIDTH + 75, 160));
 		terminalScrollPane.setBorder(BorderFactory.createEmptyBorder(20, 5, 5, 5));
 		panel.add(terminalScrollPane, c);
-
-		// TODO: remove this when all features are implemented
-		// checkboxNeighborOverl.setEnabled(false);
-		// radioNeighborPerm.setEnabled(false);
-		radioAlgoSim.setEnabled(false);
-		radioAlgoTaboo.setEnabled(false);
 
 		setListeners();
 		return panel;
@@ -496,10 +491,7 @@ public class GUI extends JFrame {
 				repaintBoxes(
 						"   Running time: " + algorithm.getRunningTime() / 1000 + "s");
 				updateState(STATE_FINISHED);
-				print("[+] Done");
-				print("[+] Final solution:\n" + "          #boxes:    "
-						+ solution.getBoxes().size() + "\n          objective: "
-						+ String.format("%.2f", solution.getObjective()));
+				reportDone();
 			}
 		});
 
@@ -512,10 +504,9 @@ public class GUI extends JFrame {
 				if (algorithmName.equals(ALGO_LOCAL_SEARCH)
 						|| !solution.isWorseThanPrevious() || showWorseSolutions) {
 					repaintBoxes(null);
-					print("[+] Current solution:\n" + "          #boxes:    "
-							+ solution.getBoxes().size() + "\n          objective: "
-							+ String.format("%.2f", solution.getObjective()));
-
+					reportCurrentSolution();
+					if (algorithm.isFinished())
+						reportDone();
 				}
 			}
 		});
@@ -632,12 +623,25 @@ public class GUI extends JFrame {
 	private void print(String message) {
 		try {
 			textAreaTerminal.append(message + "\n");
-			JScrollBar vertical = terminalScrollPane.getVerticalScrollBar();
-			vertical.setValue( vertical.getMaximum() );
+			terminalScrollPane.getVerticalScrollBar()
+					.setValue(textAreaTerminal.getHeight());
+			terminalScrollPane.validate();
 		} catch (NullPointerException e) {
 		}
 	}
 
+	private void reportDone() {
+		print("[+] Done");
+		print("[+] Final solution:");
+		print("          #boxes:    " + solution.getBoxes().size());
+		print("          objective: " + String.format("%.2f", solution.getObjective()));
+	}
+
+	private void reportCurrentSolution() {
+		print("[+] Current solution:");
+		print("          #boxes:    " + solution.getBoxes().size());
+		print("          objective: " + String.format("%.2f", solution.getObjective()));
+	}
 	/**
 	 * Run one single step of the current chosen algorithm
 	 */
@@ -668,11 +672,11 @@ public class GUI extends JFrame {
 				if (algorithmName.equals(ALGO_LOCAL_SEARCH)
 						|| !solution.isWorseThanPrevious() || showWorseSolutions) {
 					repaintBoxes(null);
-					print("[+] Current solution:\n" + "          #boxes:    "
-							+ solution.getBoxes().size() + "\n          objective: "
-							+ String.format("%.2f", solution.getObjective()));
+					reportCurrentSolution();
 
 				}
+				if (algorithm.isFinished())
+					reportDone();
 			}
 		};
 	}
@@ -1000,37 +1004,37 @@ public class GUI extends JFrame {
 			print("[+] Algorithm: " + algorithmName);
 		}
 	}
-	
+
 	class TerminalRightClickListener extends MouseAdapter {
-	    public void mousePressed(MouseEvent e) {
-	        if (e.isPopupTrigger())
-	            doPop(e);
-	    }
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger())
+				doPop(e);
+		}
 
-	    public void mouseReleased(MouseEvent e) {
-	        if (e.isPopupTrigger())
-	            doPop(e);
-	    }
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger())
+				doPop(e);
+		}
 
-	    private void doPop(MouseEvent e) {
-	        TerminalPopupMenu menu = new TerminalPopupMenu();
-	        menu.show(e.getComponent(), e.getX(), e.getY());
-	    }
+		private void doPop(MouseEvent e) {
+			TerminalPopupMenu menu = new TerminalPopupMenu();
+			menu.show(e.getComponent(), e.getX(), e.getY());
+		}
 	}
-	
+
 	private class TerminalPopupMenu extends JPopupMenu {
 		private static final long serialVersionUID = 1L;
 		JMenuItem clearItem;
-	    public TerminalPopupMenu() {
-	        clearItem = new JMenuItem("Clear");
-	        add(clearItem);
-	        clearItem.addActionListener(new ActionListener() {
-				
+		public TerminalPopupMenu() {
+			clearItem = new JMenuItem("Clear");
+			add(clearItem);
+			clearItem.addActionListener(new ActionListener() {
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					textAreaTerminal.setText("");
 				}
 			});
-	    }
+		}
 	}
 }
