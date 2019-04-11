@@ -3,6 +3,8 @@ package de.nhd.localsearch.view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,14 +54,16 @@ public class GUI extends JFrame {
 	public static final Color COLOR_REMOVED_RECT = Color.lightGray;
 	public static final Color COLOR_WORSE_THAN_PREVIOUS_SOLUTION = new Color(247, 185,
 			185);
+	public static final Color COLOR_TERMINAL_BG = Color.black;
+	public static final Color COLOR_TERMINAL_FONT = Color.white;
 
 	// Other Constants
 	private static final int DEFAULT_DELAY = 50;
-	private static final String GEN_RANDOM = "Random-Instance-Generator";
-	private static final String GEN_SPLIT = "Split-Instance-Generator";
-	private static final String ALGO_LOCAL_SEARCH = "ALGO_LOCAL_SEARCH";
-	private static final String ALGO_SIM_ANNEALING = "ALGO_SIM_ANNEALING";
-	private static final String ALGO_TABOO = "ALGO_TABOO";
+	private static final String GEN_RANDOM = "RANDOM";
+	private static final String GEN_SPLIT = "SPLIT";
+	private static final String ALGO_LOCAL_SEARCH = "LOCAL_SEARCH";
+	private static final String ALGO_SIM_ANNEALING = "SIM_ANNEALING";
+	private static final String ALGO_TABOO = "TABOO_SEARCH";
 
 	// Options
 	private int amount = DEFAULT_AMOUNT;
@@ -92,6 +96,8 @@ public class GUI extends JFrame {
 	private JButton buttonRunStep;
 	private JButton buttonRun;
 	private JButton buttonReset;
+	JScrollPane terminalScrollPane;
+	private JTextArea textAreaTerminal;
 
 	private ButtonGroup groupNeighbor;
 	private ButtonGroup groupAlgo;
@@ -142,6 +148,9 @@ public class GUI extends JFrame {
 		frame.pack();
 		frame.setVisible(true);
 		this.updateState(this.state);
+		this.print("[+] Generator: " + this.generatorName);
+		this.print("[+] Neighborhoos: " + this.neighborhood);
+		this.print("[+] Algorithm: " + this.algorithmName);
 	}
 
 	/**
@@ -435,6 +444,20 @@ public class GUI extends JFrame {
 		buttonReset.setPreferredSize(new Dimension(100, 20));
 		panel.add(buttonReset, c);
 
+		// The container of all the boxes
+		c.gridx = 0;
+		c.gridy = 14;
+		c.gridwidth = 3;
+		textAreaTerminal = new JTextArea();
+		textAreaTerminal.setEditable(false);
+		textAreaTerminal.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		textAreaTerminal.setForeground(COLOR_TERMINAL_FONT);
+		textAreaTerminal.setBackground(COLOR_TERMINAL_BG);
+		terminalScrollPane = new JScrollPane(textAreaTerminal);
+		terminalScrollPane.setPreferredSize(new Dimension(MENU_CONTAINER_WIDTH + 75, 160));
+		terminalScrollPane.setBorder(BorderFactory.createEmptyBorder(20, 5, 5, 5));
+		panel.add(terminalScrollPane, c);
+
 		// TODO: remove this when all features are implemented
 		// checkboxNeighborOverl.setEnabled(false);
 		// radioNeighborPerm.setEnabled(false);
@@ -461,16 +484,22 @@ public class GUI extends JFrame {
 		radioAlgoTaboo.addActionListener(new AlgoSelectListener());
 		checkboxShowWorse.addActionListener(new ShowWorseSelectListener());
 		buttonInsGen.addActionListener(new InsGenerateListener());
+		textAreaTerminal.addMouseListener(new TerminalRightClickListener());
 
 		// Run the whole algorithm without delay between the steps
 		buttonRun.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				print("[+] Running...");
 				algorithm.run();
 				solution = (MSolution) algorithm.getCurrentSolution();
 				repaintBoxes(
 						"   Running time: " + algorithm.getRunningTime() / 1000 + "s");
 				updateState(STATE_FINISHED);
+				print("[+] Done");
+				print("[+] Final solution:\n" + "          #boxes:    "
+						+ solution.getBoxes().size() + "\n          objective: "
+						+ String.format("%.2f", solution.getObjective()));
 			}
 		});
 
@@ -481,8 +510,13 @@ public class GUI extends JFrame {
 				if (!runStep())
 					updateState(STATE_PAUSED);
 				if (algorithmName.equals(ALGO_LOCAL_SEARCH)
-						|| !solution.isWorseThanPrevious() || showWorseSolutions)
+						|| !solution.isWorseThanPrevious() || showWorseSolutions) {
 					repaintBoxes(null);
+					print("[+] Current solution:\n" + "          #boxes:    "
+							+ solution.getBoxes().size() + "\n          objective: "
+							+ String.format("%.2f", solution.getObjective()));
+
+				}
 			}
 		});
 
@@ -544,6 +578,7 @@ public class GUI extends JFrame {
 				problem = MInstanceFactory.getInstanceSplit(initLength, boxLength, -1);
 				break;
 		}
+		this.print("[+] Problem instance generated");
 	}
 
 	/**
@@ -590,6 +625,20 @@ public class GUI extends JFrame {
 	}
 
 	/**
+	 * Print to GUI terminal
+	 * 
+	 * @param message
+	 */
+	private void print(String message) {
+		try {
+			textAreaTerminal.append(message + "\n");
+			JScrollBar vertical = terminalScrollPane.getVerticalScrollBar();
+			vertical.setValue( vertical.getMaximum() );
+		} catch (NullPointerException e) {
+		}
+	}
+
+	/**
 	 * Run one single step of the current chosen algorithm
 	 */
 	private boolean runStep() {
@@ -617,8 +666,13 @@ public class GUI extends JFrame {
 			public void run() {
 				runStep();
 				if (algorithmName.equals(ALGO_LOCAL_SEARCH)
-						|| !solution.isWorseThanPrevious() || showWorseSolutions)
+						|| !solution.isWorseThanPrevious() || showWorseSolutions) {
 					repaintBoxes(null);
+					print("[+] Current solution:\n" + "          #boxes:    "
+							+ solution.getBoxes().size() + "\n          objective: "
+							+ String.format("%.2f", solution.getObjective()));
+
+				}
 			}
 		};
 	}
@@ -823,6 +877,7 @@ public class GUI extends JFrame {
 			} else
 				throw new RuntimeException("No generator type selected");
 			updateState(STATE_INIT);
+			print("[+] Generator: " + generatorName);
 		}
 	}
 
@@ -898,6 +953,7 @@ public class GUI extends JFrame {
 			else
 				throw new RuntimeException("No neighborhood is selected");
 			updateState(STATE_INIT);
+			print("[+] Neighborhoos: " + neighborhood);
 		}
 	}
 
@@ -905,10 +961,13 @@ public class GUI extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent event) {
-			if (checkboxNeighborOverl.isSelected())
+			if (checkboxNeighborOverl.isSelected()) {
 				MRectangle.setOverlap(true);
-			else
+				print("[+] Overlapping rectangles: ON");
+			} else {
 				MRectangle.setOverlap(false);
+				print("[+] Overlapping rectangles: OFF");
+			}
 		}
 	}
 
@@ -916,10 +975,13 @@ public class GUI extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent event) {
-			if (checkboxShowWorse.isSelected())
+			if (checkboxShowWorse.isSelected()) {
 				showWorseSolutions = true;
-			else
+				print("[+] Show worse solutions: ON");
+			} else {
 				showWorseSolutions = false;
+				print("[+] Show worse solutions: OFF");
+			}
 		}
 	}
 
@@ -929,14 +991,46 @@ public class GUI extends JFrame {
 		public void actionPerformed(ActionEvent arg0) {
 			if (radioAlgoLocal.isSelected()) {
 				algorithmName = ALGO_LOCAL_SEARCH;
-				revalidateAlgo();
 			} else if (radioAlgoSim.isSelected()) {
 				algorithmName = ALGO_SIM_ANNEALING;
-				revalidateAlgo();
 			} else if (radioAlgoTaboo.isSelected()) {
 			} else
 				throw new RuntimeException("No algorithm selected");
 			revalidateAlgo();
+			print("[+] Algorithm: " + algorithmName);
 		}
+	}
+	
+	class TerminalRightClickListener extends MouseAdapter {
+	    public void mousePressed(MouseEvent e) {
+	        if (e.isPopupTrigger())
+	            doPop(e);
+	    }
+
+	    public void mouseReleased(MouseEvent e) {
+	        if (e.isPopupTrigger())
+	            doPop(e);
+	    }
+
+	    private void doPop(MouseEvent e) {
+	        TerminalPopupMenu menu = new TerminalPopupMenu();
+	        menu.show(e.getComponent(), e.getX(), e.getY());
+	    }
+	}
+	
+	private class TerminalPopupMenu extends JPopupMenu {
+		private static final long serialVersionUID = 1L;
+		JMenuItem clearItem;
+	    public TerminalPopupMenu() {
+	        clearItem = new JMenuItem("Clear");
+	        add(clearItem);
+	        clearItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					textAreaTerminal.setText("");
+				}
+			});
+	    }
 	}
 }
