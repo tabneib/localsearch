@@ -11,50 +11,39 @@ import de.nhd.localsearch.solutions.Solution;
  */
 public class LocalSearch extends NeighborhoodBasedAlgo {
 
-	/**
-	 * Running time of the algorithm
-	 */
-	private long runningTime = -1;
-
-	private boolean isFinished = false;
-
 	public LocalSearch(OptProblem optProblem, String neighborhood) {
 		super(optProblem, neighborhood);
 	}
 
 	@Override
 	public void run() {
-		if (this.isFinished)
+		if (this.isFinished())
 			throw new RuntimeException("Algorithm already finished. Reset before rerun.");
 
 		// uh huh ? TODO: why not in this class locally
 		MSolution.resetRound();
 
-		int countStep = 0;
 		// if (MRectangle.isOverlapPermitted())
 		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
-		long startTime = System.currentTimeMillis();
-
+		this.startTimer();
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext()) {
 			((MSolution) this.currentSolution).removeEmptyBoxes(true);
-			countStep++;
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				MSolution.increaseRound();
 				this.currentSolution = neighbor;
 				neighborhood = neighbor.getNeighborhood();
-			} 
+			}
 		}
-		runningTime = System.currentTimeMillis() - startTime;
-		this.isFinished = true;
-		System.out.println("[+] Total Round:  " + countStep);
-		System.out.println("[+] Running time: " + runningTime);
+		this.stopTimer();
+		this.setFinished();
+		System.out.println("[+] Running time: " + this.getRunningTime());
 	}
 
 	@Override
 	public void runStep() {
-		if (this.isFinished)
+		if (this.isFinished())
 			throw new RuntimeException("Algorithm already terminated!");
 
 		// if (MRectangle.isOverlapPermitted())
@@ -66,23 +55,14 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				this.currentSolution = neighbor;
 				break;
-			} 
+			}
 		}
 		if (!neighborhood.hasNext())
-			this.isFinished = true;
-	}
-
-	@Override
-	public long getRunningTime() {
-		return runningTime;
+			this.setFinished();
 	}
 
 	@Override
 	public Solution getCurrentSolution() {
 		return this.currentSolution;
-	}
-
-	public boolean isFinished() {
-		return isFinished;
 	}
 }

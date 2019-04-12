@@ -31,4 +31,11 @@ public interface IOptAlgo {
 	 * @return the running time
 	 */
 	public long getRunningTime();
+	
+	/**
+	 * Get the running state of the algorithm
+	 * 
+	 * @return true if the algorithm has finished, otherwise false
+	 */
+	public boolean isFinished();
 }
