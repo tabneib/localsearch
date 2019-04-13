@@ -3,7 +3,9 @@ package de.nhd.localsearch.neighborhoods;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;
 import de.nhd.localsearch.problem.geometry.MRectangle;
+import de.nhd.localsearch.solutions.GeometryBasedFeature;
 import de.nhd.localsearch.solutions.GeometryBasedSolution;
+import de.nhd.localsearch.solutions.MFeature;
 import de.nhd.localsearch.solutions.Solution;
 
 /**
@@ -13,7 +15,8 @@ import de.nhd.localsearch.solutions.Solution;
 public class GeometryBasedNeighborhood extends Neighborhood {
 
 	/**
-	 * Maximal number of attempts to reposition the rectangles between boxes.
+	 * Maximal number of attempts to reposition the rectangles between boxes for
+	 * constructing a neighbor.
 	 */
 	public static final int MAX_REPOSITIONING_ATTEMPTS = 100;
 
@@ -62,6 +65,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 				|| this.iteratedNeighbors >= MAX_NEIGHBORS)
 			return null;
 		GeometryBasedSolution neighbor = ((GeometryBasedSolution) this.owner).clone();
+
 		// Pick two random boxes
 		int sourceBoxIndex = neighbor.getRandomBoxIdx();
 		int destinationBoxIndex = neighbor.getRandomBoxIdx();
@@ -74,22 +78,30 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		// Pick random rectangle
 		MBox sourceBox = neighbor.getBoxes().get(sourceBoxIndex);
 		MRectangle randomRect = sourceBox.getRandomRect();
-		MRectangle clonedRandomRect = randomRect.clone();
-		// Insert this rectangle into the destination box
 		MBox destinationBox = neighbor.getBoxes().get(destinationBoxIndex);
-		// destinationBox.optimalSort(); <- No need to sort the destination box
-		// due to optimal insert
 		MRectangle insertedRect = destinationBox.optimalInsert(randomRect);
-		if (insertedRect != null) {
-			sourceBox.removeRect(randomRect);
-			if (!sourceBox.isEmptyBox())
-				sourceBox.optimalSort();
-		} else
+		if (insertedRect == null)
 			return null;
+
+		if (this.isTabooMode()) {
+			MFeature removedFeature = new GeometryBasedFeature(randomRect, sourceBox);
+			MFeature insertedFeature = new GeometryBasedFeature(insertedRect,
+					destinationBox);
+			if (!this.checkInsertable(insertedFeature)
+					|| !this.checkRemovable(removedFeature))
+				return null;
+			else {
+				neighbor.addRemovedFeature(removedFeature);
+				neighbor.addInsertedFeature(insertedFeature);
+			}
+		}
+		sourceBox.removeRect(randomRect);
+		if (!sourceBox.isEmptyBox())
+			sourceBox.optimalSort();
 		neighbor.revalidateObjective();
 		insertedRect.setRepositioned();
 		sourceBox.setRepositionSrc();
-		sourceBox.setRemovedRect(clonedRandomRect);
+		sourceBox.setRemovedRect(randomRect);
 		destinationBox.setRepositionDest();
 		this.iteratedNeighbors++;
 		return neighbor;

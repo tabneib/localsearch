@@ -14,9 +14,11 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 	/**
 	 * The corresponding optimization problem
 	 */
-	OptProblem problem;
+	protected OptProblem problem;
 	
 	private boolean worseThanPrevious = false;
+	
+	private int index = 0;
 
 	public Solution(OptProblem optProblem) {
 		this.problem = optProblem;
@@ -75,6 +77,14 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 
 	public void setWorseThanPrevious() {
 		this.worseThanPrevious = true;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 
 }

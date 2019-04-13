@@ -27,6 +27,8 @@ public class MOptProblem extends OptProblem {
 	 */
 	private final int boxLength;
 
+	private final int optimalBoxAmount;
+
 	public MOptProblem(String direction, int boxLength, ArrayList<MRectangle> rectangles,
 			ArrayList<MBox> boxes) {
 		super(direction);
@@ -34,6 +36,8 @@ public class MOptProblem extends OptProblem {
 		this.rechtangles = rectangles;
 		for (MRectangle r : rectangles)
 			this.rectArea += r.getArea();
+		this.optimalBoxAmount = (int) (this.rectArea / (boxLength * boxLength))
+				+ (this.rectArea % (boxLength * boxLength) == 0 ? 0 : 1);
 	}
 
 	public ArrayList<MRectangle> getRechtangles() {
@@ -46,5 +50,9 @@ public class MOptProblem extends OptProblem {
 
 	public double getTotalRectArea() {
 		return this.rectArea;
+	}
+
+	public int getOptimalBoxAmount() {
+		return this.optimalBoxAmount;
 	}
 }

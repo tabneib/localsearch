@@ -24,69 +24,43 @@ public class RuleBasedSolution extends MSolution {
 	private ArrayList<MRectangle> permutation;
 
 	/**
-	 * boxes whose fill-rate passes this threshold will not be touch by permuting
+	 * boxes whose fill-rate passes this threshold will not be touch by
+	 * permuting
 	 */
 	private static final double OPTIMAL_FILL_RATE = 0.9;
 
-	private static final Comparator<MRectangle> areaComparator = new Comparator<MRectangle>() {
-
-		@Override
-		public int compare(MRectangle o1, MRectangle o2) {
-			if (o1.getArea() < o2.getArea())
-				return -1;
-			else if (o1.getArea() == o2.getArea())
-				return 0;
-			else
-				return 1;
-		}
-	};
-
-	private static final Comparator<MBox> freeAreaComparator = new Comparator<MBox>() {
-
-		@Override
-		public int compare(MBox o1, MBox o2) {
-			if (o1.getFreeArea() < o2.getFreeArea())
-				return -1;
-			else if (o1.getFreeArea() == o2.getFreeArea())
-				return 0;
-			else
-				return 1;
-		}
-	};
-
-	public RuleBasedSolution(OptProblem optProblem,
-			ArrayList<MRectangle> initPermutation) {
-		super(optProblem, null);
-
-		if (initPermutation == null) {
-			this.boxes = new ArrayList<>();
-			this.permutation = new ArrayList<>();
-			permutation.addAll(((MOptProblem) optProblem).getRechtangles());
-			Collections.sort(permutation, areaComparator);
-
-			ArrayList<MRectangle> firstHalf = new ArrayList<>();
-			ArrayList<MRectangle> secondHalf = new ArrayList<>();
-
-			for (int i = 0; i < permutation.size() / 2; i++)
-				firstHalf.add(permutation.get(i));
-			for (int i = permutation.size() / 2; i < permutation.size(); i++)
-				secondHalf.add(permutation.get(i));
-			Collections.reverse(firstHalf);
-
-			// Re-insert the parts alternatively
-			this.permutation = new ArrayList<>();
-			for (int i = 0; i < firstHalf.size(); i++) {
-				this.permutation.add(firstHalf.get(i));
-				this.permutation.add(secondHalf.get(i));
-			}
-			if (secondHalf.size() > firstHalf.size())
-				this.permutation.add(secondHalf.get(secondHalf.size() - 1));
-
-			this.revalidate();
-		} else {
+	public RuleBasedSolution(OptProblem problem, ArrayList<MRectangle> initPermutation) {
+		super(problem, null);
+		if (initPermutation == null)
+			this.genDefaultPermutation();
+		else
 			this.permutation = initPermutation;
-			this.revalidate();
+		this.revalidate();
+	}
+
+	private void genDefaultPermutation() {
+		this.boxes = new ArrayList<>();
+		this.permutation = new ArrayList<>();
+		permutation.addAll(((MOptProblem) this.problem).getRechtangles());
+		Collections.sort(permutation, areaComparator);
+
+		ArrayList<MRectangle> firstHalf = new ArrayList<>();
+		ArrayList<MRectangle> secondHalf = new ArrayList<>();
+
+		for (int i = 0; i < permutation.size() / 2; i++)
+			firstHalf.add(permutation.get(i));
+		for (int i = permutation.size() / 2; i < permutation.size(); i++)
+			secondHalf.add(permutation.get(i));
+		Collections.reverse(firstHalf);
+
+		// Re-insert the parts alternatively
+		this.permutation = new ArrayList<>();
+		for (int i = 0; i < firstHalf.size(); i++) {
+			this.permutation.add(firstHalf.get(i));
+			this.permutation.add(secondHalf.get(i));
 		}
+		if (secondHalf.size() > firstHalf.size())
+			this.permutation.add(secondHalf.get(secondHalf.size() - 1));
 	}
 
 	/**
@@ -120,9 +94,9 @@ public class RuleBasedSolution extends MSolution {
 		Collections.sort(this.boxes, freeAreaComparator);
 		double totalFreeArea = 0;
 		ArrayList<MBox> optimalBoxes = new ArrayList<>();
-		ArrayList<MBox> tmpBoxes = new ArrayList<>();
-		tmpBoxes.addAll(this.boxes);
-		Iterator<MBox> iter = tmpBoxes.iterator();
+		ArrayList<MBox> nonOptimalBoxes = new ArrayList<>();
+		nonOptimalBoxes.addAll(this.boxes);
+		Iterator<MBox> iter = nonOptimalBoxes.iterator();
 
 		while (iter.hasNext()) {
 			MBox box = iter.next();
@@ -132,27 +106,27 @@ public class RuleBasedSolution extends MSolution {
 			} else
 				totalFreeArea += box.getFreeArea();
 		}
-		if (tmpBoxes.size() <= 1)
+		if (nonOptimalBoxes.size() <= 1)
 			return;
 
 		double randomPart = new Random().nextInt((int) totalFreeArea);
 		int randomIndex = 0;
 
-		for (MBox box : tmpBoxes) {
+		for (MBox box : nonOptimalBoxes) {
 			randomPart -= box.getFillArea();
 			if (randomPart <= 0)
 				break;
 			randomIndex++;
 		}
-		randomIndex = randomIndex >= tmpBoxes.size() ? randomIndex - 1 : randomIndex;
+		randomIndex = randomIndex >= nonOptimalBoxes.size() ? randomIndex - 1 : randomIndex;
 
 		this.permutation = new ArrayList<>();
 		for (MBox box : optimalBoxes)
 			this.permutation.addAll(box.getMRectangles());
-		this.permutation.addAll(tmpBoxes.get(randomIndex).getMRectangles());
-		tmpBoxes.remove(randomIndex);
-		for (int i = 0; i < tmpBoxes.size(); i++)
-			this.permutation.addAll(tmpBoxes.get(i).getMRectangles());
+		this.permutation.addAll(nonOptimalBoxes.get(randomIndex).getMRectangles());
+		nonOptimalBoxes.remove(randomIndex);
+		for (int i = 0; i < nonOptimalBoxes.size(); i++)
+			this.permutation.addAll(nonOptimalBoxes.get(i).getMRectangles());
 
 		this.revalidate();
 	}
@@ -174,4 +148,31 @@ public class RuleBasedSolution extends MSolution {
 		return new RuleBasedSolution(this.problem, null)
 				.setPermutation(clonedPermutation);
 	}
+
+	private static final Comparator<MRectangle> areaComparator = new Comparator<MRectangle>() {
+
+		@Override
+		public int compare(MRectangle o1, MRectangle o2) {
+			if (o1.getArea() < o2.getArea())
+				return -1;
+			else if (o1.getArea() == o2.getArea())
+				return 0;
+			else
+				return 1;
+		}
+	};
+
+	private static final Comparator<MBox> freeAreaComparator = new Comparator<MBox>() {
+
+		@Override
+		public int compare(MBox o1, MBox o2) {
+			if (o1.getFreeArea() < o2.getFreeArea())
+				return -1;
+			else if (o1.getFreeArea() == o2.getFreeArea())
+				return 0;
+			else
+				return 1;
+		}
+	};
+
 }

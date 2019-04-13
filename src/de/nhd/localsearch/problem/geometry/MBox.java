@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Class representing a box that contains rectangles
@@ -12,6 +13,33 @@ import java.util.Random;
 public class MBox extends Rectangle implements Cloneable {
 
 	private static final long serialVersionUID = 1L;
+
+	private final String id;
+	static private final String EMPTY_BOX_ID = "EMPTY_BOX_ID";
+
+	public static int getSmoothDegree() {
+		return SMOOTH_DEGREE;
+	}
+
+	public static int getVertical() {
+		return VERTICAL;
+	}
+
+	public static int getHorizontal() {
+		return HORIZONTAL;
+	}
+
+	public int getGridStep() {
+		return gridStep;
+	}
+
+	public int getMaxRange() {
+		return maxRange;
+	}
+
+	public ArrayList<MRectangle> getmRectangles() {
+		return mRectangles;
+	}
 
 	/**
 	 * TODO: comment me
@@ -43,9 +71,10 @@ public class MBox extends Rectangle implements Cloneable {
 	 * corresponding solution
 	 */
 	private boolean repositionDest = false;
-	
+
 	/**
-	 * The rectangle, if any, that was removed to generate the corresponding solution
+	 * The rectangle, if any, that was removed to generate the corresponding
+	 * solution
 	 */
 	private MRectangle removedRect;
 
@@ -61,14 +90,17 @@ public class MBox extends Rectangle implements Cloneable {
 		this.mRectangles = mRectangles;
 		this.gridStep = this.boxLength / SMOOTH_DEGREE;
 		this.maxRange = this.boxLength / this.gridStep;
+		this.id = UUID.randomUUID().toString();
 	}
 
-	public MBox(int boxLength, ArrayList<MRectangle> mRectangles, int gridStep) {
+	public MBox(int boxLength, ArrayList<MRectangle> mRectangles, int gridStep,
+			String id) {
 		super.setRect(0, 0, boxLength, boxLength);
 		this.boxLength = boxLength;
 		this.mRectangles = mRectangles;
 		this.gridStep = gridStep;
 		this.maxRange = this.boxLength / this.gridStep;
+		this.id = id;
 	}
 
 	public MBox(int boxLength) {
@@ -77,6 +109,7 @@ public class MBox extends Rectangle implements Cloneable {
 		this.mRectangles = new ArrayList<MRectangle>();
 		this.gridStep = this.boxLength / SMOOTH_DEGREE;
 		this.maxRange = this.boxLength / this.gridStep;
+		this.id = UUID.randomUUID().toString();
 	}
 
 	public static long getSerialversionuid() {
@@ -93,7 +126,8 @@ public class MBox extends Rectangle implements Cloneable {
 	 * 
 	 * @param rect
 	 *            The given rectangle
-	 * @return the inserted rectangle if inserted, null otherwise
+	 * @return the inserted rectangle (clone of the given rect) if inserted,
+	 *         null otherwise
 	 */
 	public MRectangle optimalInsert(MRectangle rect) {
 
@@ -106,7 +140,8 @@ public class MBox extends Rectangle implements Cloneable {
 			// Along vertical axis
 			for (int j = 0; j < maxRange; j++) {
 				// without rotating
-				MRectangle insertedRect = this.insert(rect, i * gridStep, j * gridStep, false);
+				MRectangle insertedRect = this.insert(rect, i * gridStep, j * gridStep,
+						false);
 				if (insertedRect != null)
 					return insertedRect;
 				// with rotating
@@ -423,8 +458,8 @@ public class MBox extends Rectangle implements Cloneable {
 		for (MRectangle mRectangle : this.mRectangles) {
 			clonedRectangles.add(mRectangle.clone());
 		}
-		MBox newBox = new MBox(this.boxLength, clonedRectangles, this.gridStep);
-		return newBox;
+		MBox clone = new MBox(this.boxLength, clonedRectangles, this.gridStep, this.id);
+		return clone;
 	}
 
 	public boolean isRepositionSrc() {
@@ -442,13 +477,20 @@ public class MBox extends Rectangle implements Cloneable {
 	public void setRepositionDest() {
 		this.repositionDest = true;
 	};
-	
+
 	public MRectangle getRemovedRect() {
 		return removedRect;
 	}
 
 	public void setRemovedRect(MRectangle removedRect) {
 		this.removedRect = removedRect;
+	}
+
+	public String getId() {
+		if (this.isEmptyBox())
+			return EMPTY_BOX_ID;
+		else
+			return this.id;
 	}
 
 	@Override
@@ -461,18 +503,14 @@ public class MBox extends Rectangle implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		MBox other = (MBox) obj;
-		if (mRectangles == null) {
-			if (other.mRectangles != null)
-				return false;
-		} else if (!mRectangles.equals(other.mRectangles))
+		if (this.getId().equals(other.getId()))
+			return true;
+		else
 			return false;
-		return true;
 	}
 }

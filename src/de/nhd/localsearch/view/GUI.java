@@ -13,6 +13,7 @@ import javax.swing.*;
 import de.nhd.localsearch.algorithms.LocalSearch;
 import de.nhd.localsearch.algorithms.NeighborhoodBasedAlgo;
 import de.nhd.localsearch.algorithms.SimulatedAnnealing;
+import de.nhd.localsearch.algorithms.TabooSearch;
 import de.nhd.localsearch.problem.MInstanceFactory;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;
@@ -50,6 +51,8 @@ public class GUI extends JFrame {
 
 	public static final Color COLOR_REPOSITIONING_SOURCE = Color.black;
 	public static final Color COLOR_REPOSITIONING_DESTINATION = Color.yellow;
+	public static final Color COLOR_RECT = new Color(47, 255, 228);
+	public static final Color COLOR_TABOO_RECT = new Color(57, 185, 211);
 	public static final Color COLOR_REPOSITIONED_RECT = Color.red;
 	public static final Color COLOR_REMOVED_RECT = Color.lightGray;
 	public static final Color COLOR_WORSE_THAN_PREVIOUS_SOLUTION = new Color(247, 185,
@@ -585,6 +588,7 @@ public class GUI extends JFrame {
 				algorithm = new SimulatedAnnealing(problem, neighborhood);
 				break;
 			case ALGO_TABOO :
+				algorithm = new TabooSearch(problem, neighborhood);
 				break;
 			default :
 				throw new RuntimeException("Invalid algorithm name: " + algorithmName);
@@ -634,13 +638,13 @@ public class GUI extends JFrame {
 		print("[+] Done");
 		print("[+] Final solution:");
 		print("          #boxes:    " + solution.getBoxes().size());
-		print("          objective: " + String.format("%.2f", solution.getObjective()));
+		print("          objective: " + String.format("%.10f", solution.getObjective()));
 	}
 
 	private void reportCurrentSolution() {
-		print("[+] Current solution:");
+		print("[+] Solution " + this.solution.getIndex() + ":");
 		print("          #boxes:    " + solution.getBoxes().size());
-		print("          objective: " + String.format("%.2f", solution.getObjective()));
+		print("          objective: " + String.format("%.10f", solution.getObjective()));
 	}
 	/**
 	 * Run one single step of the current chosen algorithm
@@ -849,7 +853,9 @@ public class GUI extends JFrame {
 			for (MRectangle r : box.getMRectangles()) {
 				g2.setColor(r.isRepositioned()
 						? COLOR_REPOSITIONED_RECT
-						: new Color(47, 255, 228));
+						: solution.checkTaboo(r)
+						? COLOR_TABOO_RECT
+						: COLOR_RECT);
 				g2.fill(r);
 				g2.setColor(Color.BLACK);
 				g2.draw(r);
@@ -998,6 +1004,7 @@ public class GUI extends JFrame {
 			} else if (radioAlgoSim.isSelected()) {
 				algorithmName = ALGO_SIM_ANNEALING;
 			} else if (radioAlgoTaboo.isSelected()) {
+				algorithmName = ALGO_TABOO;
 			} else
 				throw new RuntimeException("No algorithm selected");
 			revalidateAlgo();

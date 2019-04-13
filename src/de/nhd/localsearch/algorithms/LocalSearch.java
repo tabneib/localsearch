@@ -28,7 +28,7 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 		this.startTimer();
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext()) {
-			((MSolution) this.currentSolution).removeEmptyBoxes(true);
+			((MSolution) this.currentSolution).removeEmptyBoxes(0);
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				MSolution.increaseRound();
@@ -48,11 +48,12 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 
 		// if (MRectangle.isOverlapPermitted())
 		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
-		((MSolution) this.currentSolution).removeEmptyBoxes(true);
+		((MSolution) this.currentSolution).removeEmptyBoxes(0);
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext()) {
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
+				neighbor.setIndex(this.currentSolution.getIndex() + 1);
 				this.currentSolution = neighbor;
 				break;
 			}

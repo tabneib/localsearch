@@ -2,6 +2,7 @@ package de.nhd.localsearch.solutions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import de.nhd.localsearch.problem.MOptProblem;
@@ -34,9 +35,19 @@ public abstract class MSolution extends Solution {
 
 	private double objectiveValue = -1;
 
+	private HashSet<MFeature> removedFeatures;
+	private HashSet<MFeature> insertedFeatures;
+
+	/**
+	 * current taboo rectangles, for which repositioning it is not allowed. This
+	 * is used solely for visualization purpose.
+	 */
+	private HashSet<MRectangle> tabooRectangles;
+
 	public MSolution(OptProblem optProblem, ArrayList<MBox> boxes) {
 		super(optProblem);
 		this.boxes = boxes;
+		tabooRectangles = new HashSet<>();
 	}
 
 	@Override
@@ -167,5 +178,47 @@ public abstract class MSolution extends Solution {
 
 	public static void resetRound() {
 		round = 0;
+	}
+
+	public HashSet<MFeature> getRemovedFeatures() {
+		return removedFeatures;
+	}
+
+	public void addRemovedFeature(MFeature removedFeature) {
+		if (this.removedFeatures == null)
+			this.removedFeatures = new HashSet<>();
+		this.removedFeatures.add(removedFeature);
+	}
+
+	public HashSet<MFeature> getInsertedFeatures() {
+		return insertedFeatures;
+	}
+
+	public void addInsertedFeature(MFeature insertedFeature) {
+		if (this.insertedFeatures == null)
+			this.insertedFeatures = new HashSet<>();
+		this.insertedFeatures.add(insertedFeature);
+	}
+
+	public void addTaboo(MRectangle rect) {
+		if (!this.tabooRectangles.add(rect))
+			throw new RuntimeException("Double insert taboo rectangle");
+	}
+	
+	public void removeTaboo(MRectangle rect) {
+		if (!this.tabooRectangles.remove(rect))
+			throw new RuntimeException("Taboo rectangle not present");
+	}
+	
+	public HashSet<MRectangle> getTabooRectangles() {
+		return tabooRectangles;
+	}
+
+	public void setTabooRectangles(HashSet<MRectangle> tabooRectangles) {
+		this.tabooRectangles = tabooRectangles;
+	}
+
+	public boolean checkTaboo(MRectangle rect) {
+		return this.tabooRectangles.contains(rect);
 	}
 }

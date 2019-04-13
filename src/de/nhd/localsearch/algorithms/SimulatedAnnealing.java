@@ -13,11 +13,14 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 
 	private static final double[] TEMPERATURES = {100, 90, 80, 70, 60, 50, 40, 30, 20, 10,
 			1};
-	//private static final int[] STEP_LENGTHS = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
-	//		200};
+	// private static final int[] STEP_LENGTHS = {10, 20, 30, 40, 50, 60, 70,
+	// 80, 90, 100,
+	// 200};
 	private static final int[] STEP_LENGTHS = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 			20};
-	
+
+	private static final int EMPTY_BOX_REMOVING_AGGRESSIVELESSNESS = 5;
+
 	/**
 	 * Maximal number of consecutive unsuccessful attempts at searching for
 	 * better neighbor
@@ -55,7 +58,8 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext()) {
-			((MSolution) this.currentSolution).removeEmptyBoxes(false);
+			((MSolution) this.currentSolution)
+					.removeEmptyBoxes(EMPTY_BOX_REMOVING_AGGRESSIVELESSNESS);
 			countStep++;
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
@@ -70,7 +74,7 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 		}
 		runningTime = System.currentTimeMillis() - startTime;
 		this.isFinished = true;
-		((MSolution) this.currentSolution).removeEmptyBoxes(true);
+		((MSolution) this.currentSolution).removeEmptyBoxes(0);
 		System.out.println("[+] Total Round:  " + countStep);
 		System.out.println("[+] Running time: " + runningTime);
 	}
@@ -81,14 +85,17 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 			throw new RuntimeException("Algorithm already terminated!");
 		// if (MRectangle.isOverlapPermitted())
 		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
-		((MSolution) this.currentSolution).removeEmptyBoxes(false);
+		((MSolution) this.currentSolution)
+				.removeEmptyBoxes(EMPTY_BOX_REMOVING_AGGRESSIVELESSNESS);
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext()) {
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
+				neighbor.setIndex(this.currentSolution.getIndex() + 1);
 				this.currentSolution = neighbor;
 				break;
 			} else if (this.biasedCoinFlip(this.currentSolution, neighbor)) {
+				neighbor.setIndex(this.currentSolution.getIndex() + 1);
 				this.currentSolution = neighbor;
 				this.currentSolution.setWorseThanPrevious();
 				break;
@@ -96,7 +103,7 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 		}
 		if (!neighborhood.hasNext()) {
 			this.isFinished = true;
-			((MSolution) this.currentSolution).removeEmptyBoxes(true);
+			((MSolution) this.currentSolution).removeEmptyBoxes(0);
 		}
 	}
 
