@@ -2,7 +2,6 @@ package de.nhd.localsearch.problem;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Random;
 
@@ -15,7 +14,7 @@ import de.nhd.localsearch.problem.geometry.MRectangle;
  */
 public class MInstanceFactory {
 
-	private static final String direction = OptProblem.Direction.MAXIMIZING;
+	private static final String direction = OptProblem.Direction.MINIMIZING;
 
 	/**
 	 * ratio between box size and the maximum size of the resulted rects.

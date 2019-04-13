@@ -16,8 +16,6 @@ import de.nhd.localsearch.problem.geometry.MRectangle;
  */
 public abstract class MSolution extends Solution {
 
-	private static final int AGGRESSIVELESSNESS = 10;
-
 	/**
 	 * Total number of rounds that the algorithm has run
 	 */
@@ -44,21 +42,23 @@ public abstract class MSolution extends Solution {
 	@Override
 	public double getObjective() {
 		if (this.objectiveValue == -1) {
+			int integerPart = this.getNonEmptyBoxAmount()
+					- ((MOptProblem) this.problem).getOptimalBoxAmount();
+			if (integerPart == 0)
+				return 0;
+
+			double fractionalPart = 0;
 			int totalRects = ((MOptProblem) problem).getRechtangles().size();
-			ArrayList<Double> fillGrades = new ArrayList<Double>();
+			ArrayList<Double> fillRates = new ArrayList<Double>();
 			for (MBox box : this.boxes)
-				fillGrades.add((Double) box.getFillRate());
-			Collections.sort(fillGrades);
-			Collections.reverse(fillGrades);
-			this.objectiveValue = 0;
-			for (int i = 0; i < fillGrades.size(); i++)
-				this.objectiveValue += fillGrades.get(i) * (totalRects - i);
+				fillRates.add((Double) box.getFillRate());
+			Collections.sort(fillRates);
+			Collections.reverse(fillRates);
+			for (int i = 0; i < fillRates.size(); i++)
+				fractionalPart += fillRates.get(i) * (totalRects - i);
+			fractionalPart = Math.pow(fractionalPart + 1, -1);
+			this.objectiveValue = integerPart + fractionalPart;
 		}
-
-		if (MRectangle.isOverlapPermitted())
-			this.objectiveValue -= MSolution.getPenaltyRate()
-					* this.getTotalOverlapArea();
-
 		return this.objectiveValue;
 	}
 
@@ -94,6 +94,14 @@ public abstract class MSolution extends Solution {
 		return rects;
 	}
 
+	public int getNonEmptyBoxAmount() {
+		int amount = 0;
+		for (MBox box : this.boxes)
+			if (!box.isEmptyBox())
+				amount++;
+		return amount;
+	}
+
 	public ArrayList<MBox> getBoxes() {
 		return this.boxes;
 	}
@@ -108,9 +116,9 @@ public abstract class MSolution extends Solution {
 	 * @param aggressive
 	 *            if all empty boxes are to be removed
 	 */
-	public void removeEmptyBoxes(boolean aggressive) {
+	public void removeEmptyBoxes(int aggressiveness) {
 		Iterator<MBox> iter = this.boxes.iterator();
-		if (aggressive) {
+		if (aggressiveness == 0) {
 			while (iter.hasNext()) {
 				if (((MBox) iter.next()).isEmptyBox())
 					iter.remove();
@@ -123,9 +131,9 @@ public abstract class MSolution extends Solution {
 			if (box.isEmptyBox())
 				toBeRemoved.add(box);
 		}
-		if (toBeRemoved.isEmpty() || toBeRemoved.size() <= AGGRESSIVELESSNESS)
+		if (toBeRemoved.isEmpty() || toBeRemoved.size() <= aggressiveness)
 			return;
-		for (int i = 0; i <= AGGRESSIVELESSNESS; i++)
+		for (int i = 0; i <= aggressiveness; i++)
 			toBeRemoved.remove(toBeRemoved.size() - 1);
 		this.boxes.removeAll(toBeRemoved);
 	}
