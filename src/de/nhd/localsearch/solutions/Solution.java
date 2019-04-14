@@ -64,7 +64,7 @@ public abstract class Solution implements Comparable<Solution>, Cloneable {
 	
 	public abstract double getObjective();
 	
-	public OptProblem getOptProblem() {
+	public OptProblem getProblem() {
 		return this.problem;
 	}
 

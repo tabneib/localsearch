@@ -9,7 +9,7 @@ import java.util.UUID;
  * Class representing a rectangle to be placed into a box.
  *
  */
-public class MRectangle extends Rectangle {
+public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -339,5 +339,15 @@ public class MRectangle extends Rectangle {
 			return true;
 		else
 			return false;
+	}
+
+	@Override
+	public int compareTo(MRectangle other) {
+		if (this.getArea() > other.getArea())
+			return 1;
+		else if (this.getArea() < other.getArea())
+			return -1;
+		else
+			return 0;
 	}
 }
