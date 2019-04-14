@@ -19,20 +19,6 @@ public class RuleBasedSolution extends MSolution {
 
 	private ArrayList<MRectangle> permutation;
 
-	/**
-	 * boxes whose fill-rate passes this threshold will not be touch by
-	 * permuting
-	 */
-	private static final double OPTIMAL_FILL_RATE = 0.9;
-
-	public ArrayList<MRectangle> getPermutation() {
-		return permutation;
-	}
-
-	public static double getOptimalFillRate() {
-		return OPTIMAL_FILL_RATE;
-	}
-
 	public RuleBasedSolution(OptProblem problem, ArrayList<MRectangle> initPermutation) {
 		super(problem, null);
 		if (initPermutation == null)

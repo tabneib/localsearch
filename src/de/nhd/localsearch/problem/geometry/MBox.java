@@ -117,6 +117,8 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 
 	private void resetGridStep() {
 		this.gridStep = this.boxLength / SMOOTH_DEGREE;
+		if (this.gridStep == 0)
+			this.gridStep = 1;
 	}
 	/**
 	 * Automatically insert the given rectangle into this box at an optimal

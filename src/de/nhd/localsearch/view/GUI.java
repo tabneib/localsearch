@@ -237,7 +237,7 @@ public class GUI extends JFrame {
 					+ problem.getRechtangles().size() + "   boxLength: " + boxLength);
 		else
 			labelStatusBar.setText("  #Box: " + boxes.size() + "   #Rect: "
-					+ solution.getRechtangles().size() + "   boxLength: " + boxLength);
+					+ solution.getRectangles().size() + "   boxLength: " + boxLength);
 
 		return boxesContainer;
 	}

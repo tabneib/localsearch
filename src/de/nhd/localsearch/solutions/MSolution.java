@@ -98,7 +98,7 @@ public abstract class MSolution extends Solution {
 	 * 
 	 * @return
 	 */
-	public ArrayList<MRectangle> getRechtangles() {
+	public ArrayList<MRectangle> getRectangles() {
 		ArrayList<MRectangle> rects = new ArrayList<>();
 		for (MBox box : this.boxes)
 			rects.addAll(box.getMRectangles());

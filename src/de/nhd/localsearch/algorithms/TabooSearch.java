@@ -2,6 +2,9 @@ package de.nhd.localsearch.algorithms;
 
 import java.util.ArrayList;
 
+import org.hamcrest.core.IsInstanceOf;
+
+import de.nhd.localsearch.neighborhoods.GeometryBasedNeighborhood;
 import de.nhd.localsearch.neighborhoods.Neighborhood;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
@@ -90,7 +93,8 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 			this.stuckingSteps = 0;
 
 		bestNeighbor.setIndex(this.currentSolution.getIndex() + 1);
-		((MSolution) bestNeighbor).setTabooRectangles(
+		if (this.neighborhood.equals(NEIGHBORHOOD_GEO))
+			((MSolution) bestNeighbor).setTabooRectangles(
 				((MSolution) this.currentSolution).getTabooRectangles());
 		if (this.currentSolution.isBetterThan(bestNeighbor)) {
 			this.currentSolution = bestNeighbor;
@@ -156,19 +160,27 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 
 	private void updateTaboos(Solution newSolution) {
 		for (MFeature insertedFeature : ((MSolution) newSolution).getInsertedFeatures()) {
-			if (this.recentInsertedFeatures.contains(insertedFeature))
-				throw new RuntimeException("Taboo feature cannot be inserted.");
+			if (this.recentInsertedFeatures.contains(insertedFeature)){
+				//throw new RuntimeException("Taboo feature cannot be inserted.");
+				//System.out.println("Double inserted Taboo feature");
+				continue;
+			}
 			if (this.recentInsertedFeatures.size() == this.tabooListLength)
 				this.recentInsertedFeatures.remove(0);
 			this.recentInsertedFeatures.add(insertedFeature);
-			((MSolution) this.currentSolution).addTaboo(insertedFeature.getRect());
-			if (this.recentInsertedFeatures.size() == this.tabooListLength)
-				((MSolution) this.currentSolution)
-						.removeTaboo(this.recentInsertedFeatures.get(0).getRect());
+			if (this.neighborhood.equals(NEIGHBORHOOD_GEO)) {
+				((MSolution) this.currentSolution).addTaboo(insertedFeature.getRect());
+				if (this.recentInsertedFeatures.size() == this.tabooListLength)
+					((MSolution) this.currentSolution)
+							.removeTaboo(this.recentInsertedFeatures.get(0).getRect());
+			}
 		}
 		for (MFeature removedFeature : ((MSolution) newSolution).getRemovedFeatures()) {
-			if (this.recentRemovedFeatures.contains(removedFeature))
-				throw new RuntimeException("Taboo feature cannot be removed.");
+			if (this.recentRemovedFeatures.contains(removedFeature)){
+				//throw new RuntimeException("Taboo feature cannot be removed.");
+				//System.out.println("Double removed Taboo feature");
+				continue;
+			}
 			if (this.recentRemovedFeatures.size() == this.tabooListLength)
 				this.recentRemovedFeatures.remove(0);
 			this.recentRemovedFeatures.add(removedFeature);

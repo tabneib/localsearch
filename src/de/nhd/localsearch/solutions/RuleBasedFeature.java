@@ -1,15 +1,14 @@
 package de.nhd.localsearch.solutions;
 
-import de.nhd.localsearch.problem.geometry.MBox;
 import de.nhd.localsearch.problem.geometry.MRectangle;
 
 public class RuleBasedFeature extends MFeature {
 
-	private MBox residentialBox;
+	private int index;
 
-	public RuleBasedFeature(MRectangle rect, MBox residentialBox) {
+	public RuleBasedFeature(MRectangle rect, int index) {
 		super(rect);
-		this.residentialBox = residentialBox;
+		this.index= index;
 	}
 
 	@Override
@@ -19,7 +18,7 @@ public class RuleBasedFeature extends MFeature {
 		if (getClass() != obj.getClass())
 			return false;
 		MFeature other = (MFeature) obj;
-		if (this.residentialBox.equals(((RuleBasedFeature) other).getBox())
+		if (this.index == ((RuleBasedFeature) other).getIndex()
 				&& this.rect.equals(other.getRect()))
 			return true;
 		else{
@@ -27,13 +26,13 @@ public class RuleBasedFeature extends MFeature {
 		}
 	}
 
-	public MBox getBox() {
-		return residentialBox;
+	public int getIndex() {
+		return this.index;
 	}
 
 	@Override
 	public String toString() {
-		return "MFeature(rect: " + this.rect.getId() + "; box: "
-				+ this.residentialBox.getId() + ")";
+		return "MFeature(rect: " + this.rect.getId() + "; index: "
+				+ this.getIndex() + ")";
 	}
 }

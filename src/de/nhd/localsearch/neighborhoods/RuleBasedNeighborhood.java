@@ -6,6 +6,10 @@ import java.util.Collections;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;
 import de.nhd.localsearch.problem.geometry.MRectangle;
+import de.nhd.localsearch.solutions.GeometryBasedFeature;
+import de.nhd.localsearch.solutions.MFeature;
+import de.nhd.localsearch.solutions.MSolution;
+import de.nhd.localsearch.solutions.RuleBasedFeature;
 import de.nhd.localsearch.solutions.RuleBasedSolution;
 import de.nhd.localsearch.solutions.Solution;
 
@@ -16,9 +20,15 @@ public class RuleBasedNeighborhood extends Neighborhood {
 	 * permuting
 	 */
 	private static final double OPTIMAL_FILL_RATE = 0.8;
+	
+	private static final int MAX_TRY_TO_AVOID_TABOO = 30;
 
 	private int iteratedNeighbors;
 	private boolean noMoreNeighbor = false;
+	private MFeature removedFeature;
+	private MFeature insertedFeature;
+	
+	private int avoidTabooTries;
 
 	public RuleBasedNeighborhood(MOptProblem instance, Solution currentSolution) {
 		super(instance, currentSolution);
@@ -49,7 +59,7 @@ public class RuleBasedNeighborhood extends Neighborhood {
 	 */
 	private Solution findNextNeighbor(RuleBasedSolution solution) {
 		ArrayList<MRectangle> neighborPerm = new ArrayList<>();
-		ArrayList<MRectangle> rects = solution.getRechtangles();
+		ArrayList<MRectangle> rects = solution.getRectangles();
 		ArrayList<MBox> boxes = new ArrayList<>(solution.getBoxes());
 		Collections.sort(boxes);
 		Collections.reverse(boxes);
@@ -69,6 +79,10 @@ public class RuleBasedNeighborhood extends Neighborhood {
 
 		// neighborPerm = solution.getPermutation();
 		Solution neighbor = new RuleBasedSolution(this.owner.getProblem(), neighborPerm);
+		((RuleBasedSolution) neighbor).addInsertedFeature(this.insertedFeature);
+		((RuleBasedSolution) neighbor).addRemovedFeature(this.removedFeature);
+		this.insertedFeature = null;
+		this.removedFeature = null;
 		return neighbor;
 	}
 
@@ -115,8 +129,31 @@ public class RuleBasedNeighborhood extends Neighborhood {
 			permutation.addAll(rectangles);
 
 		// One single random switch
-		MRectangle randomRect = permutation
-				.get((int) (Math.random() * permutation.size()));
+		int randomIdx = (int) (Math.random() * permutation.size());
+		MRectangle randomRect = permutation.get(randomIdx);
+		if (this.isTabooMode()) {
+			int startIdx = ((MSolution) this.owner).getRectangles().size()
+					- rectangles.size();
+			// busy loop, no good idea :) 
+			// consider using further termination criteria
+			while (this.avoidTabooTries <= MAX_TRY_TO_AVOID_TABOO) {
+				MFeature removedFeature = new RuleBasedFeature(randomRect,
+						startIdx + randomIdx);
+				MFeature insertedFeature = new RuleBasedFeature(randomRect,
+						startIdx);
+				if (!this.checkInsertable(insertedFeature)
+						|| !this.checkRemovable(removedFeature)){
+					randomIdx = (int) (Math.random() * permutation.size());
+					this.avoidTabooTries++;
+				}
+				else {
+					this.removedFeature = removedFeature;
+					this.insertedFeature = insertedFeature;
+					this.avoidTabooTries = 0;
+					break;
+				}
+			}
+		}
 		permutation.remove(randomRect);
 		permutation.add(0, randomRect);
 		return permutation;
