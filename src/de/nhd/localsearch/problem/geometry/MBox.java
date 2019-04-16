@@ -164,8 +164,8 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 			return null;
 
 		for (int i = 0; i <= 2; i++) {
-			this.push(rect, VERTICAL, this.boxLength / 2);
 			this.push(rect, HORIZONTAL, this.boxLength / 2);
+			this.push(rect, VERTICAL, this.boxLength / 2);
 		}
 
 		// After pushing, compute filled, free and total overlapped area
@@ -201,8 +201,8 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 		if (MRectangle.isOverlapPermitted() && MRectangle.getOverlapRate() > 0)
 			return;
 		for (MRectangle rect : this.mRectangles) {
-			this.push(rect, VERTICAL, this.boxLength / 2);
 			this.push(rect, HORIZONTAL, this.boxLength / 2);
+			this.push(rect, VERTICAL, this.boxLength / 2);
 		}
 	}
 
@@ -228,16 +228,16 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 
 		switch (direction) {
 			case VERTICAL : {
-				if (this.checkPlaceable(rect, tempX + stepLength, tempY)) {
-					rect.setLocation(tempX + stepLength, tempY);
+				if (this.checkPlaceable(rect, tempX, tempY + stepLength)) {
+					rect.setLocation(tempX, tempY + stepLength);
 					this.push(rect, direction, stepLength);
 				} else
 					this.push(rect, direction, stepLength / 2);
 				break;
 			}
 			case HORIZONTAL : {
-				if (this.checkPlaceable(rect, tempX, tempY + stepLength)) {
-					rect.setLocation(tempX, tempY + stepLength);
+				if (this.checkPlaceable(rect, tempX + stepLength, tempY)) {
+					rect.setLocation(tempX + stepLength, tempY);
 					this.push(rect, direction, stepLength);
 				} else
 					this.push(rect, direction, stepLength / 2);

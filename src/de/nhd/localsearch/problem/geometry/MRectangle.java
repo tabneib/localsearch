@@ -55,11 +55,6 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	private double overlapArea = 0;
 
 	/**
-	 * Temperal overlap area used by {@link #optimalSort() optimalSort}
-	 */
-	private double tmpOverlapArea = 0;
-
-	/**
 	 * Map of all intersections of this rectangle to the respective rectangles.
 	 * This intersections must not overlap with each other. Keys are IDs of
 	 * MRectangle.
@@ -132,7 +127,7 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 				double intersectionArea = intersection.getWidth()
 						* intersection.getHeight();
 				if (Math.max((intersectionArea + currentOverlapArea) / this.getArea(),
-						intersectionArea / other.getArea()) <= overlapRate)
+						(intersectionArea + other.getOverlapArea()) / other.getArea()) <= overlapRate)
 					return false;
 				else
 					return true;
