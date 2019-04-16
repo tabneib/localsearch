@@ -29,16 +29,16 @@ public class GUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	// Default parameters for instance generation
-//	public static final int DEFAULT_AMOUNT = 130;
-//	public static final int DEFAULT_MIN_LENGTH = 2;
-//	public static final int DEFAULT_MAX_LENGTH = 20;
-//	public static final int DEFAULT_BOX_LENGTH = 40;
-//	public static final int DEFAULT_INIT_LENGTH = 90;
-	public static final int DEFAULT_AMOUNT = 6;
-	public static final int DEFAULT_MIN_LENGTH = 10;
-	public static final int DEFAULT_MAX_LENGTH = 60;
-	public static final int DEFAULT_BOX_LENGTH = 200;
+	public static final int DEFAULT_AMOUNT = 130;
+	public static final int DEFAULT_MIN_LENGTH = 2;
+	public static final int DEFAULT_MAX_LENGTH = 20;
+	public static final int DEFAULT_BOX_LENGTH = 40;
 	public static final int DEFAULT_INIT_LENGTH = 90;
+//	public static final int DEFAULT_AMOUNT = 6;
+//	public static final int DEFAULT_MIN_LENGTH = 10;
+//	public static final int DEFAULT_MAX_LENGTH = 60;
+//	public static final int DEFAULT_BOX_LENGTH = 200;
+//	public static final int DEFAULT_INIT_LENGTH = 90;
 
 	// GUI States
 	private static final String STATE_INIT = "STATE_INIT";

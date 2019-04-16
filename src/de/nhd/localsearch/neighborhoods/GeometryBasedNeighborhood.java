@@ -67,12 +67,12 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		GeometryBasedSolution neighbor = ((GeometryBasedSolution) this.owner).clone();
 		
 		// Pick two random boxes
-		int sourceBoxIndex = neighbor.getRandomBoxIdx();
-		int destinationBoxIndex = neighbor.getRandomBoxIdx();
+		int sourceBoxIndex = this.getRandomBoxIdx(neighbor);
+		int destinationBoxIndex = this.getRandomBoxIdx(neighbor);
 		while (sourceBoxIndex == destinationBoxIndex
 				|| neighbor.getBoxes().get(sourceBoxIndex).isEmptyBox()) {
-			sourceBoxIndex = neighbor.getRandomBoxIdx();
-			destinationBoxIndex = neighbor.getRandomBoxIdx();
+			sourceBoxIndex = this.getRandomBoxIdx(neighbor);
+			destinationBoxIndex = this.getRandomBoxIdx(neighbor);
 		}
 
 		// Pick random rectangle
@@ -106,7 +106,31 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		this.iteratedNeighbors++;
 		return neighbor;
 	}
+	
 
+	/**
+	 * Randomly select a box in the given solution. The probability that a box is
+	 * selected is proportional to its free area.
+	 * 
+	 * TODO: adapt for Overlap Mode
+	 * 
+	 * @return index of the selected box
+	 */
+	private int getRandomBoxIdx(GeometryBasedSolution solution) {
+		double totalFreeArea = 0;
+		for (MBox mBox : solution.getBoxes())
+			totalFreeArea += mBox.getFreeArea() * mBox.getFreeArea();
+		double random = totalFreeArea * Math.random();
+		int index = 0;
+		for (MBox mBox : solution.getBoxes()) {
+			random -= mBox.getFreeArea() * mBox.getFreeArea();
+			if (random <= 0)
+				return index;
+			index++;
+		}
+		return solution.getBoxes().size() - 1;
+	}
+	
 	@Override
 	public Solution next() {
 		if (this.hasNext()) {

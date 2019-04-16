@@ -1,7 +1,6 @@
 package de.nhd.localsearch.solutions;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import de.nhd.localsearch.neighborhoods.GeometryBasedNeighborhood;
 import de.nhd.localsearch.neighborhoods.Neighborhood;
@@ -29,39 +28,6 @@ public class GeometryBasedSolution extends MSolution {
 				this.boxes.add(mBox);
 			}
 		}
-	}
-
-	/**
-	 * Randomly select a box in this solution. The probability that a box is
-	 * selected is proportional to its free area.
-	 * 
-	 * TODO: adapt for the case
-	 * 
-	 * @return index of the selected box
-	 */
-	public int getRandomBoxIdx() {
-		double totalFreeArea = 0;
-		for (MBox mBox : this.boxes)
-			totalFreeArea += mBox.getFreeArea();
-		double random = totalFreeArea * Math.random();
-		int index = 0;
-		for (MBox mBox : this.boxes) {
-			random -= mBox.getFreeArea();
-			if (random <= 0)
-				return index;
-			index++;
-		}
-		return this.boxes.size() - 1;
-	}
-
-	/**
-	 * Randomly select a box in this solution.
-	 * 
-	 * @return index of the selected box
-	 */
-	public int getRandomBox() {
-		Random r = new Random();
-		return r.nextInt(this.boxes.size()) - 1;
 	}
 
 	/**

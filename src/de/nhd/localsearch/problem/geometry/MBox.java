@@ -3,7 +3,6 @@ package de.nhd.localsearch.problem.geometry;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.UUID;
 
@@ -18,24 +17,9 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 	private final String id;
 	static private final String EMPTY_BOX_ID = "EMPTY_BOX_ID";
 
-	/**
-	 * TODO: comment me
-	 */
-	// public static final int SMOOTH_DEGREE = 1;
-
 	public static final int VERTICAL = 1;
 	public static final int HORIZONTAL = 2;
 	private final int boxLength;
-
-	/**
-	 * The length of a step when trying to push a rectangle into this box
-	 */
-	// private int gridStep;
-
-	/**
-	 * TODO: comment me
-	 */
-	// private int maxRange;
 
 	/**
 	 * If this box is the source of the repositioning that generates the
@@ -51,7 +35,7 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 
 	/**
 	 * The rectangle, if any, that was removed to generate the corresponding
-	 * solution
+	 * (geometry-based) solution
 	 */
 	private MRectangle removedRect;
 
@@ -62,14 +46,24 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 	private double fillRate;
 	private double overlapArea = 0;
 
+	/**
+	 * Construct a box from the given box length and MRectangles. <br>
+	 * The given MRectangles must not intersect each other for correctness!
+	 * 
+	 * @param boxLength
+	 * @param mRectangles
+	 */
 	public MBox(int boxLength, ArrayList<MRectangle> mRectangles) {
 		super.setRect(0, 0, boxLength, boxLength);
 		this.boxLength = boxLength;
 		this.freeArea = this.boxLength * this.boxLength;
 		this.mRectangles = mRectangles;
+		for (MRectangle rect : mRectangles) {
+			this.freeArea -= rect.getArea();
+			this.fillArea += rect.getArea();
+		}
+		this.fillRate = this.fillArea / (this.boxLength * this.boxLength);
 		this.syncMRectangleMap();
-		// resetGridStep();
-		// this.maxRange = this.boxLength / this.gridStep;
 		this.id = UUID.randomUUID().toString();
 	}
 
@@ -83,8 +77,6 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 		this.freeArea = freeArea;
 		this.fillArea = fillArea;
 		this.fillRate = fillRate;
-		// resetGridStep();
-		// this.maxRange = this.boxLength / this.gridStep;
 		this.id = id;
 	}
 
@@ -94,8 +86,6 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 		this.freeArea = this.boxLength * this.boxLength;
 		this.mRectangles = new ArrayList<MRectangle>();
 		this.syncMRectangleMap();
-		// resetGridStep();
-		// this.maxRange = this.boxLength / this.gridStep;
 		this.id = UUID.randomUUID().toString();
 	}
 
@@ -103,11 +93,6 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 		return boxLength;
 	}
 
-	// private void resetGridStep() {
-	// this.gridStep = this.boxLength / SMOOTH_DEGREE;
-	// if (this.gridStep == 0)
-	// this.gridStep = 1;
-	// }
 	/**
 	 * Automatically insert the given rectangle into this box at an optimal
 	 * position. <br>
@@ -121,9 +106,12 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 	 *         inserted, null otherwise
 	 */
 	public MRectangle optimalInsert(MRectangle rect) {
-		if (this.mRectangles.contains(rect) || (!MRectangle.isOverlapPermitted()
-				&& this.getFreeArea() < rect.getArea()))
+		if (this.mRectangles.contains(rect))
+			throw new RuntimeException(
+					"The given MRectangle is already contained in this box");
+		if ((!MRectangle.isOverlapPermitted() && this.getFreeArea() < rect.getArea()))
 			return null;
+
 		MRectangle insertedRect;
 		// Along horizontal axis
 		for (int i = 0; i < this.boxLength; i++) {
@@ -192,11 +180,11 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 			}
 			this.fillArea += (rect.getArea() - rect.getOverlapArea());
 			this.freeArea -= (rect.getArea() - rect.getOverlapArea());
-			this.fillRate = this.fillArea / this.boxLength * this.boxLength;
+			this.fillRate = this.fillArea / (this.boxLength * this.boxLength);
 		} else {
 			this.freeArea -= rect.getArea();
 			this.fillArea += rect.getArea();
-			this.fillRate = this.fillArea / this.boxLength * this.boxLength;
+			this.fillRate = this.fillArea / (this.boxLength * this.boxLength);
 		}
 		// Insert the given rectangle into this Box
 		this.addMRectangle(rect);
@@ -319,8 +307,6 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 	 * @return The free area
 	 */
 	public double getFreeArea() {
-		// if (this.freeArea == -1)
-		// this.freeArea = this.boxLength * this.boxLength - this.getFillArea();
 		return this.freeArea;
 	}
 
@@ -347,7 +333,8 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 	}
 
 	/**
-	 * Remove the given rectangle from this box
+	 * Remove the given rectangle from this box. <br>
+	 * Box data is updated accordingly
 	 * 
 	 * @param rect
 	 */
@@ -356,6 +343,7 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 			this.overlapArea -= rect.getOverlapArea();
 			this.fillArea -= (rect.getArea() - rect.getOverlapArea());
 			this.freeArea += (rect.getArea() - rect.getOverlapArea());
+			this.fillRate = this.fillArea / (this.boxLength * this.boxLength);
 			for (String otherId : rect.getIntersections().keySet())
 				this.getMRectById(otherId).removeIntersectionWith(rect);
 			rect.removeAllIntersections();
@@ -364,6 +352,7 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 			this.removeMRectangle(rect);
 			this.fillArea = this.getFillArea() - rect.getArea();
 			this.freeArea = this.getFreeArea() + rect.getArea();
+			this.fillRate = this.fillArea / (this.boxLength * this.boxLength);
 		}
 	}
 
@@ -396,18 +385,18 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 				this.fillArea, this.fillRate);
 		return clone;
 	}
-	
+
 	private void syncMRectangleMap() {
 		this.mRectangleMap = new HashMap<>();
-		for (MRectangle rect: this.mRectangles) 
+		for (MRectangle rect : this.mRectangles)
 			this.mRectangleMap.put(rect.getId(), rect);
 	}
-	
+
 	private void addMRectangle(MRectangle rect) {
 		this.mRectangles.add(rect);
 		this.mRectangleMap.put(rect.getId(), rect);
 	}
-	
+
 	private void removeMRectangle(MRectangle rect) {
 		this.mRectangles.remove(rect);
 		this.mRectangleMap.remove(rect.getId(), rect);

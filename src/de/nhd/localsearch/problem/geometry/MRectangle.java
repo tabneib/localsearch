@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import javax.management.RuntimeErrorException;
-
-import org.w3c.dom.css.Rect;
-
 /**
  * Class representing a rectangle to be placed into a box.
  *
