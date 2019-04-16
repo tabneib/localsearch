@@ -29,10 +29,15 @@ public class GUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	// Default parameters for instance generation
-	public static final int DEFAULT_AMOUNT = 130;
-	public static final int DEFAULT_MIN_LENGTH = 2;
-	public static final int DEFAULT_MAX_LENGTH = 20;
-	public static final int DEFAULT_BOX_LENGTH = 40;
+//	public static final int DEFAULT_AMOUNT = 130;
+//	public static final int DEFAULT_MIN_LENGTH = 2;
+//	public static final int DEFAULT_MAX_LENGTH = 20;
+//	public static final int DEFAULT_BOX_LENGTH = 40;
+//	public static final int DEFAULT_INIT_LENGTH = 90;
+	public static final int DEFAULT_AMOUNT = 6;
+	public static final int DEFAULT_MIN_LENGTH = 10;
+	public static final int DEFAULT_MAX_LENGTH = 60;
+	public static final int DEFAULT_BOX_LENGTH = 200;
 	public static final int DEFAULT_INIT_LENGTH = 90;
 
 	// GUI States
@@ -151,9 +156,9 @@ public class GUI extends JFrame {
 		frame.pack();
 		frame.setVisible(true);
 		this.updateState(this.state);
-		this.print("[+] Generator: " + this.generatorName);
-		this.print("[+] Neighborhoos: " + this.neighborhood);
-		this.print("[+] Algorithm: " + this.algorithmName);
+		this.terminalOut("[+] Generator: " + this.generatorName);
+		this.terminalOut("[+] Neighborhoos: " + this.neighborhood);
+		this.terminalOut("[+] Algorithm: " + this.algorithmName);
 	}
 
 	/**
@@ -488,7 +493,7 @@ public class GUI extends JFrame {
 		buttonRun.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				print("[+] Running...");
+				terminalOut("[+] Running...");
 				algorithm.run();
 				solution = (MSolution) algorithm.getCurrentSolution();
 				repaintBoxes(
@@ -572,7 +577,7 @@ public class GUI extends JFrame {
 				problem = MInstanceFactory.getInstanceSplit(initLength, boxLength, -1);
 				break;
 		}
-		this.print("[+] Problem instance generated");
+		this.terminalOut("[+] Problem instance generated");
 	}
 
 	/**
@@ -624,7 +629,7 @@ public class GUI extends JFrame {
 	 * 
 	 * @param message
 	 */
-	private void print(String message) {
+	private void terminalOut(String message) {
 		try {
 			textAreaTerminal.append(message + "\n");
 			terminalScrollPane.getVerticalScrollBar()
@@ -635,16 +640,16 @@ public class GUI extends JFrame {
 	}
 
 	private void reportDone() {
-		print("[+] Done");
-		print("[+] Final solution:");
-		print("          #boxes:    " + solution.getBoxes().size());
-		print("          objective: " + String.format("%.10f", solution.getObjective()));
+		terminalOut("[+] Done");
+		terminalOut("[+] Final solution:");
+		terminalOut("          #boxes:    " + solution.getBoxes().size());
+		terminalOut("          objective: " + String.format("%.10f", solution.getObjective()));
 	}
 
 	private void reportCurrentSolution() {
-		print("[+] Solution " + this.solution.getIndex() + ":");
-		print("          #boxes:    " + solution.getBoxes().size());
-		print("          objective: " + String.format("%.10f", solution.getObjective()));
+		terminalOut("[+] Solution " + this.solution.getIndex() + ":");
+		terminalOut("          #boxes:    " + solution.getBoxes().size());
+		terminalOut("          objective: " + String.format("%.10f", solution.getObjective()));
 	}
 	/**
 	 * Run one single step of the current chosen algorithm
@@ -887,7 +892,7 @@ public class GUI extends JFrame {
 			} else
 				throw new RuntimeException("No generator type selected");
 			updateState(STATE_INIT);
-			print("[+] Generator: " + generatorName);
+			terminalOut("[+] Generator: " + generatorName);
 		}
 	}
 
@@ -963,7 +968,7 @@ public class GUI extends JFrame {
 			else
 				throw new RuntimeException("No neighborhood is selected");
 			updateState(STATE_INIT);
-			print("[+] Neighborhoos: " + neighborhood);
+			terminalOut("[+] Neighborhoos: " + neighborhood);
 		}
 	}
 
@@ -973,10 +978,10 @@ public class GUI extends JFrame {
 		public void actionPerformed(ActionEvent event) {
 			if (checkboxNeighborOverl.isSelected()) {
 				MRectangle.setOverlap(true);
-				print("[+] Overlapping rectangles: ON");
+				terminalOut("[+] Overlapping rectangles: ON");
 			} else {
 				MRectangle.setOverlap(false);
-				print("[+] Overlapping rectangles: OFF");
+				terminalOut("[+] Overlapping rectangles: OFF");
 			}
 		}
 	}
@@ -987,10 +992,10 @@ public class GUI extends JFrame {
 		public void actionPerformed(ActionEvent event) {
 			if (checkboxShowWorse.isSelected()) {
 				showWorseSolutions = true;
-				print("[+] Show worse solutions: ON");
+				terminalOut("[+] Show worse solutions: ON");
 			} else {
 				showWorseSolutions = false;
-				print("[+] Show worse solutions: OFF");
+				terminalOut("[+] Show worse solutions: OFF");
 			}
 		}
 	}
@@ -1008,7 +1013,7 @@ public class GUI extends JFrame {
 			} else
 				throw new RuntimeException("No algorithm selected");
 			revalidateAlgo();
-			print("[+] Algorithm: " + algorithmName);
+			terminalOut("[+] Algorithm: " + algorithmName);
 		}
 	}
 

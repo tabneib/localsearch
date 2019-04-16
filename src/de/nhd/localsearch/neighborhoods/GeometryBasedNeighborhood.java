@@ -65,7 +65,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 				|| this.iteratedNeighbors >= MAX_NEIGHBORS)
 			return null;
 		GeometryBasedSolution neighbor = ((GeometryBasedSolution) this.owner).clone();
-
+		
 		// Pick two random boxes
 		int sourceBoxIndex = neighbor.getRandomBoxIdx();
 		int destinationBoxIndex = neighbor.getRandomBoxIdx();
@@ -94,7 +94,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 				neighbor.addRemovedFeature(removedFeature);
 				neighbor.addInsertedFeature(insertedFeature);
 			}
-		}
+		} 
 		sourceBox.removeRect(randomRect);
 		if (!sourceBox.isEmptyBox())
 			sourceBox.optimalSort();

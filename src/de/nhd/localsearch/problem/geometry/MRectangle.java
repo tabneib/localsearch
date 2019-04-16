@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import javax.management.RuntimeErrorException;
+
+import org.w3c.dom.css.Rect;
+
 /**
  * Class representing a rectangle to be placed into a box.
  *
@@ -14,25 +18,26 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	private static final long serialVersionUID = 1L;
 
 	private final String id;
+	private int boxLength;
+	private MBox box;
+	private final int maxSize;
+	private final int minSize;
+
+	/**
+	 * If this rectangle is repositioned to generate the corresponding solution
+	 */
+	private boolean repositioned = false;
 
 	/**
 	 * If overlapping of rectangles is permitted
 	 */
-	private static boolean overlap = false;
-
-	/**
-	 * The current percentage of permitted overlapping area.
-	 * 
-	 */
-	private static double overlapRate;
+	private static boolean overlapMode = false;
 
 	/**
 	 * The maximal percentage of permitted overlapping area. This is the
-	 * starting value of the reduction of overlapping percentage. This should
-	 * not be equal to 1 because if so, two overlapped rectangles of the same
-	 * size will be equal to each other This could mess up the program.
+	 * starting value of the reduction of overlapping percentage.
 	 */
-	public static final double MAX_OVERLAP_RATE = 0.9;
+	public static final double MAX_OVERLAP_RATE = 1;
 
 	/**
 	 * The minimal percentage of permitted overlapping area. This is the lower
@@ -41,25 +46,22 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	public static final double MIN_OVERLAP_RATE = 0;
 
 	/**
+	 * The current percentage of permitted overlapping area.
+	 * 
+	 */
+	private static double overlapRate;
+
+	/**
 	 * The total area of this rectangle that overlap other rectangles
 	 */
 	private double overlapArea = 0;
 
 	/**
 	 * Map of all intersections of this rectangle to the respective rectangles.
-	 * This intersections are not overlapped with each other.
+	 * This intersections must not overlap with each other. Keys are IDs of
+	 * MRectangle.
 	 */
-	private HashMap<MRectangle, Rectangle> intersections = new HashMap<>();
-
-	/**
-	 * If this rectangle is repositioned to generate the corresponding solution
-	 */
-	private boolean repositioned = false;
-
-	private int boxLength;
-	private MBox box;
-	private final int maxSize;
-	private final int minSize;
+	private HashMap<String, Rectangle> intersections;
 
 	public MRectangle(int x, int y, int width, int height, int boxLength) {
 		super.setRect(x, y, width, height);
@@ -67,6 +69,7 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 		this.maxSize = Math.max(width, height);
 		this.minSize = Math.min(width, height);
 		this.id = UUID.randomUUID().toString();
+		this.intersections = new HashMap<>();
 	}
 
 	public MRectangle(int width, int height, int boxLength) {
@@ -75,28 +78,52 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 		this.maxSize = Math.max(width, height);
 		this.minSize = Math.min(width, height);
 		this.id = UUID.randomUUID().toString();
+		this.intersections = new HashMap<>();
 	}
 
-	private MRectangle(int width, int height, int boxLength, String id) {
-		super.setRect(-1, -1, width, height);
+	/**
+	 * Constructor for cloning this MRectangle
+	 * 
+	 * @param width
+	 * @param height
+	 * @param boxLength
+	 * @param id
+	 */
+	private MRectangle(int x, int y, int width, int height, int boxLength, String id,
+			HashMap<String, Rectangle> intersections) {
+		super.setRect(x, y, width, height);
 		this.boxLength = boxLength;
 		this.maxSize = Math.max(width, height);
 		this.minSize = Math.min(width, height);
 		this.id = id;
+		// ISSUE: cyclic clone!!!! The keys of intersections still reference to
+		// original
+		// MRectangles which in turn belong to the original solution!
+		// If we try to clone all the keys, this will trigger an infinite
+		// cloning cycle
+		// => stack overflow...
+		this.intersections = new HashMap<>(intersections);
 	}
 
-	@Override
-	public boolean intersects(Rectangle r) {
-		if (!MRectangle.overlap || overlapRate <= 0)
-			return super.intersects(r);
+	/**
+	 * Check whether this MRectangle overlap the given MRectangle but
+	 * overlapping is not allowed, or the overlapping area is invalid in case
+	 * overlapping is allowed
+	 * 
+	 * @param other
+	 *            the given MRectangle to check against
+	 * @return true if invalidly overlap, otherwise false
+	 */
+	public boolean invalidlyOverlap(MRectangle other) {
+		if (!MRectangle.overlapMode || overlapRate <= 0)
+			return super.intersects(other);
 		else {
-			// Case overlapping is permitted
-			if (!super.intersects(r))
+			if (!super.intersects(other))
 				return false;
 			else {
-				Rectangle intersection = intersection(r);
-				if (intersection.getWidth() * intersection.getHeight() / Math
-						.max(this.getArea(), ((MRectangle) r).getArea()) <= overlapRate)
+				Rectangle intersection = this.intersection(other);
+				if (intersection.getWidth() * intersection.getHeight() / Math.max(
+						this.getArea(), ((MRectangle) other).getArea()) <= overlapRate)
 					return false;
 				else
 					return true;
@@ -105,143 +132,95 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	}
 
 	/**
-	 * Check if it is possible to place this rectangle into the set of the given
-	 * existing rectangles. In case overlapping is permitted, no
-	 * 3-layer-overlapping is allowed. Note that the given list of rectangles
-	 * might already include this rectangle.
+	 * Check if this MRectangle overlaps the given MRectangle and the
+	 * overlapping area is valid
 	 * 
-	 * @param existingRects
+	 * @param other
 	 * @return
 	 */
-	public boolean checkPlaceable(ArrayList<MRectangle> existingRects) {
-		if (MRectangle.overlap) {
-			ArrayList<Rectangle> intersektions = new ArrayList<>();
-			for (MRectangle r : existingRects) {
-				if (!this.equals(r) && !this.intersects(r)
-						&& !this.intersection(r).isEmpty())
-					// If there exists valid overlapping
-					intersektions.add(this.intersection(r));
-				else if (this.intersects(r))
-					return false;
-			}
+	public boolean validlyOverlap(MRectangle other) {
+		return !this.intersection(other).isEmpty() && !this.invalidlyOverlap(other);
+	}
 
-			// No 3-layer-overlapping is allowed
-			if (intersektions.size() >= 2) {
-				for (int i = 0; i < intersektions.size(); i++)
-					for (int j = i + 1; j < intersektions.size(); j++)
-						if (intersektions.get(i).intersects(intersektions.get(j)))
+	/**
+	 * Check if it is possible to place this rectangle into the set of the given
+	 * existing rectangles. In case overlapping is permitted, no
+	 * 3-layer-overlapping is allowed.
+	 * 
+	 * @param givenRects
+	 * @return
+	 */
+	public boolean checkPlaceable(ArrayList<MRectangle> givenRects) {
+		if (givenRects.contains(this))
+			throw new RuntimeException(
+					"The given MRectangle set contains this MRectangle");
+		if (MRectangle.overlapMode) {
+			ArrayList<Rectangle> intersections = new ArrayList<>();
+			for (MRectangle rect : givenRects)
+				if (this.invalidlyOverlap(rect))
+					return false;
+				else if (this.validlyOverlap(rect))
+					intersections.add(this.intersection(rect));
+
+			// No 3-layer Overlapping
+			if (intersections.size() >= 2)
+				for (int i = 0; i < intersections.size(); i++)
+					for (int j = i + 1; j < intersections.size(); j++)
+						if (intersections.get(i).intersects(intersections.get(j)))
 							return false;
-			}
-			// No overlapping at all or only one overlap (and therefore
-			// 2-layer-overlapping)
-			return true;
-		} else {
-			for (MRectangle r : existingRects)
-				if (!this.equals(r) && this.intersects(r))
+		} else
+			for (MRectangle r : givenRects)
+				if (this.invalidlyOverlap(r))
 					return false;
-			return true;
-		}
+		return true;
 	}
 
 	/**
-	 * Add the given intersection with the given rectangle. If the given
-	 * intersection already exists, a runtime exception is thrown.
+	 * Add the given intersection with the given rectangle and update
+	 * overlapping area accordingly. <br>
+	 * If an intersection with the given MRectangle already exists, a runtime
+	 * exception is thrown.
 	 * 
-	 * @param rect
-	 * @param intersection
-	 * @return the difference of total overlapping area
+	 * @param other
+	 * @return the intersection between two MRectangles, null if not intersected
 	 */
-	public double addIntersection(MRectangle rect, Rectangle intersection) {
-		if (this.intersections.containsKey(rect)
-				&& this.intersections.get(rect).equals(intersection))
+	public Rectangle addIntersectionWith(MRectangle other) {
+		if (this.intersections.containsKey(other.getId()))
 			throw new RuntimeException(
-					"Invalid insertion of already existing intersection!");
-
-		this.intersections.put(rect, intersection);
-		return intersection.getHeight() * intersection.getWidth();
+					"An intersection with the given MRectangle is already present.");
+		Rectangle intersection = this.intersection(other);
+		if (intersection.isEmpty())
+			return null;
+		this.intersections.put(other.getId(), intersection);
+		this.overlapArea += intersection.getWidth() * intersection.getHeight();
+		return intersection;
 	}
 
 	/**
-	 * Remove the given intersection with the given rectangle If the given
-	 * intersection does not exist, a runtime exception is thrown.
+	 * Remove the given intersection with the given rectangle and update
+	 * overlapping area accordingly. <br>
+	 * If no intersection with the given MRectangle is present, a runtime
+	 * exception is thrown.
 	 * 
-	 * @param rect
+	 * @param other
 	 * @param intersection
 	 * @return the difference of total overlapping area
 	 */
-	public double removeIntersection(MRectangle rect, Rectangle intersection) {
-		if (!this.intersections.containsKey(rect)
-				|| !this.intersections.get(rect).equals(intersection))
-			throw new RuntimeException("Invalid removal of not existing intersection!");
-
-		this.intersections.remove(rect);
-		return -1 * intersection.getHeight() * intersection.getWidth();
-	}
-
-	/**
-	 * Replace the given intersection with the given rectangle If the given
-	 * intersection does not exist, a runtime exception is thrown.
-	 * 
-	 * @param rect
-	 * @param intersection
-	 * @return the difference of total overlapping area
-	 */
-	public double replaceIntersection(MRectangle rect, Rectangle intersection) {
-		if (!this.intersections.containsKey(rect)
-				|| !this.intersections.get(rect).equals(intersection))
+	public Rectangle removeIntersectionWith(MRectangle other) {
+		if (!this.intersections.containsKey(other.getId()))
 			throw new RuntimeException(
-					"Invalid Replacement of not existing intersection!");
-
-		this.intersections.put(rect, intersection);
-
-		return intersection.getHeight() * intersection.getWidth()
-				- this.intersections.get(rect).getHeight()
-						* this.intersections.get(rect).getWidth();
+					" No intersection with the given MRectangle is present");
+		Rectangle intersection = this.intersections.remove(other.getId());
+		this.overlapArea -= intersection.getWidth() * intersection.getHeight();
+		return intersection;
 	}
 
-	/**
-	 * Update the intersections list of this MRectangle with the given one. For
-	 * each update case update the affected rectangle accordingly.
-	 * 
-	 * @param newIntersections
-	 * @return the difference of total overlapping area
-	 */
-	public double updateIntersections(HashMap<MRectangle, Rectangle> newIntersections) {
-		if (newIntersections.isEmpty())
-			return 0;
-
-		HashMap<MRectangle, Rectangle> oldIntersections = new HashMap<>();
-		oldIntersections.putAll(this.intersections);
-		double diff = 0;
-
-		// Case 1: New intersection added
-		for (MRectangle newRect : newIntersections.keySet()) {
-			if (!oldIntersections.containsKey(newRect)) {
-				this.intersections.put(newRect, newIntersections.get(newRect));
-				diff += newRect.addIntersection(this, newIntersections.get(newRect));
-			}
-		}
-
-		// Case 2: Old intersection removed
-		for (MRectangle oldRect : oldIntersections.keySet()) {
-			if (!newIntersections.containsKey(oldRect)) {
-				this.intersections.remove(oldRect);
-				diff += oldRect.removeIntersection(this, oldIntersections.get(oldRect));
-			}
-		}
-
-		// Case 3: Old intersection changed
-		for (MRectangle oldRect : oldIntersections.keySet()) {
-			if (newIntersections.containsKey(oldRect) && !newIntersections.get(oldRect)
-					.equals(oldIntersections.get(oldRect))) {
-				this.intersections.put(oldRect, newIntersections.get(oldRect));
-				diff += oldRect.replaceIntersection(this, newIntersections.get(oldRect));
-			}
-		}
-		return diff;
+	public void removeAllIntersections() {
+		this.intersections = new HashMap<>();
+		this.overlapArea = 0;
 	}
 
-	public HashMap<MRectangle, Rectangle> getIntersections() {
+	public HashMap<String, Rectangle> getIntersections() {
 		return this.intersections;
 	}
 
@@ -257,12 +236,13 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	}
 
 	public static void setOverlap(boolean overlap) {
-		MRectangle.overlap = overlap;
-		System.out.println("Overlap permitted: " + MRectangle.overlap);
+		MRectangle.overlapMode = overlap;
+		if (overlap)
+			MRectangle.overlapRate = MAX_OVERLAP_RATE;
 	}
 
 	public static boolean isOverlapPermitted() {
-		return MRectangle.overlap;
+		return MRectangle.overlapMode;
 	}
 
 	public static double getOverlapRate() {
@@ -309,15 +289,14 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 
 	@Override
 	public String toString() {
-		return "((" + getLocation().getX() + ", " + getLocation().getY() + "), " + "("
-				+ getWidth() + ", " + getHeight() + "))";
+		return ((int) this.getWidth()) + "" + ((int) this.getHeight()) + "-"
+				+ this.id.substring(0, 2);
 	};
 
 	@Override
 	public MRectangle clone() {
-		MRectangle clone = new MRectangle(this.width, this.height, boxLength, this.id);
-		clone.setLocation(this.getLocation());
-		return clone;
+		return new MRectangle(this.x, this.y, this.width, this.height, boxLength, this.id,
+				this.intersections);
 	}
 
 	public boolean isRepositioned() {

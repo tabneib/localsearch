@@ -2,6 +2,7 @@ package de.nhd.localsearch.algorithms;
 
 import de.nhd.localsearch.neighborhoods.Neighborhood;
 import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.Solution;
 
@@ -45,7 +46,6 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 	public void runStep() {
 		if (this.isFinished())
 			throw new RuntimeException("Algorithm already terminated!");
-
 		// if (MRectangle.isOverlapPermitted())
 		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
 		((MSolution) this.currentSolution).removeEmptyBoxes(0);

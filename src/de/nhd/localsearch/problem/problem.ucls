@@ -30,7 +30,7 @@
   </class>  
   <class id="4" language="java" name="de.nhd.localsearch.problem.geometry.MRectangle" project="localsearch" 
     file="/localsearch/src/de/nhd/localsearch/problem/geometry/MRectangle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="305" y="737"/>    
+    <position height="-1" width="-1" x="305" y="785"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -39,42 +39,54 @@
   </class>  
   <class id="5" language="java" name="de.nhd.localsearch.problem.geometry.MBox" project="localsearch" 
     file="/localsearch/src/de/nhd/localsearch/problem/geometry/MBox.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="694" y="740"/>    
+    <position height="-1" width="-1" x="694" y="788"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <nesting id="6">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="1"/>  
-  </nesting>  
-  <generalization id="7">    
+  <generalization id="6">    
     <end type="SOURCE" refId="3"/>    
     <end type="TARGET" refId="2"/>  
   </generalization>  
-  <association id="8">    
+  <association id="7">    
     <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="9" name="box"/>      
-      <multiplicity id="10" minimum="0" maximum="1"/>    
+      <attribute id="8" name="box">        
+        <position height="0" width="0" x="0" y="48"/>      
+      </attribute>      
+      <multiplicity id="9" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="48"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="5" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="11">    
-    <bendpoint x="529" y="807"/>    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="12" name="mRectangles"/>      
-      <multiplicity id="13" minimum="0" maximum="2147483647"/>    
+  <association id="10">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="11" name="rechtangles">        
+        <position height="0" width="0" x="0" y="48"/>      
+      </attribute>      
+      <multiplicity id="12" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="48"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="4" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+  <nesting id="13">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </nesting>  
   <association id="14">    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="15" name="rechtangles"/>      
-      <multiplicity id="16" minimum="0" maximum="2147483647"/>    
+    <bendpoint x="529" y="855"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="15" name="mRectangles">        
+        <position height="0" width="0" x="0" y="48"/>      
+      </attribute>      
+      <multiplicity id="16" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="48"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="4" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
