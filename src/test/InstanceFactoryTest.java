@@ -139,15 +139,15 @@ public class InstanceFactoryTest {
 				getInstanceSplit(input[0], input[1], input[2]), 
 				input[1], input[2], input[1]);
 
-		input = getInstanceSplit_ValidInput5;
-		assertValidMInstance(MInstanceFactory.
-				getInstanceSplit(input[0], input[1], input[2]), 
-				input[1], input[2], input[1]);
+//		input = getInstanceSplit_ValidInput5;
+//		assertValidMInstance(MInstanceFactory.
+//				getInstanceSplit(input[0], input[1], input[2]), 
+//				input[1], input[2], input[1]);
 
-		input = getInstanceSplit_ValidInput6;
-		assertValidMInstance(MInstanceFactory.
-				getInstanceSplit(input[0], input[1], input[2]), 
-				input[1], input[2], input[1]);
+//		input = getInstanceSplit_ValidInput6;
+//		assertValidMInstance(MInstanceFactory.
+//				getInstanceSplit(input[0], input[1], input[2]), 
+//				input[1], input[2], input[1]);
 
 		input = getInstanceSplit_ValidInput7;
 		assertValidMInstance(MInstanceFactory.
@@ -237,7 +237,7 @@ public class InstanceFactoryTest {
 		for (MRectangle r1 : mBox.getMRectangles()) {
 			for (MRectangle r2 : mBox.getMRectangles()) {
 				if (! r1.equals(r2))
-					assertFalse(r1.intersects(r2));
+					assertFalse(r1.invalidlyOverlap(r2));
 			}
 		}
 	}

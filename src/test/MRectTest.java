@@ -10,7 +10,7 @@ import de.nhd.localsearch.problem.geometry.MRectangle;
 
 import static org.junit.Assert.*;
 
-public class MBoxTest {
+public class MRectTest {
 
 	private final int BOX_LENGTH = 400;
 	private MBox box;
@@ -62,60 +62,37 @@ public class MBoxTest {
 		rect_400_200B = new MRectangle(400, 200, BOX_LENGTH);
 		rect_200_400B = new MRectangle(200, 400, BOX_LENGTH);
 		rect_400_201 = new MRectangle(400, 201, BOX_LENGTH);
-		rect_201_400 = new MRectangle(201, 400, BOX_LENGTH);
 		rect_300_400 = new MRectangle(300, 400, BOX_LENGTH);
+
 	}
 
 	@Test
-	public void insert_fullBox_valid() {
-		assertNotNull(box.optimalInsert(rect_400_400));
-		assertEquals(0, box.getFreeArea(), 0);
-		assertEquals(400 * 400, box.getFillArea(), 0);
-		assertEquals(0, box.getOverlapArea(), 0);
+	public void invalidlyOverlap_nonOverlapMode_true() {
+		rect_400_400.setLocation(0, 0);
+		rect_400_200A.setLocation(0, 0);
+		assertTrue(rect_400_400.invalidlyOverlap(rect_400_200A));
+		assertTrue(rect_400_200A.invalidlyOverlap(rect_400_400));
+		
+		rect_400_200A.setLocation(399, 0);
+		assertTrue(rect_400_400.invalidlyOverlap(rect_400_200A));
+		assertTrue(rect_400_200A.invalidlyOverlap(rect_400_400));
 	}
 
 	@Test
-	public void insert_largerBox_invalid() {
-		assertNull(box.optimalInsert(rect_401_400));
-		assertEquals(400 * 400, box.getFreeArea(), 0);
-		assertEquals(0, box.getFillArea(), 0);
-		assertEquals(0, box.getOverlapArea(), 0);
-	}
+	public void invalidlyOverlap_nonOverlapMode_false() {
+		rect_400_400.setLocation(0, 0);
 
-	@Test
-	public void insert_twoHorizontalHalves_valid() {
-		assertNotNull(box.optimalInsert(rect_200_400A));
-		assertNotNull(box.optimalInsert(rect_200_400B));
-		assertEquals(0, box.getFreeArea(), 0);
-		assertEquals(400 * 400, box.getFillArea(), 0);
-		assertEquals(0, box.getOverlapArea(), 0);
-	}
-
-	@Test
-	public void insert_twoVerticalHalves_valid() {
-		assertNotNull(box.optimalInsert(rect_400_200A));
-		assertNotNull(box.optimalInsert(rect_400_200B));
-		assertEquals(0, box.getFreeArea(), 0);
-		assertEquals(400 * 400, box.getFillArea(), 0);
-		assertEquals(0, box.getOverlapArea(), 0);
-	}
-
-	@Test
-	public void insert_twoLargerHorizontalHalves_invalid() {
-		assertNotNull(box.optimalInsert(rect_200_400A));
-		assertNull(box.optimalInsert(rect_201_400));
-		assertEquals(400 * 400 / 2, box.getFreeArea(), 0);
-		assertEquals(400 * 400 / 2, box.getFillArea(), 0);
-		assertEquals(0, box.getOverlapArea(), 0);
-	}
-
-	@Test
-	public void insert_twoLargeVerticalHalves_invalid() {
-		assertNotNull(box.optimalInsert(rect_400_200A));
-		assertNull(box.optimalInsert(rect_400_201));
-		assertEquals(400 * 400 / 2, box.getFreeArea(), 0);
-		assertEquals(400 * 400 / 2, box.getFillArea(), 0);
-		assertEquals(0, box.getOverlapArea(), 0);
+		rect_400_200A.setLocation(400, 0);
+		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A));
+		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400));
+		
+		rect_400_200A.setLocation(401, 0);
+		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A));
+		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400));
+		
+		rect_400_200A.setLocation(4000, 0);
+		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A));
+		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400));
 	}
 
 }

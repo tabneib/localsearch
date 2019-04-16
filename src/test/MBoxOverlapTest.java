@@ -16,8 +16,10 @@ public class MBoxOverlapTest {
 	private MBox box;
 	private MRectangle rect_401_400;
 	private MRectangle rect_400_400;
-	private MRectangle rect_400_200;
-	private MRectangle rect_200_400;
+	private MRectangle rect_400_200A;
+	private MRectangle rect_200_400A;
+	private MRectangle rect_400_200B;
+	private MRectangle rect_200_400B;
 	private MRectangle rect_400_201;
 	private MRectangle rect_201_400;
 	private MRectangle rect_400_300;
@@ -55,16 +57,19 @@ public class MBoxOverlapTest {
 		MRectangle.setOverlap(true);
 		rect_401_400 = new MRectangle(401, 400, BOX_LENGTH);
 		rect_400_400 = new MRectangle(400, 400, BOX_LENGTH);
-		rect_400_200 = new MRectangle(400, 200, BOX_LENGTH);
-		rect_200_400 = rect_400_200.rotate();
+		rect_400_200A = new MRectangle(400, 200, BOX_LENGTH);
+		rect_200_400A = new MRectangle(200, 400, BOX_LENGTH);
+		rect_400_200B = new MRectangle(400, 200, BOX_LENGTH);
+		rect_200_400B = new MRectangle(200, 400, BOX_LENGTH);
 		rect_400_201 = new MRectangle(400, 201, BOX_LENGTH);
-
+		rect_300_400 = new MRectangle(300, 400, BOX_LENGTH);
+		rect_400_300 = new MRectangle(400, 300, BOX_LENGTH);
 	}
 
 	@Test
 	public void insert_fullBox_valid() {
-//		assertEquals(BOX_LENGTH * BOX_LENGTH, box.getFreeArea(), 0);
-//		assertEquals(0, box.getFillArea(), 0);
+		// assertEquals(BOX_LENGTH * BOX_LENGTH, box.getFreeArea(), 0);
+		// assertEquals(0, box.getFillArea(), 0);
 		assertNotNull(box.optimalInsert(rect_400_400));
 		assertEquals(0, box.getFreeArea(), 0);
 	}
@@ -77,34 +82,41 @@ public class MBoxOverlapTest {
 
 	@Test
 	public void insert_twoHorizontalHalves_valid() {
-		assertNotNull(box.optimalInsert(rect_200_400));
-		assertNotNull(box.optimalInsert(rect_200_400));
-		assertEquals(200 * 200 / 2, box.getFreeArea(), 0);
-		assertEquals(200 * 200 / 2, box.getOverlapArea(), 0);
+		assertNotNull(box.optimalInsert(rect_200_400A));
+		assertNotNull(box.optimalInsert(rect_200_400B));
+		assertEquals(400 * 200, box.getMRectById(rect_200_400A.getId()).getOverlapArea(), 0);
+		assertEquals(400 * 200, box.getMRectById(rect_200_400B.getId()).getOverlapArea(), 0);
+		assertEquals(400 * 400 / 2, box.getFillArea(), 0);
+		assertEquals(400 * 400 / 2, box.getFreeArea(), 0);
+		assertEquals(400 * 400 / 2, box.getOverlapArea(), 0);
 	}
 
 	@Test
 	public void insert_twoVerticalHalves_valid() {
-		assertNotNull(box.optimalInsert(rect_400_200));
-		assertNotNull(box.optimalInsert(rect_400_200));
+		assertNotNull(box.optimalInsert(rect_400_200A));
+		assertNotNull(box.optimalInsert(rect_400_200B));
+		assertEquals(400 * 200, box.getMRectById(rect_400_200A.getId()).getOverlapArea(), 0);
+		assertEquals(400 * 200, box.getMRectById(rect_400_200B.getId()).getOverlapArea(), 0);
 		assertEquals(400 * 400 / 2, box.getFillArea(), 0);
 		assertEquals(400 * 400 / 2, box.getFreeArea(), 0);
-		assertEquals(200 * 200 / 2, box.getOverlapArea(), 0);
+		assertEquals(400 * 400 / 2, box.getOverlapArea(), 0);
 	}
 
 	@Test
-	public void insert_twoLargerHorizontalHalves_valid() {
-		assertNotNull(box.optimalInsert(rect_200_400));
-		assertNull(box.optimalInsert(rect_300_400));
-		assertEquals(200 * 200 / 2, box.getFreeArea(), 0);
-		assertEquals(200 * 200 / 2, box.getOverlapArea(), 0);
+	public void insert_twoDiffrentSizedRects_valid() {
+		assertNotNull(box.optimalInsert(rect_200_400A));
+		assertNotNull(box.optimalInsert(rect_300_400));
+		assertEquals(100 * 400, box.getFreeArea(), 0);
+		assertEquals(200 * 400, box.getOverlapArea(), 0);
 	}
 
 	@Test
-	public void insert_twoLargeVerticalHalves_valid() {
-		assertNotNull(box.optimalInsert(rect_400_200));
-		assertEquals(200 * 200 / 2, box.getFreeArea(), 0);
-		assertEquals(200 * 200 / 2, box.getOverlapArea(), 0);
+	public void insert_totalSizeExceedsBoxSize_invalid() {
+		assertNotNull(box.optimalInsert(rect_400_200A));
+		assertNotNull(box.optimalInsert(rect_400_200B));
+		assertNull(box.optimalInsert(rect_400_300));
+		assertEquals(200 * 400, box.getFreeArea(), 0);
+		assertEquals(200 * 400, box.getOverlapArea(), 0);
 	}
 
 }
