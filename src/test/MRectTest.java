@@ -54,7 +54,7 @@ public class MRectTest {
 	@Before
 	public void prepareInputs() {
 		box = new MBox(BOX_LENGTH);
-		MRectangle.setOverlap(false);
+		MRectangle.setOverlapMode(false);
 		rect_401_400 = new MRectangle(401, 400, BOX_LENGTH);
 		rect_400_400 = new MRectangle(400, 400, BOX_LENGTH);
 		rect_400_200A = new MRectangle(400, 200, BOX_LENGTH);
@@ -70,12 +70,12 @@ public class MRectTest {
 	public void invalidlyOverlap_nonOverlapMode_true() {
 		rect_400_400.setLocation(0, 0);
 		rect_400_200A.setLocation(0, 0);
-		assertTrue(rect_400_400.invalidlyOverlap(rect_400_200A));
-		assertTrue(rect_400_200A.invalidlyOverlap(rect_400_400));
+		assertTrue(rect_400_400.invalidlyOverlap(rect_400_200A, null));
+		assertTrue(rect_400_200A.invalidlyOverlap(rect_400_400, null));
 		
 		rect_400_200A.setLocation(399, 0);
-		assertTrue(rect_400_400.invalidlyOverlap(rect_400_200A));
-		assertTrue(rect_400_200A.invalidlyOverlap(rect_400_400));
+		assertTrue(rect_400_400.invalidlyOverlap(rect_400_200A, null));
+		assertTrue(rect_400_200A.invalidlyOverlap(rect_400_400, null));
 	}
 
 	@Test
@@ -83,16 +83,16 @@ public class MRectTest {
 		rect_400_400.setLocation(0, 0);
 
 		rect_400_200A.setLocation(400, 0);
-		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A));
-		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400));
+		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A, null));
+		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400, null));
 		
 		rect_400_200A.setLocation(401, 0);
-		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A));
-		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400));
+		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A, null));
+		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400, null));
 		
 		rect_400_200A.setLocation(4000, 0);
-		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A));
-		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400));
+		assertFalse(rect_400_400.invalidlyOverlap(rect_400_200A, null));
+		assertFalse(rect_400_200A.invalidlyOverlap(rect_400_400, null));
 	}
 
 }

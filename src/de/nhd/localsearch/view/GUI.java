@@ -977,10 +977,10 @@ public class GUI extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			if (checkboxNeighborOverl.isSelected()) {
-				MRectangle.setOverlap(true);
+				MRectangle.setOverlapMode(true);
 				terminalOut("[+] Overlapping rectangles: ON");
 			} else {
-				MRectangle.setOverlap(false);
+				MRectangle.setOverlapMode(false);
 				terminalOut("[+] Overlapping rectangles: OFF");
 			}
 		}

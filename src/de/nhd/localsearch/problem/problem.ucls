@@ -46,42 +46,42 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <generalization id="6">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="2"/>  
-  </generalization>  
+  <nesting id="6">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </nesting>  
   <association id="7">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="8" name="box">        
+    <bendpoint x="529" y="855"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="8" name="mRectangles">        
         <position height="0" width="0" x="0" y="48"/>      
       </attribute>      
-      <multiplicity id="9" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="48"/>      
-      </multiplicity>    
-    </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="10">    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="11" name="rechtangles">        
-        <position height="0" width="0" x="0" y="48"/>      
-      </attribute>      
-      <multiplicity id="12" minimum="0" maximum="2147483647">        
+      <multiplicity id="9" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="0" y="48"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="4" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <nesting id="13">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="1"/>  
-  </nesting>  
+  <generalization id="10">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="2"/>  
+  </generalization>  
+  <association id="11">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="12" name="box">        
+        <position height="0" width="0" x="0" y="48"/>      
+      </attribute>      
+      <multiplicity id="13" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="48"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <association id="14">    
-    <bendpoint x="529" y="855"/>    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="15" name="mRectangles">        
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="15" name="rechtangles">        
         <position height="0" width="0" x="0" y="48"/>      
       </attribute>      
       <multiplicity id="16" minimum="0" maximum="2147483647">        

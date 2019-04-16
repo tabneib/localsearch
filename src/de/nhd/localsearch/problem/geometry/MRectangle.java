@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.w3c.dom.css.Rect;
+
 /**
  * Class representing a rectangle to be placed into a box.
  *
@@ -51,6 +53,11 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	 * The total area of this rectangle that overlap other rectangles
 	 */
 	private double overlapArea = 0;
+
+	/**
+	 * Temperal overlap area used by {@link #optimalSort() optimalSort}
+	 */
+	private double tmpOverlapArea = 0;
 
 	/**
 	 * Map of all intersections of this rectangle to the respective rectangles.
@@ -110,32 +117,27 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	 *            the given MRectangle to check against
 	 * @return true if invalidly overlap, otherwise false
 	 */
-	public boolean invalidlyOverlap(MRectangle other) {
+	public boolean invalidlyOverlap(MRectangle other, ArrayList<Rectangle> currentIntersections) {
 		if (!MRectangle.overlapMode || overlapRate <= 0)
 			return super.intersects(other);
 		else {
 			if (!super.intersects(other))
 				return false;
 			else {
+				double currentOverlapArea = 0;
+				if (currentIntersections != null)
+					for (Rectangle rect : currentIntersections)
+						currentOverlapArea += rect.getWidth() * rect.getHeight();
 				Rectangle intersection = this.intersection(other);
-				if (intersection.getWidth() * intersection.getHeight() / Math.max(
-						this.getArea(), ((MRectangle) other).getArea()) <= overlapRate)
+				double intersectionArea = intersection.getWidth()
+						* intersection.getHeight();
+				if (Math.max((intersectionArea + currentOverlapArea) / this.getArea(),
+						intersectionArea / other.getArea()) <= overlapRate)
 					return false;
 				else
 					return true;
 			}
 		}
-	}
-
-	/**
-	 * Check if this MRectangle overlaps the given MRectangle and the
-	 * overlapping area is valid
-	 * 
-	 * @param other
-	 * @return
-	 */
-	public boolean validlyOverlap(MRectangle other) {
-		return !this.intersection(other).isEmpty() && !this.invalidlyOverlap(other);
 	}
 
 	/**
@@ -153,9 +155,9 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 		if (MRectangle.overlapMode) {
 			ArrayList<Rectangle> intersections = new ArrayList<>();
 			for (MRectangle rect : givenRects)
-				if (this.invalidlyOverlap(rect))
+				if (this.invalidlyOverlap(rect, intersections))
 					return false;
-				else if (this.validlyOverlap(rect))
+				else if (!this.intersection(rect).isEmpty())
 					intersections.add(this.intersection(rect));
 
 			// No 3-layer Overlapping
@@ -166,7 +168,7 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 							return false;
 		} else
 			for (MRectangle r : givenRects)
-				if (this.invalidlyOverlap(r))
+				if (this.invalidlyOverlap(r, null))
 					return false;
 		return true;
 	}
@@ -231,7 +233,7 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 		return rotatedM;
 	}
 
-	public static void setOverlap(boolean overlap) {
+	public static void setOverlapMode(boolean overlap) {
 		MRectangle.overlapMode = overlap;
 		if (overlap)
 			MRectangle.overlapRate = MAX_OVERLAP_RATE;

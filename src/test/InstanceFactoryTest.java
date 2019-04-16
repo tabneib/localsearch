@@ -237,7 +237,7 @@ public class InstanceFactoryTest {
 		for (MRectangle r1 : mBox.getMRectangles()) {
 			for (MRectangle r2 : mBox.getMRectangles()) {
 				if (! r1.equals(r2))
-					assertFalse(r1.invalidlyOverlap(r2));
+					assertFalse(r1.invalidlyOverlap(r2, null));
 			}
 		}
 	}
