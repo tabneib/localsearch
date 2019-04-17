@@ -34,11 +34,11 @@ public class GUI extends JFrame {
 	public static final int DEFAULT_MAX_LENGTH = 20;
 	public static final int DEFAULT_BOX_LENGTH = 40;
 	public static final int DEFAULT_INIT_LENGTH = 90;
-//	public static final int DEFAULT_AMOUNT = 6;
-//	public static final int DEFAULT_MIN_LENGTH = 10;
-//	public static final int DEFAULT_MAX_LENGTH = 60;
-//	public static final int DEFAULT_BOX_LENGTH = 200;
-//	public static final int DEFAULT_INIT_LENGTH = 90;
+//	 public static final int DEFAULT_AMOUNT = 6;
+//	 public static final int DEFAULT_MIN_LENGTH = 10;
+//	 public static final int DEFAULT_MAX_LENGTH = 60;
+//	 public static final int DEFAULT_BOX_LENGTH = 200;
+//	 public static final int DEFAULT_INIT_LENGTH = 90;
 
 	// GUI States
 	private static final String STATE_INIT = "STATE_INIT";
@@ -114,7 +114,6 @@ public class GUI extends JFrame {
 
 	private String generatorName = GEN_RANDOM;
 	private String neighborhood = NeighborhoodBasedAlgo.NEIGHBORHOOD_GEO;
-	private boolean overlap = false;
 	private String algorithmName = ALGO_LOCAL_SEARCH;
 	private boolean showWorseSolutions = true;
 	private NeighborhoodBasedAlgo algorithm;
@@ -556,6 +555,7 @@ public class GUI extends JFrame {
 
 					@Override
 					public void run() {
+						MRectangle.setOverlapMode(MRectangle.isOverlapPermitted());
 						revalidateAlgo();
 					}
 				});
@@ -643,13 +643,15 @@ public class GUI extends JFrame {
 		terminalOut("[+] Done");
 		terminalOut("[+] Final solution:");
 		terminalOut("          #boxes:    " + solution.getBoxes().size());
-		terminalOut("          objective: " + String.format("%.10f", solution.getObjective()));
+		terminalOut("          objective: "
+				+ String.format("%.10f", solution.getObjective()));
 	}
 
 	private void reportCurrentSolution() {
 		terminalOut("[+] Solution " + this.solution.getIndex() + ":");
 		terminalOut("          #boxes:    " + solution.getBoxes().size());
-		terminalOut("          objective: " + String.format("%.10f", solution.getObjective()));
+		terminalOut("          objective: "
+				+ String.format("%.10f", solution.getObjective()));
 	}
 	/**
 	 * Run one single step of the current chosen algorithm
@@ -858,9 +860,7 @@ public class GUI extends JFrame {
 			for (MRectangle r : box.getMRectangles()) {
 				g2.setColor(r.isRepositioned()
 						? COLOR_REPOSITIONED_RECT
-						: solution.checkTaboo(r)
-						? COLOR_TABOO_RECT
-						: COLOR_RECT);
+						: solution.checkTaboo(r) ? COLOR_TABOO_RECT : COLOR_RECT);
 				g2.fill(r);
 				g2.setColor(Color.BLACK);
 				g2.draw(r);

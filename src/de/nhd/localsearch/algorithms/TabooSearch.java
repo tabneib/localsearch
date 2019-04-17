@@ -2,12 +2,10 @@ package de.nhd.localsearch.algorithms;
 
 import java.util.ArrayList;
 
-import org.hamcrest.core.IsInstanceOf;
-
-import de.nhd.localsearch.neighborhoods.GeometryBasedNeighborhood;
 import de.nhd.localsearch.neighborhoods.Neighborhood;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 import de.nhd.localsearch.solutions.MFeature;
 import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.Solution;
@@ -18,7 +16,7 @@ import de.nhd.localsearch.solutions.Solution;
  */
 public class TabooSearch extends NeighborhoodBasedAlgo {
 
-	private static final int MAX_STUCKING_STEPS = 20;
+	private static final int MAX_STUCK_STEPS = 20;
 
 	/**
 	 * Number of neighbors that are scanned for the best among them
@@ -33,7 +31,7 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 	private int tabooListLength;
 	private ArrayList<MFeature> recentInsertedFeatures;
 	private ArrayList<MFeature> recentRemovedFeatures;
-	private int stuckingSteps;
+	private int stuckSteps;
 
 	public TabooSearch(OptProblem optProblem, String neighborhood) {
 		super(optProblem, neighborhood);
@@ -48,25 +46,26 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 		if (this.isFinished())
 			throw new RuntimeException("Algorithm already finished. Reset before rerun.");
 
-		// uh huh ? TODO: why not in this class locally
-		MSolution.resetRound();
-
-		// if (MRectangle.isOverlapPermitted())
-		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
 		this.startTimer();
+
 		Solution bestNeighbor = this.getBestNeighbor();
-		while (bestNeighbor != null && this.stuckingSteps <= MAX_STUCKING_STEPS) {
-			if (this.currentSolution.getObjDiff(bestNeighbor) < 1)
-				this.stuckingSteps++;
-			else
-				this.stuckingSteps = 0;
+		while (bestNeighbor != null && (!MRectangle.checkOverlapNotEffective()
+				|| this.stuckSteps <= MAX_STUCK_STEPS)) {
+			// We only consider stuck step if overlap is no more effective
+			if (MRectangle.checkOverlapNotEffective())
+				if (this.currentSolution.getObjDiff(bestNeighbor) < 1)
+					this.stuckSteps++;
+				else
+					this.stuckSteps = 0;
 			this.currentSolution = bestNeighbor;
 			bestNeighbor = this.getBestNeighbor();
+//			this.increaseTotalRounds();
 		}
 		this.convergeToNearestLocalOptimum();
 		this.stopTimer();
 		this.setFinished();
 		((MSolution) this.currentSolution).removeEmptyBoxes(0);
+		System.out.println("[+] Total Round:  " + this.getTotalRounds());
 		System.out.println("[+] Running time: " + this.getRunningTime());
 	}
 
@@ -80,7 +79,7 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 				.removeEmptyBoxes(this.getEmptyBoxRemovingAggressivelessness());
 
 		Solution bestNeighbor = this.getBestNeighbor();
-		if (bestNeighbor == null || stuckingSteps > MAX_STUCKING_STEPS) {
+		if (bestNeighbor == null || stuckSteps > MAX_STUCK_STEPS) {
 			this.convergeToNearestLocalOptimum();
 			this.setFinished();
 			((MSolution) this.currentSolution).removeEmptyBoxes(0);
@@ -88,14 +87,14 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 		}
 
 		if (this.currentSolution.getObjDiff(bestNeighbor) < 1)
-			this.stuckingSteps++;
+			this.stuckSteps++;
 		else
-			this.stuckingSteps = 0;
+			this.stuckSteps = 0;
 
 		bestNeighbor.setIndex(this.currentSolution.getIndex() + 1);
 		if (this.neighborhood.equals(NEIGHBORHOOD_GEO))
 			((MSolution) bestNeighbor).setTabooRectangles(
-				((MSolution) this.currentSolution).getTabooRectangles());
+					((MSolution) this.currentSolution).getTabooRectangles());
 		if (this.currentSolution.isBetterThan(bestNeighbor)) {
 			this.currentSolution = bestNeighbor;
 			this.currentSolution.setWorseThanPrevious();
@@ -117,16 +116,12 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 			((MSolution) this.currentSolution).removeEmptyBoxes(0);
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
+				this.increaseTotalRounds();
 				neighbor.setIndex(this.currentSolution.getIndex() + 1);
 				this.currentSolution = neighbor;
 				neighborhood = neighbor.getNeighborhood();
 			}
 		}
-	}
-
-	@Override
-	public Solution getCurrentSolution() {
-		return this.currentSolution;
 	}
 
 	/**
@@ -154,15 +149,17 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 			if (nextNeighbor.isBetterThan(bestNeighbor))
 				bestNeighbor = nextNeighbor;
 			count++;
+			this.increaseTotalRounds();
 		}
 		return bestNeighbor;
 	}
 
 	private void updateTaboos(Solution newSolution) {
 		for (MFeature insertedFeature : ((MSolution) newSolution).getInsertedFeatures()) {
-			if (this.recentInsertedFeatures.contains(insertedFeature)){
-				//throw new RuntimeException("Taboo feature cannot be inserted.");
-				//System.out.println("Double inserted Taboo feature");
+			if (this.recentInsertedFeatures.contains(insertedFeature)) {
+				// throw new RuntimeException("Taboo feature cannot be
+				// inserted.");
+				// System.out.println("Double inserted Taboo feature");
 				continue;
 			}
 			if (this.recentInsertedFeatures.size() == this.tabooListLength)
@@ -176,9 +173,10 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 			}
 		}
 		for (MFeature removedFeature : ((MSolution) newSolution).getRemovedFeatures()) {
-			if (this.recentRemovedFeatures.contains(removedFeature)){
-				//throw new RuntimeException("Taboo feature cannot be removed.");
-				//System.out.println("Double removed Taboo feature");
+			if (this.recentRemovedFeatures.contains(removedFeature)) {
+				// throw new RuntimeException("Taboo feature cannot be
+				// removed.");
+				// System.out.println("Double removed Taboo feature");
 				continue;
 			}
 			if (this.recentRemovedFeatures.size() == this.tabooListLength)

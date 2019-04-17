@@ -2,6 +2,7 @@ package de.nhd.localsearch.algorithms;
 
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 import de.nhd.localsearch.solutions.GeometryBasedSolution;
 import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.RuleBasedSolution;
@@ -18,6 +19,22 @@ public abstract class NeighborhoodBasedAlgo implements IOptAlgo {
 	public static final String NEIGHBORHOOD_PERM = "PERMUTATION";
 
 	private static final int DEFAULT_EMPTY_BOX_REMOVING_AGGRESSIVELESSNESS = 10;
+
+	/**
+	 * The percentage amount to reduce the overlap rate in one reduction step.
+	 */
+	private static final double OVERLAP_RATE_REDUCTION_AMOUNT = 0.1;
+
+	/**
+	 * Number of algorithm rounds run before the next reduction of the overlap
+	 * rate.
+	 */
+	private static final int OVERLAP_RATE_REDUCTION_STEP = 10;
+
+	/**
+	 * Number of rounds that this algorithm has run
+	 */
+	private int totalRounds = 0;
 
 	/**
 	 * Total running time of the algorithm
@@ -97,6 +114,29 @@ public abstract class NeighborhoodBasedAlgo implements IOptAlgo {
 
 	public OptProblem getProblem() {
 		return problem;
+	}
+
+	public int getTotalRounds() {
+		return totalRounds;
+	}
+	
+	@Override
+	public Solution getCurrentSolution() {
+		return this.currentSolution;
+	}
+	
+	/**
+	 * Increase the total executed rounds of the algorithm. This is used for the
+	 * penalty of overlapping.
+	 */
+	public void increaseTotalRounds() {
+		this.totalRounds++;
+//		System.out.println("increaseTotalRounds()");
+		if (MRectangle.isOverlapPermitted()
+				&& MRectangle.getOverlapRate() > MRectangle.MIN_OVERLAP_RATE
+				&& this.totalRounds % OVERLAP_RATE_REDUCTION_STEP == 0)
+			MRectangle.setOverlapRate(
+					MRectangle.getOverlapRate() - OVERLAP_RATE_REDUCTION_AMOUNT);
 	}
 
 	protected int getEmptyBoxRemovingAggressivelessness() {

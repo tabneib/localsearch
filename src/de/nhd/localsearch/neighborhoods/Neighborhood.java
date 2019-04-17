@@ -5,7 +5,9 @@ import java.util.Iterator;
 
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
+import de.nhd.localsearch.problem.geometry.MRectangle;
 import de.nhd.localsearch.solutions.MFeature;
+import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.Solution;
 
 /**
@@ -76,6 +78,7 @@ public abstract class Neighborhood implements Iterator<Solution> {
 	/**
 	 * Check if the to be removed feature is not recently inserted, therefore
 	 * removable
+	 * 
 	 * @param toBeRemovedFeature
 	 * @return
 	 */
@@ -84,5 +87,4 @@ public abstract class Neighborhood implements Iterator<Solution> {
 			throw new RuntimeException("Not in taboo mode");
 		return !this.recentInsertedFeatures.contains(toBeRemovedFeature);
 	}
-
 }

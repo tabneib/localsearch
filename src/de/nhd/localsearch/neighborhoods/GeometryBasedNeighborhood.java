@@ -50,6 +50,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		int attempts = 0;
 		this.nextNeighbor = (GeometryBasedSolution) this.makeRandomMove();
 		while (this.nextNeighbor == null && attempts < MAX_REPOSITIONING_ATTEMPTS) {
+			System.out.println("attempts: " + attempts);
 			this.nextNeighbor = (GeometryBasedSolution) this.makeRandomMove();
 			attempts++;
 		}
@@ -98,7 +99,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		sourceBox.removeRect(randomRect);
 		if (!sourceBox.isEmptyBox())
 			sourceBox.optimalSort();
-		neighbor.revalidateObjective();
+//		neighbor.revalidateObjective();
 		insertedRect.setRepositioned();
 		sourceBox.setRepositionSrc();
 		sourceBox.setRemovedRect(randomRect);
@@ -119,11 +120,11 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 	private int getRandomBoxIdx(GeometryBasedSolution solution) {
 		double totalFreeArea = 0;
 		for (MBox mBox : solution.getBoxes())
-			totalFreeArea += mBox.getFreeArea() * mBox.getFreeArea();
+			totalFreeArea += mBox.getFreeArea();
 		double random = totalFreeArea * Math.random();
 		int index = 0;
 		for (MBox mBox : solution.getBoxes()) {
-			random -= mBox.getFreeArea() * mBox.getFreeArea();
+			random -= mBox.getFreeArea();
 			if (random <= 0)
 				return index;
 			index++;

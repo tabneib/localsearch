@@ -20,30 +20,19 @@ public class GeometryBasedSolution extends MSolution {
 		super(problem, boxes);
 		if (boxes == null) {
 			this.problem = problem;
-			this.boxes = new ArrayList<MBox>();
 			MOptProblem mProblem = (MOptProblem) this.problem;
 			for (MRectangle m : mProblem.getRechtangles()) {
 				MBox mBox = new MBox(mProblem.getBoxLength());
 				mBox.optimalInsert(m);
-				this.boxes.add(mBox);
+				this.addBox(mBox);
 			}
 		}
-	}
-
-	/**
-	 * Remove a box from this solution
-	 * 
-	 * @param index
-	 *            of the box
-	 */
-	public void removeBox(int index) {
-		this.boxes.remove(index);
 	}
 
 	@Override
 	public GeometryBasedSolution clone() {
 		ArrayList<MBox> clonedBoxes = new ArrayList<MBox>();
-		for (MBox mBox : this.boxes)
+		for (MBox mBox : this.getBoxes())
 			clonedBoxes.add(mBox.clone());
 		return new GeometryBasedSolution(this.problem, clonedBoxes);
 	}

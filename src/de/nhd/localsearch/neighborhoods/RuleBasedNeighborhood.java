@@ -6,7 +6,6 @@ import java.util.Collections;
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.geometry.MBox;
 import de.nhd.localsearch.problem.geometry.MRectangle;
-import de.nhd.localsearch.solutions.GeometryBasedFeature;
 import de.nhd.localsearch.solutions.MFeature;
 import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.RuleBasedFeature;
@@ -20,14 +19,14 @@ public class RuleBasedNeighborhood extends Neighborhood {
 	 * permuting
 	 */
 	private static final double OPTIMAL_FILL_RATE = 0.8;
-	
+
 	private static final int MAX_TRY_TO_AVOID_TABOO = 30;
 
 	private int iteratedNeighbors;
 	private boolean noMoreNeighbor = false;
 	private MFeature removedFeature;
 	private MFeature insertedFeature;
-	
+
 	private int avoidTabooTries;
 
 	public RuleBasedNeighborhood(MOptProblem instance, Solution currentSolution) {
@@ -41,12 +40,21 @@ public class RuleBasedNeighborhood extends Neighborhood {
 
 	@Override
 	public Solution next() {
-		if (this.noMoreNeighbor || this.iteratedNeighbors > MAX_NEIGHBORS)
+		if (this.noMoreNeighbor)
 			throw new RuntimeException("No more neighbor");
 		Solution neighbor = this.findNextNeighbor((RuleBasedSolution) this.owner);
-		this.iteratedNeighbors++;
-		if (this.iteratedNeighbors > MAX_NEIGHBORS || neighbor == null)
-			this.noMoreNeighbor = true;
+		if (MRectangle.checkOverlapNotEffective()
+				&& ((MSolution) neighbor).getTotalOverlapArea() <= 0) {
+			// If No and Never more overlapping => behave normally
+			this.iteratedNeighbors++;
+
+			if ((this.iteratedNeighbors > MAX_NEIGHBORS || neighbor == null)) {
+				System.out.println("RuleBasedNeighborhood: No more neighbor!");
+				System.out.println("Solution's total overlap area: "
+						+ ((MSolution) this.owner).getTotalOverlapArea());
+				this.noMoreNeighbor = true;
+			}
+		}
 		return neighbor;
 	}
 
@@ -63,26 +71,34 @@ public class RuleBasedNeighborhood extends Neighborhood {
 		ArrayList<MBox> boxes = new ArrayList<>(solution.getBoxes());
 		Collections.sort(boxes);
 		Collections.reverse(boxes);
-		int prependingOptimalBoxes = 0;
-		for (int i = 0; i < boxes.size(); i++) {
-			if (boxes.get(i).getFillRate() < OPTIMAL_FILL_RATE) {
-				for (int j = 0; j < prependingOptimalBoxes; j++) {
-					neighborPerm.addAll(boxes.get(j).getMRectangles());
-					rects.removeAll(boxes.get(j).getMRectangles());
-				}
-				break;
-			} else
-				prependingOptimalBoxes++;
+		// Only consider prepending optimal box if No and Never more overlapping
+		if (MRectangle.checkOverlapNotEffective()
+				&& ((MSolution) this.owner).getTotalOverlapArea() <= 0) {
+			int prependingOptimalBoxes = 0;
+			for (int i = 0; i < boxes.size(); i++) {
+				if (boxes.get(i).getFillRate() < OPTIMAL_FILL_RATE) {
+					for (int j = 0; j < prependingOptimalBoxes; j++) {
+						neighborPerm.addAll(boxes.get(j).getMRectangles());
+						rects.removeAll(boxes.get(j).getMRectangles());
+					}
+					break;
+				} else
+					prependingOptimalBoxes++;
+			}
 		}
 		// Permute all rectangles of non-optimal boxes
 		neighborPerm.addAll(this.permute(rects));
-
-		// neighborPerm = solution.getPermutation();
 		Solution neighbor = new RuleBasedSolution(this.owner.getProblem(), neighborPerm);
-		((RuleBasedSolution) neighbor).addInsertedFeature(this.insertedFeature);
-		((RuleBasedSolution) neighbor).addRemovedFeature(this.removedFeature);
-		this.insertedFeature = null;
-		this.removedFeature = null;
+//		System.out.println("New neighbor! overlap area: "
+//				+ ((MSolution) neighbor).getTotalOverlapArea());
+//		System.out.println(
+//				"checkOverlapNotEffective() = " + this.checkOverlapNotEffective());
+		if (this.isTabooMode()) {
+			((RuleBasedSolution) neighbor).addInsertedFeature(this.insertedFeature);
+			((RuleBasedSolution) neighbor).addRemovedFeature(this.removedFeature);
+			this.insertedFeature = null;
+			this.removedFeature = null;
+		}
 		return neighbor;
 	}
 
@@ -134,19 +150,15 @@ public class RuleBasedNeighborhood extends Neighborhood {
 		if (this.isTabooMode()) {
 			int startIdx = ((MSolution) this.owner).getRectangles().size()
 					- rectangles.size();
-			// busy loop, no good idea :) 
-			// consider using further termination criteria
 			while (this.avoidTabooTries <= MAX_TRY_TO_AVOID_TABOO) {
 				MFeature removedFeature = new RuleBasedFeature(randomRect,
 						startIdx + randomIdx);
-				MFeature insertedFeature = new RuleBasedFeature(randomRect,
-						startIdx);
+				MFeature insertedFeature = new RuleBasedFeature(randomRect, startIdx);
 				if (!this.checkInsertable(insertedFeature)
-						|| !this.checkRemovable(removedFeature)){
+						|| !this.checkRemovable(removedFeature)) {
 					randomIdx = (int) (Math.random() * permutation.size());
 					this.avoidTabooTries++;
-				}
-				else {
+				} else {
 					this.removedFeature = removedFeature;
 					this.insertedFeature = insertedFeature;
 					this.avoidTabooTries = 0;

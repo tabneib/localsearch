@@ -18,22 +18,14 @@ import de.nhd.localsearch.problem.geometry.MRectangle;
 public abstract class MSolution extends Solution {
 
 	/**
-	 * Total number of rounds that the algorithm has run
-	 */
-	private static int round = 0;
-
-	/**
-	 * The percentage amount to reduce the overlap rate in one reduction step.
-	 */
-	private static final double OVERLAP_RATE_REDUCE_STEP = 0.1;
-
-	/**
 	 * List of the boxes used by this solution to store the rectangles given by
 	 * the corresponding instance of the optimization problem.
 	 */
-	protected ArrayList<MBox> boxes;
+	private ArrayList<MBox> boxes;
 
 	private double objectiveValue = -1;
+
+	private double overlapArea;
 
 	private HashSet<MFeature> removedFeatures;
 	private HashSet<MFeature> insertedFeatures;
@@ -47,28 +39,41 @@ public abstract class MSolution extends Solution {
 	public MSolution(OptProblem optProblem, ArrayList<MBox> boxes) {
 		super(optProblem);
 		this.boxes = boxes;
+		if (boxes != null && MRectangle.isOverlapPermitted())
+			for (MBox box : this.boxes)
+				this.overlapArea += box.getOverlapArea();
 		tabooRectangles = new HashSet<>();
 	}
 
 	@Override
 	public double getObjective() {
-		if (this.objectiveValue == -1) {
-			int integerPart = this.getNonEmptyBoxAmount()
-					- ((MOptProblem) this.problem).getOptimalBoxAmount();
-			if (integerPart == 0)
-				return 0;
 
-			double fractionalPart = 0;
-			int totalRects = ((MOptProblem) problem).getRechtangles().size();
-			ArrayList<Double> fillRates = new ArrayList<Double>();
-			for (MBox box : this.boxes)
-				fillRates.add((Double) box.getFillRate());
-			Collections.sort(fillRates);
-			Collections.reverse(fillRates);
-			for (int i = 0; i < fillRates.size(); i++)
-				fractionalPart += fillRates.get(i) * (totalRects - i);
-			fractionalPart = Math.pow(fractionalPart + 1, -1);
-			this.objectiveValue = integerPart + fractionalPart;
+		int integerPart = this.getNonEmptyBoxAmount()
+				- ((MOptProblem) this.problem).getOptimalBoxAmount();
+		if (integerPart <= 0)
+			integerPart = 0;
+
+		double fractionalPart = 0;
+		int totalRects = ((MOptProblem) problem).getRechtangles().size();
+		ArrayList<Double> fillRates = new ArrayList<Double>();
+		for (MBox box : this.boxes)
+			fillRates.add((Double) box.getFillRate());
+		Collections.sort(fillRates);
+		Collections.reverse(fillRates);
+		for (int i = 0; i < fillRates.size(); i++)
+			fractionalPart += fillRates.get(i) * (totalRects - i);
+		fractionalPart = Math.pow(fractionalPart + 1, -1);
+
+		this.objectiveValue = integerPart + fractionalPart;
+
+		if (MRectangle.isOverlapPermitted()) {
+//			System.out.println("this.objectiveValue = " + this.objectiveValue);
+//			System.out.println("this.getTotalOverlapArea()" + this.getTotalOverlapArea());
+//			System.out.println("Penalty rate: " + MRectangle.getOverlapPenaltyRate());
+//			System.out.println("Penalty: "
+//					+ (MRectangle.getOverlapPenaltyRate() * this.getTotalOverlapArea()));
+			this.objectiveValue += MRectangle.getOverlapPenaltyRate()
+					* this.getTotalOverlapArea();
 		}
 		return this.objectiveValue;
 	}
@@ -78,20 +83,17 @@ public abstract class MSolution extends Solution {
 	 * 
 	 * @return The total overlap area
 	 */
-	private double getTotalOverlapArea() {
-		double total = 0;
-		for (MBox box : this.boxes)
-			total += box.getOverlapArea();
-		return total;
+	public double getTotalOverlapArea() {
+		return this.overlapArea;
 	}
 
 	/**
 	 * This method forces the objective value to be updated (recomputed) the
 	 * next time.
 	 */
-	public void revalidateObjective() {
-		this.objectiveValue = -1;
-	}
+//	public void revalidateObjective() {
+//		this.objectiveValue = -1;
+//	}
 
 	/**
 	 * Retrieve the list of all rectangles stored in the boxes of this solution.
@@ -114,22 +116,36 @@ public abstract class MSolution extends Solution {
 	}
 
 	public ArrayList<MBox> getBoxes() {
-		return this.boxes;
+		return new ArrayList<>(this.boxes);
 	}
 
-	public void setBoxes(ArrayList<MBox> boxes) {
-		this.boxes = boxes;
+	protected void addBox(MBox box) {
+		if (this.boxes == null)
+			this.boxes = new ArrayList<>();
+		this.boxes.add(box);
+		if (MRectangle.isOverlapPermitted() && box.getOverlapArea() > 0) {
+			this.overlapArea += box.getOverlapArea();
+//			System.out.println("MSolution - Updated overlapArea: " + this.overlapArea);
+		}
+//		this.revalidateObjective();
+	}
+
+	protected void removeBoxes() {
+		this.boxes = new ArrayList<>();
+		this.overlapArea = 0;
+//		this.revalidateObjective();
 	}
 
 	/**
-	 * Remove all empty boxes or all but except the last (empty) one
+	 * Remove all empty boxes or all but except a given amount of the last
+	 * (empty) ones
 	 * 
 	 * @param aggressive
-	 *            if all empty boxes are to be removed
+	 *            amount of last empty boxes not to be removed
 	 */
-	public void removeEmptyBoxes(int aggressiveness) {
+	public void removeEmptyBoxes(int aggressivelessness) {
 		Iterator<MBox> iter = this.boxes.iterator();
-		if (aggressiveness == 0) {
+		if (aggressivelessness == 0) {
 			while (iter.hasNext()) {
 				if (((MBox) iter.next()).isEmptyBox())
 					iter.remove();
@@ -142,11 +158,12 @@ public abstract class MSolution extends Solution {
 			if (box.isEmptyBox())
 				toBeRemoved.add(box);
 		}
-		if (toBeRemoved.isEmpty() || toBeRemoved.size() <= aggressiveness)
+		if (toBeRemoved.isEmpty() || toBeRemoved.size() <= aggressivelessness)
 			return;
-		for (int i = 0; i <= aggressiveness; i++)
+		for (int i = 0; i <= aggressivelessness; i++)
 			toBeRemoved.remove(toBeRemoved.size() - 1);
 		this.boxes.removeAll(toBeRemoved);
+//		this.revalidateObjective();
 	}
 
 	/**
@@ -155,30 +172,13 @@ public abstract class MSolution extends Solution {
 	 * 
 	 * @return
 	 */
-	public static double getPenaltyRate() {
-		if (MRectangle.isOverlapPermitted())
-			return Math.pow(round, 1.2);
-		else
-			throw new RuntimeException(
-					"Cannot get penalty rate in case overlap is not permitted!");
-	}
-
-	/**
-	 * Increase the counted round of the algorithm. This is used for the penalty
-	 * of overlapping
-	 */
-	public static void increaseRound() {
-		round++;
-		if (MRectangle.isOverlapPermitted()
-				&& MRectangle.getOverlapRate() > MRectangle.MIN_OVERLAP_RATE
-				&& round % 20 == 0)
-			MRectangle.setOverlapRate(
-					MRectangle.getOverlapRate() - OVERLAP_RATE_REDUCE_STEP);
-	}
-
-	public static void resetRound() {
-		round = 0;
-	}
+	// public static double getPenaltyRate() {
+	// if (MRectangle.isOverlapPermitted())
+	// return Math.pow(round, 1.2);
+	// else
+	// throw new RuntimeException(
+	// "Cannot get penalty rate in case overlap is not permitted!");
+	// }
 
 	public HashSet<MFeature> getRemovedFeatures() {
 		return removedFeatures;
@@ -204,12 +204,12 @@ public abstract class MSolution extends Solution {
 		if (!this.tabooRectangles.add(rect))
 			throw new RuntimeException("Double insert taboo rectangle");
 	}
-	
+
 	public void removeTaboo(MRectangle rect) {
 		if (!this.tabooRectangles.remove(rect))
 			throw new RuntimeException("Taboo rectangle not present");
 	}
-	
+
 	public HashSet<MRectangle> getTabooRectangles() {
 		return tabooRectangles;
 	}

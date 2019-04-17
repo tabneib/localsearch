@@ -39,15 +39,15 @@ public class RuleBasedSolution extends MSolution {
 	 *
 	 */
 	public void revalidate() {
-		this.boxes = new ArrayList<>();
+		this.removeBoxes();
 		MBox box = new MBox(((MOptProblem) this.problem).getBoxLength());
 		for (MRectangle r : permutation) {
 			while (box.optimalInsert(r) == null) {
-				this.boxes.add(box);
+				this.addBox(box);
 				box = new MBox(((MOptProblem) this.problem).getBoxLength());
 			}
 		}
-		this.boxes.add(box);
+		this.addBox(box);
 	}
 
 	private RuleBasedSolution setPermutation(ArrayList<MRectangle> permutation) {

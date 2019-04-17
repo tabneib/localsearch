@@ -27,12 +27,6 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 	 */
 	public static final int MAX_SEARCHING_ATTEMPTS = 100;
 
-	/**
-	 * Total running time of the algorithm
-	 */
-	private long runningTime = -1;
-	private boolean isFinished = false;
-
 	private int currentTempIdx;
 	private int currentStepIdx;
 
@@ -45,50 +39,43 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 
 	@Override
 	public void run() {
-		if (this.isFinished)
+		if (this.isFinished())
 			throw new RuntimeException("Algorithm already finished. Reset before rerun.");
 
-		// uh huh ? TODO: why not in this class locally
-		MSolution.resetRound();
-
-		int countStep = 0;
-		// if (MRectangle.isOverlapPermitted())
-		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
-		long startTime = System.currentTimeMillis();
+		this.startTimer();
 
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext()) {
 			((MSolution) this.currentSolution)
 					.removeEmptyBoxes(EMPTY_BOX_REMOVING_AGGRESSIVELESSNESS);
-			countStep++;
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
-				MSolution.increaseRound();
 				this.currentSolution = neighbor;
 				neighborhood = neighbor.getNeighborhood();
 			} else if (this.biasedCoinFlip(this.currentSolution, neighbor)) {
-				MSolution.increaseRound(); // ????
 				this.currentSolution = neighbor;
 				neighborhood = neighbor.getNeighborhood();
 			}
+			System.out.println("Not better: " + this.currentSolution.getObjective()
+			+ " < " + neighbor.getObjective());
+			this.increaseTotalRounds();
+
 		}
-		runningTime = System.currentTimeMillis() - startTime;
-		this.isFinished = true;
+		this.stopTimer();
+		this.setFinished();
 		((MSolution) this.currentSolution).removeEmptyBoxes(0);
-		System.out.println("[+] Total Round:  " + countStep);
-		System.out.println("[+] Running time: " + runningTime);
+		System.out.println("[+] Total Round:  " + this.getTotalRounds());
+		System.out.println("[+] Running time: " + this.getRunningTime());
 	}
 
 	@Override
 	public void runStep() {
-		if (this.isFinished)
+		if (this.isFinished())
 			throw new RuntimeException("Algorithm already terminated!");
-		// if (MRectangle.isOverlapPermitted())
-		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
 		((MSolution) this.currentSolution)
 				.removeEmptyBoxes(EMPTY_BOX_REMOVING_AGGRESSIVELESSNESS);
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
-		while (neighborhood.hasNext()) {
+		while (neighborhood.hasNext() ) {
 			Solution neighbor = neighborhood.next();
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				neighbor.setIndex(this.currentSolution.getIndex() + 1);
@@ -100,25 +87,12 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 				this.currentSolution.setWorseThanPrevious();
 				break;
 			}
+			this.increaseTotalRounds();
 		}
 		if (!neighborhood.hasNext()) {
-			this.isFinished = true;
+			this.setFinished();
 			((MSolution) this.currentSolution).removeEmptyBoxes(0);
 		}
-	}
-
-	@Override
-	public long getRunningTime() {
-		return runningTime;
-	}
-
-	@Override
-	public Solution getCurrentSolution() {
-		return this.currentSolution;
-	}
-
-	public boolean isFinished() {
-		return isFinished;
 	}
 
 	/**

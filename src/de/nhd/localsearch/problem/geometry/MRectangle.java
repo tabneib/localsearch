@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.w3c.dom.css.Rect;
-
 /**
  * Class representing a rectangle to be placed into a box.
  *
@@ -35,7 +33,7 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	 * The maximal percentage of permitted overlapping area. This is the
 	 * starting value of the reduction of overlapping percentage.
 	 */
-	public static final double MAX_OVERLAP_RATE = 1;
+	private static final double MAX_OVERLAP_RATE = 1;
 
 	/**
 	 * The minimal percentage of permitted overlapping area. This is the lower
@@ -43,11 +41,15 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	 */
 	public static final double MIN_OVERLAP_RATE = 0;
 
+	private static final double INIT_OVERLAP_PENALTY = 0;
+	private static final double OVERLAP_PENALTY_INCREMENT = 0.5;
+	
 	/**
 	 * The current percentage of permitted overlapping area.
 	 * 
 	 */
 	private static double overlapRate;
+	private static double overlapPenaltyRate;
 
 	/**
 	 * The total area of this rectangle that overlap other rectangles
@@ -112,7 +114,8 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	 *            the given MRectangle to check against
 	 * @return true if invalidly overlap, otherwise false
 	 */
-	public boolean invalidlyOverlap(MRectangle other, ArrayList<Rectangle> currentIntersections) {
+	public boolean invalidlyOverlap(MRectangle other,
+			ArrayList<Rectangle> currentIntersections) {
 		if (!MRectangle.overlapMode || overlapRate <= 0)
 			return super.intersects(other);
 		else {
@@ -127,7 +130,8 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 				double intersectionArea = intersection.getWidth()
 						* intersection.getHeight();
 				if (Math.max((intersectionArea + currentOverlapArea) / this.getArea(),
-						(intersectionArea + other.getOverlapArea()) / other.getArea()) <= overlapRate)
+						(intersectionArea + other.getOverlapArea())
+								/ other.getArea()) <= overlapRate)
 					return false;
 				else
 					return true;
@@ -230,8 +234,12 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 
 	public static void setOverlapMode(boolean overlap) {
 		MRectangle.overlapMode = overlap;
-		if (overlap)
+		if (overlap){
+			MRectangle.overlapPenaltyRate = INIT_OVERLAP_PENALTY;
 			MRectangle.overlapRate = MAX_OVERLAP_RATE;
+			System.out.println("overlapPenaltyRate = " + MRectangle.overlapPenaltyRate);
+			System.out.println("overlapRate = " + MRectangle.overlapRate);
+		}
 	}
 
 	public static boolean isOverlapPermitted() {
@@ -239,17 +247,33 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	}
 
 	public static double getOverlapRate() {
-		return overlapRate;
+		return MRectangle.overlapRate;
 	}
 
+	public static double getOverlapPenaltyRate() {
+		return MRectangle.overlapPenaltyRate;
+	}
+	
 	public double getOverlapArea() {
 		return this.overlapArea;
 	}
 
 	public static void setOverlapRate(double rate) {
-		overlapRate = rate < MIN_OVERLAP_RATE ? MIN_OVERLAP_RATE : rate;
-		overlapRate = rate < 0 ? 0 : rate;
-		System.out.println("OverlapRate = " + overlapRate);
+		double oldRate = MRectangle.overlapRate;
+		MRectangle.overlapRate = rate < MIN_OVERLAP_RATE ? MIN_OVERLAP_RATE : rate;
+		MRectangle.overlapRate = rate < 0 ? 0 : rate;
+		if (MRectangle.overlapRate != oldRate)
+			MRectangle.overlapPenaltyRate += OVERLAP_PENALTY_INCREMENT;
+		System.out.println("OverlapRate = " + MRectangle.overlapRate);
+	}
+	
+	/**
+	 * Check if not in overlap mode or overlapping has no effect any more
+	 * 
+	 * @return true if overlapping is not effective, false otherwise
+	 */
+	public static boolean checkOverlapNotEffective() {
+		return (!MRectangle.isOverlapPermitted() || MRectangle.getOverlapRate() <= 0);
 	}
 
 	public MBox getBox() {
