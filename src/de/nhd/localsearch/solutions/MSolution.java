@@ -34,7 +34,7 @@ public abstract class MSolution extends Solution {
 	 * current taboo rectangles, for which repositioning it is not allowed. This
 	 * is used solely for visualization purpose.
 	 */
-	private HashSet<MRectangle> tabooRectangles;
+	private HashSet<String> tabooRectangles;
 
 	public MSolution(OptProblem optProblem, ArrayList<MBox> boxes) {
 		super(optProblem);
@@ -67,11 +67,6 @@ public abstract class MSolution extends Solution {
 		this.objectiveValue = integerPart + fractionalPart;
 
 		if (MRectangle.isOverlapPermitted()) {
-//			System.out.println("this.objectiveValue = " + this.objectiveValue);
-//			System.out.println("this.getTotalOverlapArea()" + this.getTotalOverlapArea());
-//			System.out.println("Penalty rate: " + MRectangle.getOverlapPenaltyRate());
-//			System.out.println("Penalty: "
-//					+ (MRectangle.getOverlapPenaltyRate() * this.getTotalOverlapArea()));
 			this.objectiveValue += MRectangle.getOverlapPenaltyRate()
 					* this.getTotalOverlapArea();
 		}
@@ -87,13 +82,14 @@ public abstract class MSolution extends Solution {
 		return this.overlapArea;
 	}
 
-	/**
-	 * This method forces the objective value to be updated (recomputed) the
-	 * next time.
-	 */
-//	public void revalidateObjective() {
-//		this.objectiveValue = -1;
-//	}
+	public void revalidateTotalOverlapArea() {
+		this.overlapArea = 0;
+		if (this.boxes != null && MRectangle.isOverlapPermitted()) {
+			for (MBox box : this.boxes) {
+				this.overlapArea += box.getOverlapArea();
+			}
+		}
+	}
 
 	/**
 	 * Retrieve the list of all rectangles stored in the boxes of this solution.
@@ -125,15 +121,12 @@ public abstract class MSolution extends Solution {
 		this.boxes.add(box);
 		if (MRectangle.isOverlapPermitted() && box.getOverlapArea() > 0) {
 			this.overlapArea += box.getOverlapArea();
-//			System.out.println("MSolution - Updated overlapArea: " + this.overlapArea);
 		}
-//		this.revalidateObjective();
 	}
 
 	protected void removeBoxes() {
 		this.boxes = new ArrayList<>();
 		this.overlapArea = 0;
-//		this.revalidateObjective();
 	}
 
 	/**
@@ -163,22 +156,7 @@ public abstract class MSolution extends Solution {
 		for (int i = 0; i <= aggressivelessness; i++)
 			toBeRemoved.remove(toBeRemoved.size() - 1);
 		this.boxes.removeAll(toBeRemoved);
-//		this.revalidateObjective();
 	}
-
-	/**
-	 * Compute and return the penalty rate which depends on the executed rounds
-	 * until now.
-	 * 
-	 * @return
-	 */
-	// public static double getPenaltyRate() {
-	// if (MRectangle.isOverlapPermitted())
-	// return Math.pow(round, 1.2);
-	// else
-	// throw new RuntimeException(
-	// "Cannot get penalty rate in case overlap is not permitted!");
-	// }
 
 	public HashSet<MFeature> getRemovedFeatures() {
 		return removedFeatures;
@@ -201,24 +179,29 @@ public abstract class MSolution extends Solution {
 	}
 
 	public void addTaboo(MRectangle rect) {
-		if (!this.tabooRectangles.add(rect))
+//		if (!this.getRectangles().contains(rect.getId())) {
+//			throw new RuntimeException(
+//					"Cannot add a taboo MRectangle that does not belong to this solution");
+//		}
+		if (!this.tabooRectangles.add(rect.getId()))
 			throw new RuntimeException("Double insert taboo rectangle");
 	}
 
 	public void removeTaboo(MRectangle rect) {
-		if (!this.tabooRectangles.remove(rect))
+		if (!this.tabooRectangles.remove(rect.getId()))
 			throw new RuntimeException("Taboo rectangle not present");
 	}
 
-	public HashSet<MRectangle> getTabooRectangles() {
+	public HashSet<String> getTabooRectangles() {
 		return tabooRectangles;
 	}
 
-	public void setTabooRectangles(HashSet<MRectangle> tabooRectangles) {
-		this.tabooRectangles = tabooRectangles;
+	public void setTabooRectangles(HashSet<String> tabooRectangleIds) {
+		for (String rectId : tabooRectangleIds)
+			this.tabooRectangles .add(rectId);
 	}
 
 	public boolean checkTaboo(MRectangle rect) {
-		return this.tabooRectangles.contains(rect);
+		return this.tabooRectangles.contains(rect.getId());
 	}
 }

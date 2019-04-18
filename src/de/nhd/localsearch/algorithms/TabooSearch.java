@@ -59,7 +59,6 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 					this.stuckSteps = 0;
 			this.currentSolution = bestNeighbor;
 			bestNeighbor = this.getBestNeighbor();
-//			this.increaseTotalRounds();
 		}
 		this.convergeToNearestLocalOptimum();
 		this.stopTimer();
@@ -73,8 +72,6 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 	public void runStep() {
 		if (this.isFinished())
 			throw new RuntimeException("Algorithm already terminated!");
-		// if (MRectangle.isOverlapPermitted())
-		// MRectangle.setOverlapRate(MRectangle.MAX_OVERLAP_RATE);
 		((MSolution) this.currentSolution)
 				.removeEmptyBoxes(this.getEmptyBoxRemovingAggressivelessness());
 
@@ -92,9 +89,10 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 			this.stuckSteps = 0;
 
 		bestNeighbor.setIndex(this.currentSolution.getIndex() + 1);
-		if (this.neighborhood.equals(NEIGHBORHOOD_GEO))
+		if (this.neighborhood.equals(NEIGHBORHOOD_GEO)) {
 			((MSolution) bestNeighbor).setTabooRectangles(
 					((MSolution) this.currentSolution).getTabooRectangles());
+		}
 		if (this.currentSolution.isBetterThan(bestNeighbor)) {
 			this.currentSolution = bestNeighbor;
 			this.currentSolution.setWorseThanPrevious();
@@ -162,14 +160,16 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 				// System.out.println("Double inserted Taboo feature");
 				continue;
 			}
-			if (this.recentInsertedFeatures.size() == this.tabooListLength)
+			if (this.recentInsertedFeatures.size() == this.tabooListLength){
 				this.recentInsertedFeatures.remove(0);
+			}
 			this.recentInsertedFeatures.add(insertedFeature);
 			if (this.neighborhood.equals(NEIGHBORHOOD_GEO)) {
 				((MSolution) this.currentSolution).addTaboo(insertedFeature.getRect());
-				if (this.recentInsertedFeatures.size() == this.tabooListLength)
+				if (this.recentInsertedFeatures.size() == this.tabooListLength) {
 					((MSolution) this.currentSolution)
 							.removeTaboo(this.recentInsertedFeatures.get(0).getRect());
+				}
 			}
 		}
 		for (MFeature removedFeature : ((MSolution) newSolution).getRemovedFeatures()) {
@@ -179,10 +179,10 @@ public class TabooSearch extends NeighborhoodBasedAlgo {
 				// System.out.println("Double removed Taboo feature");
 				continue;
 			}
-			if (this.recentRemovedFeatures.size() == this.tabooListLength)
+			if (this.recentRemovedFeatures.size() == this.tabooListLength) {
 				this.recentRemovedFeatures.remove(0);
+			}
 			this.recentRemovedFeatures.add(removedFeature);
 		}
 	}
-
 }

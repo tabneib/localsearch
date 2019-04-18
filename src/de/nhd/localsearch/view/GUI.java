@@ -57,7 +57,8 @@ public class GUI extends JFrame {
 	public static final Color COLOR_REPOSITIONING_SOURCE = Color.black;
 	public static final Color COLOR_REPOSITIONING_DESTINATION = Color.yellow;
 	public static final Color COLOR_RECT = new Color(47, 255, 228);
-	public static final Color COLOR_TABOO_RECT = new Color(57, 185, 211);
+//	public static final Color COLOR_TABOO_RECT = new Color(57, 185, 211);
+	public static final Color COLOR_TABOO_RECT = Color.blue;
 	public static final Color COLOR_REPOSITIONED_RECT = Color.red;
 	public static final Color COLOR_REMOVED_RECT = Color.lightGray;
 	public static final Color COLOR_WORSE_THAN_PREVIOUS_SOLUTION = new Color(247, 185,
@@ -582,7 +583,7 @@ public class GUI extends JFrame {
 
 	/**
 	 * Re-generate the algorithm instance. This must be called after the
-	 * algorithm, neighborhood or problem is changed.
+	 * algorithm, neighborhood, overlap or problem is changed.
 	 */
 	private void revalidateAlgo() {
 		switch (this.algorithmName) {
@@ -963,12 +964,10 @@ public class GUI extends JFrame {
 				neighborhood = NeighborhoodBasedAlgo.NEIGHBORHOOD_PERM;
 				revalidateAlgo();
 			}
-			// else if (checkboxNeighborOverl.isSelected())
-			// neighborhood = NEIGHBORHOOD_OVERL;
 			else
 				throw new RuntimeException("No neighborhood is selected");
 			updateState(STATE_INIT);
-			terminalOut("[+] Neighborhoos: " + neighborhood);
+			terminalOut("[+] Neighborhood: " + neighborhood);
 		}
 	}
 
@@ -983,6 +982,7 @@ public class GUI extends JFrame {
 				MRectangle.setOverlapMode(false);
 				terminalOut("[+] Overlapping rectangles: OFF");
 			}
+			revalidateAlgo();
 		}
 	}
 

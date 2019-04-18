@@ -90,7 +90,7 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	 * @param id
 	 */
 	private MRectangle(int x, int y, int width, int height, int boxLength, String id,
-			HashMap<String, Rectangle> intersections) {
+			HashMap<String, Rectangle> intersections, double overlapArea) {
 		super.setRect(x, y, width, height);
 		this.boxLength = boxLength;
 		this.maxSize = Math.max(width, height);
@@ -103,6 +103,7 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 		// cloning cycle
 		// => stack overflow...
 		this.intersections = new HashMap<>(intersections);
+		this.overlapArea = overlapArea;
 	}
 
 	/**
@@ -313,7 +314,7 @@ public class MRectangle extends Rectangle implements Comparable<MRectangle> {
 	@Override
 	public MRectangle clone() {
 		return new MRectangle(this.x, this.y, this.width, this.height, boxLength, this.id,
-				this.intersections);
+				this.intersections, this.overlapArea);
 	}
 
 	public boolean isRepositioned() {

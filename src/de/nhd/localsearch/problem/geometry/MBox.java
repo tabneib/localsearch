@@ -67,8 +67,18 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 		this.id = UUID.randomUUID().toString();
 	}
 
+	/**
+	 * Constructor used by {@link #clone() clone}
+	 * 
+	 * @param boxLength
+	 * @param mRectangles
+	 * @param id
+	 * @param freeArea
+	 * @param fillArea
+	 * @param fillRate
+	 */
 	public MBox(int boxLength, ArrayList<MRectangle> mRectangles, String id,
-			double freeArea, double fillArea, double fillRate) {
+			double freeArea, double fillArea, double fillRate, double overlapArea) {
 		super.setRect(0, 0, boxLength, boxLength);
 		this.boxLength = boxLength;
 		this.freeArea = this.boxLength * this.boxLength;
@@ -77,6 +87,7 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 		this.freeArea = freeArea;
 		this.fillArea = fillArea;
 		this.fillRate = fillRate;
+		this.overlapArea = overlapArea;
 		this.id = id;
 	}
 
@@ -275,16 +286,30 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 	}
 
 	/**
-	 * Select a rectangle from this box. If overlapping is permitted, the
-	 * probability that a rectangle is selected is proportional to its overlap
-	 * area.
+	 * Check if it is possible to insert the given MRectangle into this box
+	 * 
+	 * @param rect
+	 * @return
+	 */
+	public boolean checkInsertable(MRectangle rect) {
+		MRectangle clonedRect = rect.clone();
+		MBox clonedThis = this.clone();
+		return clonedThis.optimalInsert(clonedRect) != null;
+	}
+
+	/**
+	 * Select a random rectangle from this box. <br>
+	 * If this box does not contain any overlapping, the probability
+	 * distribution among the rectangles is uniform. <br>
+	 * If this box contains overlapping, the probability that a rectangle is selected
+	 * is proportional to its overlap area.
 	 * 
 	 * @return The index of the selected rectangle
 	 */
 	public MRectangle getRandomRect() {
 		if (this.isEmptyBox())
 			throw new RuntimeException("Cannot get random rect from an empty box");
-		if (MRectangle.isOverlapPermitted()) {
+		if (this.getOverlapArea() > 0) {
 			// Case overlapping is permitted
 			if (this.mRectangles.size() > 0) {
 				int randomPart = new Random().nextInt((int) this.getOverlapArea() + 1);
@@ -382,7 +407,7 @@ public class MBox extends Rectangle implements Cloneable, Comparable<MBox> {
 			clonedRectangles.add(mRectangle.clone());
 		}
 		MBox clone = new MBox(this.boxLength, clonedRectangles, this.id, this.freeArea,
-				this.fillArea, this.fillRate);
+				this.fillArea, this.fillRate, this.overlapArea);
 		return clone;
 	}
 

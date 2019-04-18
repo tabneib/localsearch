@@ -34,6 +34,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 
 	@Override
 	public boolean hasNext() {
+//		System.out.println("[GeoNeigh] hasNext()");
 		if (this.noMoreNeighbor)
 			return false;
 		if (this.nextNeighbor == null)
@@ -50,7 +51,7 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		int attempts = 0;
 		this.nextNeighbor = (GeometryBasedSolution) this.makeRandomMove();
 		while (this.nextNeighbor == null && attempts < MAX_REPOSITIONING_ATTEMPTS) {
-			System.out.println("attempts: " + attempts);
+			// System.out.println("attempts: " + attempts);
 			this.nextNeighbor = (GeometryBasedSolution) this.makeRandomMove();
 			attempts++;
 		}
@@ -65,8 +66,9 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		if (((GeometryBasedSolution) this.owner).getBoxes().size() < 2
 				|| this.iteratedNeighbors >= MAX_NEIGHBORS)
 			return null;
+
 		GeometryBasedSolution neighbor = ((GeometryBasedSolution) this.owner).clone();
-		
+
 		// Pick two random boxes
 		int sourceBoxIndex = this.getRandomBoxIdx(neighbor);
 		int destinationBoxIndex = this.getRandomBoxIdx(neighbor);
@@ -79,14 +81,16 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 		// Pick random rectangle
 		MBox sourceBox = neighbor.getBoxes().get(sourceBoxIndex);
 		MRectangle randomRect = sourceBox.getRandomRect();
+//		System.out.println(
+//				"---> Found randomRect with overlapArea: " + randomRect.getOverlapArea());
 		MBox destinationBox = neighbor.getBoxes().get(destinationBoxIndex);
-		MRectangle insertedRect = destinationBox.optimalInsert(randomRect);
-		if (insertedRect == null)
+		// MRectangle insertedRect = destinationBox.optimalInsert(randomRect);
+		if (!destinationBox.checkInsertable(randomRect))
 			return null;
 
 		if (this.isTabooMode()) {
 			MFeature removedFeature = new GeometryBasedFeature(randomRect, sourceBox);
-			MFeature insertedFeature = new GeometryBasedFeature(insertedRect,
+			MFeature insertedFeature = new GeometryBasedFeature(randomRect,
 					destinationBox);
 			if (!this.checkInsertable(insertedFeature)
 					|| !this.checkRemovable(removedFeature))
@@ -95,23 +99,27 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 				neighbor.addRemovedFeature(removedFeature);
 				neighbor.addInsertedFeature(insertedFeature);
 			}
-		} 
+		}
+//		System.out.println(
+//				"[GeoNeigh] makeRandomMove() - found new Reposition. Going to remove from SOURCE BOX...");
 		sourceBox.removeRect(randomRect);
+//		System.out.println("removed.");
 		if (!sourceBox.isEmptyBox())
 			sourceBox.optimalSort();
-//		neighbor.revalidateObjective();
-		insertedRect.setRepositioned();
+		// neighbor.revalidateObjective();
+		destinationBox.optimalInsert(randomRect).setRepositioned();
 		sourceBox.setRepositionSrc();
 		sourceBox.setRemovedRect(randomRect);
 		destinationBox.setRepositionDest();
 		this.iteratedNeighbors++;
+		neighbor.revalidateTotalOverlapArea();
 		return neighbor;
 	}
-	
 
 	/**
-	 * Randomly select a box in the given solution. The probability that a box is
-	 * selected is proportional to its free area.
+	 * Randomly select a box in the given solution. The probability that a box
+	 * is selected is proportional to its free area. <br>
+	 * If overlap is permitted, overlap area is also taken into account.
 	 * 
 	 * TODO: adapt for Overlap Mode
 	 * 
@@ -120,18 +128,21 @@ public class GeometryBasedNeighborhood extends Neighborhood {
 	private int getRandomBoxIdx(GeometryBasedSolution solution) {
 		double totalFreeArea = 0;
 		for (MBox mBox : solution.getBoxes())
-			totalFreeArea += mBox.getFreeArea();
+			totalFreeArea += (mBox.getFreeArea() + mBox.getOverlapArea() * Math
+					.pow(mBox.getOverlapArea(), MRectangle.getOverlapPenaltyRate()));
 		double random = totalFreeArea * Math.random();
 		int index = 0;
 		for (MBox mBox : solution.getBoxes()) {
-			random -= mBox.getFreeArea();
-			if (random <= 0)
+			random -= (mBox.getFreeArea() + mBox.getOverlapArea() * Math
+					.pow(mBox.getOverlapArea(), MRectangle.getOverlapPenaltyRate()));
+			if (random <= 0) {
 				return index;
+			}
 			index++;
 		}
 		return solution.getBoxes().size() - 1;
 	}
-	
+
 	@Override
 	public Solution next() {
 		if (this.hasNext()) {

@@ -22,11 +22,6 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 
 		this.startTimer();
 
-		System.out.println("initial solution's objective value: "
-				+ this.currentSolution.getObjective());
-//		if (true)
-//			throw new RuntimeException();
-
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext()) {
 			((MSolution) this.currentSolution).removeEmptyBoxes(0);
@@ -34,12 +29,7 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				this.currentSolution = neighbor;
 				neighborhood = neighbor.getNeighborhood();
-				// System.out.println(
-				// "------------------------- current solution UPDATED
-				// -----------------------------");
 			}
-			System.out.println("Not better: " + this.currentSolution.getObjective()
-					+ " < " + neighbor.getObjective());
 			this.increaseTotalRounds();
 		}
 		this.stopTimer();
@@ -52,6 +42,7 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 	public void runStep() {
 		if (this.isFinished())
 			throw new RuntimeException("Algorithm already terminated!");
+		
 		((MSolution) this.currentSolution).removeEmptyBoxes(0);
 		Neighborhood neighborhood = this.currentSolution.getNeighborhood();
 		while (neighborhood.hasNext()) {
@@ -59,11 +50,13 @@ public class LocalSearch extends NeighborhoodBasedAlgo {
 			if (neighbor.isBetterThan(this.currentSolution)) {
 				neighbor.setIndex(this.currentSolution.getIndex() + 1);
 				this.currentSolution = neighbor;
+				this.increaseTotalRounds();
 				break;
 			}
 			this.increaseTotalRounds();
 		}
-		if (!neighborhood.hasNext())
+		if (!neighborhood.hasNext()) {
 			this.setFinished();
+		}
 	}
 }

@@ -5,9 +5,7 @@ import java.util.Iterator;
 
 import de.nhd.localsearch.problem.MOptProblem;
 import de.nhd.localsearch.problem.OptProblem;
-import de.nhd.localsearch.problem.geometry.MRectangle;
 import de.nhd.localsearch.solutions.MFeature;
-import de.nhd.localsearch.solutions.MSolution;
 import de.nhd.localsearch.solutions.Solution;
 
 /**

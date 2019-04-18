@@ -49,9 +49,6 @@ public class RuleBasedNeighborhood extends Neighborhood {
 			this.iteratedNeighbors++;
 
 			if ((this.iteratedNeighbors > MAX_NEIGHBORS || neighbor == null)) {
-				System.out.println("RuleBasedNeighborhood: No more neighbor!");
-				System.out.println("Solution's total overlap area: "
-						+ ((MSolution) this.owner).getTotalOverlapArea());
 				this.noMoreNeighbor = true;
 			}
 		}
@@ -89,10 +86,6 @@ public class RuleBasedNeighborhood extends Neighborhood {
 		// Permute all rectangles of non-optimal boxes
 		neighborPerm.addAll(this.permute(rects));
 		Solution neighbor = new RuleBasedSolution(this.owner.getProblem(), neighborPerm);
-//		System.out.println("New neighbor! overlap area: "
-//				+ ((MSolution) neighbor).getTotalOverlapArea());
-//		System.out.println(
-//				"checkOverlapNotEffective() = " + this.checkOverlapNotEffective());
 		if (this.isTabooMode()) {
 			((RuleBasedSolution) neighbor).addInsertedFeature(this.insertedFeature);
 			((RuleBasedSolution) neighbor).addRemovedFeature(this.removedFeature);

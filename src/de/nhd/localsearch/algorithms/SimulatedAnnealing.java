@@ -56,8 +56,6 @@ public class SimulatedAnnealing extends NeighborhoodBasedAlgo {
 				this.currentSolution = neighbor;
 				neighborhood = neighbor.getNeighborhood();
 			}
-			System.out.println("Not better: " + this.currentSolution.getObjective()
-			+ " < " + neighbor.getObjective());
 			this.increaseTotalRounds();
 
 		}
